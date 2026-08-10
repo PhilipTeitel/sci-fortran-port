@@ -1,0 +1,52 @@
+modernization:
+  legacyRepoPath: ../scifortran-legacy
+  sourceStack:
+    family: fortran
+    language: fortran
+    dialect: TBD
+    version: TBD
+    compiler: TBD
+      name: TBD
+      version: TBD
+    build:
+      system: TBD
+      version: TBD
+    numeric:
+      libraries: []
+      precision: TBD
+    knonHazards:
+      - COMMON
+      - EQUIVALENCE
+      - implicit typing
+      - column-major arrays
+      - fixed-form IO
+      - GOTO
+      - numeric precision drift
+
+  targetStack:
+    language: C#
+    version: .NET 8
+    framework: ASP.NET Core
+
+  oracleTier: T3 documented-only
+
+  evidenceGrades:
+    E1: verified
+    E2: documented
+    E3: code-derived
+    E4: inferred
+    E5: unknown
+
+  stagingStrategies: [strangler, phased-rewrite, big-bang-parallel-run]
+  structureFidelity: [preserve-then-refactor, refactor-now]
+  defectPolicy: reproduce-then-refactor
+
+  parity:
+    numericTolerance:
+      relative: 1e-6
+      absolute: 1e-6
+    textNormalization:
+      whitespace:
+        trimWhitespace: true
+        normalizeLineEndings: true
+        caseSensitivity: true
