@@ -149,7 +149,7 @@ Passing the script's formula/copy comparison is not a parity claim. T1 establish
 ## 9. Links
 
 - Behavior catalog: `docs/modernization/behaviors/BEH-NNN-*.md` (none created yet)
-- Defect ledger: `docs/modernization/defect-ledger.md` (not created yet)
+- Defect ledger: `docs/modernization/defect-ledger.md` (DEF-001–013 created; all decisions open/TBD)
 - Parity reports: `docs/modernization/parity/{STORY-ID}-parity.md`
 
 *Created: 2026-08-09 | Probe refreshed: 2026-08-10*
