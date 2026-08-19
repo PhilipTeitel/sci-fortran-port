@@ -6,7 +6,7 @@
 
 # Legacy Flow: `fftgf` complex-column I/O (`(Re,Im)` vs `(Im,Re)`)
 
-**Behavior:** `BEH-004`
+**Behavior:** `BEH-104`
 **Legacy surface:** `fftgf` CLI (primary); annotations for `ffcmplx`, `SLREAD`/`SLPLOT` complex overloads, `COMMON_VARS` `txtfy`
 **Evidence grade:** `E3 code-derived` (help strings `E2 documented`; no `E1` asymmetric complex-column capture; secondary `ffcmplx` resolve path `E5 unknown`)
 **Date:** `2026-08-10`
@@ -17,13 +17,13 @@
 
 **In scope**
 
-- Highest-risk observable path for BEH-004: `fftgf` from help/args → stdin or file two-column read → in-memory `complex(8)` → FFT/`fftgf_*` transform → default vs `ex=T` two-column write to stdout/file.
+- Highest-risk observable path for BEH-104: `fftgf` from help/args → stdin or file two-column read → in-memory `complex(8)` → FFT/`fftgf_*` transform → default vs `ex=T` two-column write to stdout/file.
 - Secondary annotations where the same external column contract splits: `ffcmplx` help/`ex`/`sread` call site; `sread`/`splot` integer-X vs real-X complex overloads; `txtfy`/`c_to_ch` diagnostic `(re,im)` strings; matrix-reader anomalies that affect any shared IOTOOLS codec story.
 
 **Out of scope**
 
 - FFT mathematical correctness, backend choice (NR/FFTW/MKL), normalization, and sign conventions (GAP-011 / BEH for FFT content).
-- Exact list-directed byte formatting, locale, NaN/Infinity spelling (BEH-003 / GAP-007) except where column *order* is decided.
+- Exact list-directed byte formatting, locale, NaN/Infinity spelling (BEH-103 / GAP-007) except where column *order* is decided.
 - Target architecture, host (CLI vs HTTP), or a single repository-wide codec choice.
 
 **Legacy baseline:** `/Users/philipteitel/code/ADD-migrations/sci-fortran-legacy` at `e586903a26cc50ca8942f20ca3bccbd8814e6252` (read-only).
@@ -103,7 +103,7 @@ sequenceDiagram
 | 5 | `numutils/src/fftgf.f90:82-88` | Select stdout unit 6 or open `fout` on unit 20 | Egress unit | `E3 code-derived` | |
 | 6a | `numutils/src/fftgf.f90:91-101` | `type=fw`: `cfft_1d_forward(data)` then write loop | Transformed `data(:)` → two reals/line | `E3 code-derived` | **Default write:** `dimag, real` ⇒ **(Im, Re)**. **`ex` write:** `real, dimag` ⇒ **(Re, Im)** |
 | 6b | `numutils/src/fftgf.f90:103-113` | `type=bw`: same write order rules after `cfft_1d_backward` | Same as 6a | `E3 code-derived` | Column convention identical to `fw` |
-| 6c | `numutils/src/fftgf.f90:116-133` | `type=rt2rw`: length checks, `fftgf_rt2rw`, `swap_fftrt2rw`, then same `ex`/default write order on `out` | Same column rules | `E3 code-derived` | FFT internals out of BEH-004 scope |
+| 6c | `numutils/src/fftgf.f90:116-133` | `type=rt2rw`: length checks, `fftgf_rt2rw`, `swap_fftrt2rw`, then same `ex`/default write order on `out` | Same column rules | `E3 code-derived` | FFT internals out of BEH-104 scope |
 | 6d | `numutils/src/fftgf.f90:136-152` | `type=rw2rt`: even-length check, `fftgf_rw2rt`, `cfft_1d_ex`, same write order | Same column rules | `E3 code-derived` | |
 | 6e | `numutils/src/fftgf.f90:155-163` | `type=iw2tau`: `fftgf_iw2tau` → write **real** `gout(i)` only | No complex columns on egress | `E3 code-derived` | Complex-column contract does not apply to this egress |
 | 6f | `numutils/src/fftgf.f90:165-177` | `type=tau2iw`: real part of input used for transform; complex `out` written with same `ex`/default order | Same column rules on complex egress | `E3 code-derived` | Help says `tau2iw` needs real input (`:32-33`) while read path still consumes two columns (`:70-71`) — tension in §5 |
@@ -185,7 +185,7 @@ stateDiagram-v2
 | `ffcmplx` `sread(fin,Gread,wm)` generic resolve | No matching procedure signature in inspected `SLREAD` interface; not executed | Unknown whether utility builds or what columns it would load | Build/run on accepted compiler, or retire surface (GAP-019/020) |
 | `ffcmplx` unused `ex` | Help documents swap; body ignores flag | Cannot claim documented `ex` behavior | Dead help vs broken feature vs unsupported utility |
 | `sreadM_IC` / `sreadM_RC` unallocated `imY` and duplicate `imY(2)` reads | Source appears incorrect; reachability/compiler outcome unknown | Shared IOTOOLS codec may be unsafe for matrix complex paths | Defect ledger + execute or prove unreachable |
-| Exact list-directed bytes for `fftgf` columns | No `E1` capture; formatting is BEH-003/GAP-007 | Column *order* recoverable; byte goldens not | Oracle fixtures with asymmetric Re≠Im under accepted locale/compiler |
+| Exact list-directed bytes for `fftgf` columns | No `E1` capture; formatting is BEH-103/GAP-007 | Column *order* recoverable; byte goldens not | Oracle fixtures with asymmetric Re≠Im under accepted locale/compiler |
 | CLI not in scoped oracle T1 | Oracle executed core/fidelity only; CLIs not built | No verified `fftgf` golden yet | Capture when CLI enters retained slice |
 
 ---
@@ -196,25 +196,25 @@ Implications are evidence for Migration Strategist / Architect — **no target d
 
 | Implication | Affected artifact | Evidence |
 |-------------|-------------------|----------|
-| Each retained surface needs a **named** complex-column codec; a global `(Re,Im)` or `(Im,Re)` default would change some observables | GAP-013; future ADR external data contracts; REQ/DOMAIN for BEH-004 | `E2`/`E3` — this flow §§3.1–3.5; `translation-gaps.md` GAP-013 |
+| Each retained surface needs a **named** complex-column codec; a global `(Re,Im)` or `(Im,Re)` default would change some observables | GAP-013; future ADR external data contracts; REQ/DOMAIN for BEH-104 | `E2`/`E3` — this flow §§3.1–3.5; `translation-gaps.md` GAP-013 |
 | `fftgf` list-directed two-column stream is a CLI text boundary separate from HTTP/DTO mapping | GAP-007, GAP-020 | `E3` — `fftgf.f90:70-71,93-113` |
-| Help-vs-writer and unused-`ex` contradictions need owner dispositions before implementation may “fix” or “preserve” | `defect-ledger.md` DEF-001–004, DEF-012–013 (open/TBD); assessment §1/§9 complex-column stop | `E2`/`E3` — BEH-004 tensions; ASSESSMENT complex-column conflict |
+| Help-vs-writer and unused-`ex` contradictions need owner dispositions before implementation may “fix” or “preserve” | `defect-ledger.md` DEF-101–104, DEF-112–113 (open/TBD); assessment §1/§9 complex-column stop | `E2`/`E3` — BEH-104 tensions; ASSESSMENT complex-column conflict |
 | Abs/phase `ffcmplx` egress is not a complex-column writer; risk is mis-parsed input complex | GAP-013, GAP-019 | `E3` — `ffcmplx.f90:50-55` |
-| Diagnostic `txtfy` `(re,im)` must not be assumed equal to file/CLI column order | GAP-013; BEH-003 adjacency | `E3` — `COMVARS.f90:275-283` vs `splotV_RC` |
+| Diagnostic `txtfy` `(re,im)` must not be assumed equal to file/CLI column order | GAP-013; BEH-103 adjacency | `E3` — `COMVARS.f90:275-283` vs `splotV_RC` |
 | Ordering of *pairs* is column semantics (GAP-013), distinct from sort/eigenpair ordering (GAP-014) | GAP-014 only if consumers sort complex keys | `E4` inferred separation — do not conflate without evidence |
-| Process termination / stdout mixing on CLI errors remains adjacent (count mismatch `abort`, dimension `error`) | GAP-026, BEH-005 | `E3` — `fftgf.f90:77,118,138` |
+| Process termination / stdout mixing on CLI errors remains adjacent (count mismatch `abort`, dimension `error`) | GAP-026, BEH-105 | `E3` — `fftgf.f90:77,118,138` |
 | Asymmetric Re≠Im fixtures are mandatory before accepting any codec | Oracle §7; GAP-013 verification strategy | `E4`/`E5` — no E1 complex-column capture yet |
 
 ---
 
 ## 7. Links
 
-- Behavior: `docs/modernization/behaviors/BEH-004-complex-column-ordering.md`
-- Related behavior (format adjacency): `docs/modernization/behaviors/BEH-003-numeric-text-formatting.md`
+- Behavior: `docs/modernization/behaviors/BEH-104-complex-column-ordering.md`
+- Related behavior (format adjacency): `docs/modernization/behaviors/BEH-103-numeric-text-formatting.md`
 - Translation gaps: `docs/modernization/translation-gaps.md` — GAP-007, GAP-013, GAP-014 (ordering family, not pair-swap), GAP-020, GAP-026
 - Oracle: `docs/modernization/oracle.md` (CLI/`fftgf` outside scoped T1; complex-column fixtures still open)
 - Assessment stop: `docs/modernization/ASSESSMENT.md` §9 complex-column conflict
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-001–007, DEF-012–013 (all open/TBD); contradictions in §5 map to those IDs
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-101–107, DEF-112–113 (all open/TBD); contradictions in §5 map to those IDs
 
 ### Tensions / conflicts
 

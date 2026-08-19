@@ -1,4 +1,4 @@
-# BEH-001: `real(8)` / `complex(8)` numeric representation contract
+# BEH-101: `real(8)` / `complex(8)` numeric representation contract
 
 **Status:** Draft
 **Evidence grade:** `E3 code-derived` (overall; exact IEEE widths, rounding, and overflow remain `E5 unknown`)
@@ -43,7 +43,7 @@ Public SciFortran numerics are declared as Fortran kind-8 reals and complexes (`
 | Whole-source scan found no explicit `real(16)`/`complex(16)` declarations despite `ddp=16`. | `E3` — `docs/modernization/legacy-map.md` §2; GAP-008 | yes — whether quad is ever intended |
 | Kind values are implementation selections, not a portable precision guarantee across compilers. | `E3`/`E5` — GAP-008; `docs/modernization/legacy-map.md` §2 | yes |
 | Complex intrinsic pairing is Fortran `(real_part, imag_part)` in constructors such as `cmplx(rey,imy,8)` and constants `zero`/`xi`/`one`. | `E3` — `src/COMVARS.f90:13-15`; `numutils/src/fftgf.f90:71` | no |
-| Configured parity tolerances (`1e-6`) and fidelity script `TOL=1e-10` are provisional comparison knobs, not proven kind-width requirements. | `E2`/`E3`/`E4` — `.cursor/workflow.config.yml:44-47`; `scripts/fidelity.sh:11`; INT-006; **DEF-008** open/TBD | yes |
+| Configured parity tolerances (`1e-6`) and fidelity script `TOL=1e-10` are provisional comparison knobs, not proven kind-width requirements. | `E2`/`E3`/`E4` — `.cursor/workflow.config.yml:44-47`; `scripts/fidelity.sh:11`; INT-006; **DEF-108** open/TBD | yes |
 
 ## 6. Error handling and edge cases
 
@@ -96,13 +96,13 @@ And no portable claim is made about exact byte width or IEEE edge results until 
 
 - Intent ledger: `docs/modernization/intent-ledger.md` (INT-006 tolerance)
 - Legacy flow: `docs/modernization/flows/` (none yet)
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-008 (open/TBD)
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-108 (open/TBD)
 - Related gaps: GAP-008, GAP-009
 - Assessment Condition 7: `docs/modernization/ASSESSMENT.md` §8
 
 ### Tensions / conflicts
 
-- Workflow relative/absolute `1e-6` conflicts with fidelity absolute-only `1e-10`; neither is an accepted parity requirement (**DEF-008** open/TBD). `E2`/`E3`/`E4` — `.cursor/workflow.config.yml:44-47`; `scripts/fidelity.sh:11`; INT-006; oracle §6.
+- Workflow relative/absolute `1e-6` conflicts with fidelity absolute-only `1e-10`; neither is an accepted parity requirement (**DEF-108** open/TBD). `E2`/`E3`/`E4` — `.cursor/workflow.config.yml:44-47`; `scripts/fidelity.sh:11`; INT-006; oracle §6.
 - Kind-8 declarations are abundant, but portable precision equivalence to C# `double`/`Complex` is unproven. `E3`/`E5` — GAP-008.
 - Probe established exact cross-build repeatability for exercised values, not a product tolerance policy. `E1`/`E5` — oracle §§1,6.
 

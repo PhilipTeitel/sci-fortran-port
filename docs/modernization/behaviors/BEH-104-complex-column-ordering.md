@@ -1,4 +1,4 @@
-# BEH-004: Complex-column ordering `(Re,Im)` vs `(Im,Re)` contract
+# BEH-104: Complex-column ordering `(Re,Im)` vs `(Im,Re)` contract
 
 **Status:** Draft
 **Evidence grade:** `E3 code-derived` (overall; help text `E2 documented`; contradictions unresolved; no `E1` complex-column capture)
@@ -58,17 +58,17 @@ Complex values appear externally as pairs of real columns or as `(re,im)` diagno
 
 | Case | Legacy behavior | Evidence | Defect decision |
 |------|-----------------|----------|-----------------|
-| Help vs default `fftgf` output order | Help implies `(re,im)`; default write is `(im,re)` | `E2`/`E3` — `numutils/src/fftgf.f90:32,97-100` | **DEF-001** open/TBD |
-| Default `fftgf` input vs output asymmetry | Read `(Re,Im)`; write `(Im,Re)` | `E3` — `numutils/src/fftgf.f90:70-71,97-100` | **DEF-002** open/TBD |
-| `ffcmplx` `ex` flag | Documented; unused in body | `E2`/`E3` — `numutils/src/ffcmplx.f90:23-50` | **DEF-003** open/TBD |
-| `ffcmplx` `sread` argument order | `sread(fin,Gread,wm)` vs `pade`/`sreadM_RC` shape | `E3`/`E5` — `numutils/src/ffcmplx.f90:50`; `pade.f90:59` | **DEF-004** open/TBD |
-| IC vs RC column split | Integer-X `(Re,Im)`; real-X `(Im,Re)` | `E3` — `slread_sread_V.f90` / `slplot_splot_V.f90` | **DEF-005** open/TBD |
-| `txtfy` vs file/CLI writers | Diagnostic `(re,im)` vs several `(im,re)` writers | `E3` — `COMVARS.f90:275-283` | **DEF-006** open/TBD |
-| `sreadM_*` unallocated `imY` path | Source appears to use unallocated `imY` | `E3` — `src/slread_sread_M.f90:200-207` | **DEF-007** open/TBD |
-| Dual-Y formatted read duplicate `imY(2)` | Formatted branch writes `imY(2)` twice instead of `reY(2)` | `E3` — `src/slread_sread_M.f90:195,87` | **DEF-007** open/TBD |
-| `fftgf` unused `STRIDE` | Parsed; not applied in body | `E3`/`E5` — `numutils/src/fftgf.f90:46,56` | **DEF-012** open/TBD |
-| `tau2iw` help vs two-column read | Help claims real input; reader takes two columns | `E2`/`E3` — `fftgf.f90:32-33,70-71` | **DEF-013** open/TBD |
-| Missing/`ffcmplx` not in default build | Source exists; omitted from `all` | `E3`/`E5` — `numutils/src/Makefile:8,24-26` | TBD (scope; see DEF-003/004) |
+| Help vs default `fftgf` output order | Help implies `(re,im)`; default write is `(im,re)` | `E2`/`E3` — `numutils/src/fftgf.f90:32,97-100` | **DEF-101** open/TBD |
+| Default `fftgf` input vs output asymmetry | Read `(Re,Im)`; write `(Im,Re)` | `E3` — `numutils/src/fftgf.f90:70-71,97-100` | **DEF-102** open/TBD |
+| `ffcmplx` `ex` flag | Documented; unused in body | `E2`/`E3` — `numutils/src/ffcmplx.f90:23-50` | **DEF-103** open/TBD |
+| `ffcmplx` `sread` argument order | `sread(fin,Gread,wm)` vs `pade`/`sreadM_RC` shape | `E3`/`E5` — `numutils/src/ffcmplx.f90:50`; `pade.f90:59` | **DEF-104** open/TBD |
+| IC vs RC column split | Integer-X `(Re,Im)`; real-X `(Im,Re)` | `E3` — `slread_sread_V.f90` / `slplot_splot_V.f90` | **DEF-105** open/TBD |
+| `txtfy` vs file/CLI writers | Diagnostic `(re,im)` vs several `(im,re)` writers | `E3` — `COMVARS.f90:275-283` | **DEF-106** open/TBD |
+| `sreadM_*` unallocated `imY` path | Source appears to use unallocated `imY` | `E3` — `src/slread_sread_M.f90:200-207` | **DEF-107** open/TBD |
+| Dual-Y formatted read duplicate `imY(2)` | Formatted branch writes `imY(2)` twice instead of `reY(2)` | `E3` — `src/slread_sread_M.f90:195,87` | **DEF-107** open/TBD |
+| `fftgf` unused `STRIDE` | Parsed; not applied in body | `E3`/`E5` — `numutils/src/fftgf.f90:46,56` | **DEF-112** open/TBD |
+| `tau2iw` help vs two-column read | Help claims real input; reader takes two columns | `E2`/`E3` — `fftgf.f90:32-33,70-71` | **DEF-113** open/TBD |
+| Missing/`ffcmplx` not in default build | Source exists; omitted from `all` | `E3`/`E5` — `numutils/src/Makefile:8,24-26` | TBD (scope; see DEF-103/104) |
 
 ## 7. Draft Gherkin
 
@@ -112,10 +112,10 @@ And any help-text contradiction is treated as an unresolved tension until a defe
 ## 11. Links
 
 - Intent ledger: `docs/modernization/intent-ledger.md`
-- Legacy flow: `docs/modernization/flows/BEH-004-fftgf-complex-column-io.md`
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-001–007, DEF-012–013 (all open/TBD)
+- Legacy flow: `docs/modernization/flows/BEH-104-fftgf-complex-column-io.md`
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-101–107, DEF-112–113 (all open/TBD)
 - Related gaps: GAP-013, GAP-007
-- Related behavior: BEH-003
+- Related behavior: BEH-103
 
 ### Tensions / conflicts
 
