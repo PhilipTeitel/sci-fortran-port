@@ -1,124 +1,142 @@
-# Domain Model: Linear sequence generation (first slice)
+# Domain Model: SciFortran numerical library (C# port)
 
 **Source material:**
-- `docs/PURPOSE.md`
-- `docs/modernization/behaviors/BEH-001-linspace.md`
-- `docs/modernization/flows/BEH-001-linspace.md`
-- CLI help text in `numutils/src/linspace.f90` (job description only)
-- `src/tools_grids.f90` `linspace` (code-derived rules)
-- Owner decisions and ADRs 001–003 dated 2026-08-19
+- `docs/PURPOSE.md` (whole-library POC)
+- `src/SCIFOR.f90` public facade at `e586903`
+- `docs/modernization/behavior-catalog.md`
+- ADRs 001–005
+- First recovered subdomain: BEH-001 `linspace`
 
 **Date:** 2026-08-19
-**Status:** Draft (bounded to BEH-001)
+**Status:** Draft (library-wide bounded contexts; linspace recovered in detail)
 
 ---
 
 ## 1. Purpose alignment
 
-The purpose of this exercise is to re-host one recovered numerical job: produce evenly spaced numbers over a specified interval. This model names only the concepts required for that job. It does not model FFT, matrices, plotting, or ASP.NET. See `docs/PURPOSE.md`.
+The purpose is to re-host the retained SciFortran library in C# so numerical jobs keep their legacy meaning: generate grids, evaluate functions, integrate, invert and diagonalize matrices, transform Green functions, optimize, interpolate, sample, and (as adapters) drive the existing CLI jobs. This model names the bounded contexts required to plan that port. It does not model ASP.NET, MPI, or missing plot/FFT backends. See `docs/PURPOSE.md` and ADR-005.
 
 ## 2. Ubiquitous language
 
 | Term | Definition | Accepted aliases | Do not use | Source |
 |------|------------|------------------|------------|--------|
-| Linear sequence | Ordered list of evenly spaced real samples over an interval | `linspace` result | “linspace array” as a product noun; Fortran-specific `array(num)` | BEH-001; CLI DESCRIPTION |
-| Start | Value of the first sample when the start endpoint is included | `start`, CLI `wmin`/`a` | “left bound” | BEH-001; `src/tools_grids.f90:1`; `numutils/src/linspace.f90:22` |
-| Stop | Value of the last sample when the stop endpoint is included | `stop`, CLI `wmax`/`b` | “right bound” | BEH-001; `src/tools_grids.f90:1`; `numutils/src/linspace.f90:23` |
-| Length | Number of samples in the sequence | `num`, CLI `L` | “N” in user-facing text (legacy abort text still says `N`) | BEH-001; `numutils/src/linspace.f90:24` |
-| Inclusive endpoints | Default mode: both Start and Stop appear in the sequence | default `istart`/`iend` true | NumPy parameter names as domain terms unless adopted later | `src/tools_grids.f90:8-14`; FIX-001 |
-| Step | Uniform spacing between adjacent samples | `mesh` when returned | “delta” | `src/tools_grids.f90:13-14,29` |
-| Domain failure | Call rejected instead of returning a sequence | legacy `error`/`STOP` | HTTP status, CLR exception type names | ADR-002; `src/COMVARS.f90:189-199` |
+| SciFor library | The retained public numerical capability formerly imported via `use SCIFOR` | managed port, C# library | “ASP.NET app” as the product | `src/SCIFOR.f90`; ADR-004 |
+| Port | Host-neutral application service for one retained Fortran public procedure or cohesive family | use case | HTTP endpoint as the domain | ADR-002, ADR-005 |
+| Driving adapter | Something that invokes a port (managed API now; CLI later; HTTP optional) | CLI adapter | “the Fortran program is the domain” | ADR-005 |
+| Linear sequence | Ordered evenly spaced real samples over an interval | `linspace` result | Fortran `array(num)` as a product noun | BEH-001 |
+| Start / Stop / Length | Inclusive-grid request fields | `start`, `stop`, `num` | CLI-only `wmin`/`L` as library defaults | BEH-001 |
+| Domain failure | Call rejected instead of returning a result | legacy `error`/`STOP` | HTTP status as the domain concept | ADR-002 |
+| Probe baseline | Accepted POC oracle revision and environment | `e586903` probe | “production SciFortran release” | ADR-001, ADR-005 |
 
-## 3. Data dictionary
-
-| Field | Owner entity | Type / format | Required? | Constraints / allowed values | Source of value | Source |
-|-------|--------------|---------------|-----------|------------------------------|-----------------|--------|
-| `LinearSequenceRequest.start` | LinearSequenceRequest | real, kind-8 / binary64 | Yes | Unconstrained in recovered code | caller | BEH-001 §3 |
-| `LinearSequenceRequest.stop` | LinearSequenceRequest | real, kind-8 / binary64 | Yes | Unconstrained in recovered code | caller | BEH-001 §3 |
-| `LinearSequenceRequest.length` | LinearSequenceRequest | integer count | Yes | Must be `>= 2` for inclusive endpoints; `< 0` is a domain failure | caller | BEH-001 §3, §5 |
-| `LinearSequenceRequest.includeStart` | LinearSequenceRequest | boolean | No (default true) | TBD whether first-slice port exposes this | caller or default | E3 `istart`; open question |
-| `LinearSequenceRequest.includeStop` | LinearSequenceRequest | boolean | No (default true) | TBD whether first-slice port exposes this | caller or default | E3 `iend`; open question |
-| `LinearSequence.samples` | LinearSequence | ordered list of reals, length = request.length | Yes on success | FIX-001: exact `0,0.25,0.5,0.75,1` | derived | FIX-001; ADR-003 |
-| `LinearSequence.step` | LinearSequence | real | Conditional | Present if caller asked for `mesh`; `(stop-start)/(length-1)` when inclusive | derived | E3 `mesh`; open question |
-
-## 4. Core entities
-
-### LinearSequenceRequest
-
-- **Meaning:** The caller’s specification of an interval and how many samples to take.
-- **Key attributes:** `start`, `stop`, `length`; optional endpoint inclusion
-- **Identity:** Value object; two requests with the same attributes are the same request
-- **Invariants:**
-  - `length` is an integer sample count, not a step size (CLI `RANGE` `a:b:L` uses L as length). `E3` — `numutils/src/linspace.f90:25,41`.
-  - Inclusive default requires `length >= 2` or the call is a domain failure. `E3` — `src/tools_grids.f90:12`.
-- **Lifecycle:** TBD: no persistent lifecycle; created per invocation
-- **Source:** BEH-001
-
-### LinearSequence
-
-- **Meaning:** The ordered samples that satisfy a request.
-- **Key attributes:** `samples`; optional `step`
-- **Identity:** Value object determined by its samples
-- **Invariants:**
-  - `samples` count equals `length` on success.
-  - Inclusive default: first sample equals `start` and last sample equals `stop` when the formula is exact (true for FIX-001). `E1/E3`.
-  - Adjacent spacing equals `step` for the inclusive formula. `E3`.
-- **Lifecycle:** TBD: no persistent lifecycle
-- **Source:** BEH-001, FIX-001
-
-## 5. Relationships
+## 3. Bounded contexts
 
 ```mermaid
-erDiagram
-    LINEAR_SEQUENCE_REQUEST ||--o| LINEAR_SEQUENCE : "evaluates to"
+flowchart LR
+  subgraph adapters [Driving adapters]
+    ManagedAPI[Managed C# API]
+    CLI[CLI programs]
+    HTTP[HTTP later]
+  end
+  subgraph core [Host-neutral library]
+    Grids[Grids and arrays]
+    Funcs[Scalar functions]
+    Quad[Quadrature]
+    Mat[Matrices]
+    Fft[FFT / Green time-frequency]
+    Opt[Root finding / least squares]
+    Spl[Splines]
+    Rand[Random and statistics]
+    Cond[Many-body helpers]
+    Io[File and plot data]
+  end
+  ManagedAPI --> core
+  CLI --> core
+  HTTP -.-> core
 ```
 
-| Relationship | Cardinality | Ownership / lifecycle dependency | Source |
-|--------------|-------------|-----------------------------------|--------|
-| LinearSequenceRequest -> LinearSequence | one-to-one on success; none on domain failure | Sequence is derived; request is not persisted | BEH-001 |
+| Context | Meaning | Legacy module(s) | First catalog IDs |
+|---------|---------|------------------|-------------------|
+| Grids and arrays | Inclusive/log/integer/power meshes, sort/shift, derivatives | `TOOLS` | BEH-001–BEH-005, BEH-010 |
+| Scalar functions | Fermi, step, sign, Faddeeva | `FUNCTIONS` public exports | BEH-003, BEH-020 |
+| Quadrature | Trapezoid/Simpson, Kramers–Kronig | `INTEGRATE` | BEH-030 |
+| Matrices | Inverse, eigen, linear solve | `MATRIX` | BEH-040 |
+| Transforms | FFT and imaginary-time/frequency maps | `FFTGF` (NR) | BEH-050 |
+| Optimization | Broyden, Brent, MINPACK facades | `OPTIMIZE` | BEH-060 |
+| Splines | Linear/cubic/poly interpolation | `SPLINE` | BEH-070 |
+| Random and statistics | Sampling, histogram, moments | `RANDOM`, `STATISTICS` | BEH-080 |
+| Many-body helpers | Green-function types, Padé, square lattice, Bethe DOS | `GREENFUNX`, `PADE`, `SQUARE_LATTICE`, Bethe in `TOOLS` | BEH-090 |
+| File and plot data | Paths, gzip, `splot`/`sread` payloads | `IOTOOLS` | BEH-100 |
+| CLI adapters | Process arguments and streams over the ports above | `numutils/src/*` | BEH-200+ |
 
-## 6. Aggregates / consistency boundaries
+## 4. Data dictionary (recovered subdomain)
 
-| Boundary | Entities inside | Invariants protected | External interactions | Design implications |
-|----------|-----------------|----------------------|-----------------------|---------------------|
-| Linear sequence evaluation | LinearSequenceRequest, LinearSequence | Inclusive formula, length, abort rules | Managed-API driving adapter only in this slice | Host-neutral port; no I/O. ADR-002 |
+First recovered entities remain those of BEH-001. Other contexts get dictionaries during their `/document-legacy` slice.
 
-## 7. Lifecycles and state transitions
+| Field | Owner entity | Type / format | Required? | Constraints | Source |
+|-------|--------------|---------------|-----------|-------------|--------|
+| `LinearSequenceRequest.start` | LinearSequenceRequest | binary64 | Yes | Unconstrained in recovered code | BEH-001 |
+| `LinearSequenceRequest.stop` | LinearSequenceRequest | binary64 | Yes | Unconstrained in recovered code | BEH-001 |
+| `LinearSequenceRequest.length` | LinearSequenceRequest | integer count | Yes | Inclusive default requires `>= 2`; `< 0` is a domain failure | BEH-001 |
+| `LinearSequence.samples` | LinearSequence | ordered binary64 list | Yes on success | FIX-001: exact `0,0.25,0.5,0.75,1` | FIX-001; ADR-003 |
 
-### LinearSequenceRequest lifecycle
+## 5. Core entities (recovered)
 
-| From state | Event / command | Guard | To state | Side effects | Source |
-|------------|-----------------|-------|----------|--------------|--------|
-| Specified | Evaluate | inclusive and length >= 2 | Succeeded | LinearSequence produced | BEH-001 FIX-001 |
-| Specified | Evaluate | length < 0, or inclusive and length < 2 | Failed | Domain failure; legacy STOP not retained at the port | BEH-001 §6; ADR-002 |
+### LinearSequenceRequest / LinearSequence
 
-No stored entity states exist in the legacy function. `E3`.
+Unchanged from the 2026-08-19 linspace recovery: value objects, no persistence, inclusive formula, typed domain failure instead of `STOP`. See BEH-001.
 
-## 8. Domain events
+Library-wide entities (Matrix, Transform, Histogram, …) are **TBD per slice** and must not be invented here.
 
-| Event | Emitted when | Carries | Consumers / observers | Source |
-|-------|--------------|---------|-----------------------|--------|
-| LinearSequenceProduced | Evaluation succeeds | samples (and step if requested) | Managed-API caller | BEH-001 |
-| LinearSequenceRejected | Evaluation fails a length/endpoint rule | failure identity/message TBD | Managed-API caller | BEH-001 §6; open |
+## 6. Relationships
+
+| Relationship | Cardinality | Notes | Source |
+|--------------|-------------|-------|--------|
+| LinearSequenceRequest → LinearSequence | one-to-one on success | First recovered job | BEH-001 |
+| CLI adapter → library port | many adapters, one arithmetic | CLI must not reimplement grids/FFT | ADR-005 |
+
+## 7. Aggregates / consistency boundaries
+
+| Boundary | Protects | External interactions |
+|----------|----------|----------------------|
+| Linear sequence evaluation | Inclusive formula and length rules | Managed API; later `linspace` CLI |
+| Each later module port | That module’s public contract | Managed API and matching CLI |
+
+Process-global `COMMON_VARS` / RNG state is an adapter or domain-service concern (GAP-002, GAP-015); it is not an aggregate in this draft.
+
+## 8. Domain events (recovered)
+
+| Event | When | Source |
+|-------|------|--------|
+| LinearSequenceProduced | Evaluation succeeds | BEH-001 |
+| LinearSequenceRejected | Length/endpoint rule fails | BEH-001; mapping TBD in `/refine-feature` |
 
 ## 9. Open modeling questions
 
-- [ ] Expose `includeStart` / `includeStop` / `step` on the first managed port, or only the inclusive three-argument job proven by FIX-001?
-- [ ] Canonical name: keep `linspace` as an alias in the managed API, or use only “linear sequence”?
-- [ ] Decreasing intervals and `start == stop` invariants: specify now or wait for fixtures?
-- [ ] Domain-failure vocabulary vs leftover legacy string `N<0` / `N<2`.
+Library-wide (do not block `/plan-migration`):
+
+- [ ] Canonical C# names: keep Fortran identifiers (`linspace`, `fftgf`) as aliases, or rename to ubiquitous-language types only?
+- [ ] How is process-global RNG/timer/diagnostic state exposed without ASP.NET request races?
+- [ ] Which MATRIX/FFT results require order/sign canonicalization?
+
+First-slice (block `/refine-feature` on BEH-001, not library planning):
+
+- [ ] Expose `includeStart` / `includeStop` / `step` on the first managed port?
+- [ ] Decreasing intervals and `start == stop` now or later?
+- [ ] Domain-failure vocabulary vs leftover `N<0` / `N<2` strings?
 
 ## 10. Tensions / conflicts
 
-- CLI defaults (`start=-5`, `stop=5`, `length=1024`) are not library defaults; the library requires explicit `start`, `stop`, and `num`. First slice follows the library. `E3` — `numutils/src/linspace.f90:31-33` vs `src/tools_grids.f90:1-2`.
-- Implementation names (`istart`, `iend`, `mesh`) are candidate port fields, not yet approved ubiquitous language. Marked optional/TBD above.
+- CLI defaults (e.g. `linspace` `wmin=-5`) are not library defaults. Library ports require explicit arguments; CLI adapters apply CLI defaults. `E3`
+- `FUNCTIONS` comments list a huge special-function collection, but the module’s public list is six names. The catalog follows **public exports**, not the include file. ADR-005.
+- Fidelity `arange-5` is a driver loop, not library `arange`. BEH-005 stays T3 until a real `arange` capture exists.
 
 ## 11. Links
 
 - Purpose: `docs/PURPOSE.md`
-- Related ADRs: ADR-001, ADR-002, ADR-003
-- Related behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Catalog: `docs/modernization/behavior-catalog.md`
+- ADRs: ADR-001–005
+- Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 
 ---
 
-*Created: 2026-08-19 | Modeled by: modeler in Legacy recovery mode (in-chat fallback; no subagent delegation)*
+*Updated: 2026-08-19 | Whole-library bounded contexts added; linspace subdomain retained*

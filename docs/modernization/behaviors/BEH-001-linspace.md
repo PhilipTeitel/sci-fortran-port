@@ -1,6 +1,6 @@
 # BEH-001: Generate an inclusive linear sequence (linspace)
 
-**Status:** Ready for Requirements
+**Status:** Recovered; first code slice of the whole-library port (ADR-004). Ready for `/refine-feature` after `/plan-migration` sequences work.
 **Evidence grade:** `E1 verified` for `FIX-001`; `E3 code-derived` for default-endpoint formula and abort conditions; `E5 unknown` for unexecuted optional flags, `mesh`, invalid `num`, and the CLI surface (out of first-slice scope)
 **Legacy surfaces:** Library function `TOOLS.linspace`; exercised by `fidelity/driver.f90`. CLI `numutils/src/linspace.f90` is documented as related and **out of first-slice scope**.
 **Date:** `2026-08-19`
