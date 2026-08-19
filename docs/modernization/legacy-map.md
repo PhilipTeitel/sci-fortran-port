@@ -94,7 +94,7 @@ Topology interpretation: this is a library-centric native codebase, with optimiz
 
 | Surface | Trigger | Inputs | Outputs | Linked behavior ID(s) | Evidence grade | Source or pointer |
 |---|---|---|---|---|---:|---|
-| Sequence generators: `arange`, `linspace`, `logspace` | Invoke executable with numeric options | Start/end/step or count, read through `PARSE_CMD` | Numeric sequence to stdout | TBD | E3 code-derived | `numutils/src/arange.f90:1-29`; `numutils/src/linspace.f90:1-27`; `numutils/src/logspace.f90:1-26` |
+| Sequence generators: `arange`, `linspace`, `logspace` | Invoke executable with numeric options | Start/end/step or count, read through `PARSE_CMD` | Numeric sequence to stdout | BEH-001 covers **library** `linspace` only; CLI remains TBD | E3 code-derived | `numutils/src/arange.f90:1-29`; `numutils/src/linspace.f90:1-27`; `numutils/src/logspace.f90:1-26`; `docs/modernization/behaviors/BEH-001-linspace.md` |
 | Matsubara frequency generator: `wmatsubara` | Invoke executable with frequency/type options | Inverse temperature, count, boson/fermion type | Matsubara frequencies to stdout | TBD | E3 code-derived | `numutils/src/wmatsubara.f90:1-35` |
 | Random generator: `random` | Invoke executable with distribution options | Sample count, distribution, mean/variance/range parameters | Random values to stdout | TBD | E3 code-derived | `numutils/src/random.f90:1-45` |
 | Numerical derivative: `deriv` | Pipe numeric columns to stdin | X/Y columns, derivative order/options | X and derivative values to stdout | TBD | E3 code-derived | `numutils/src/deriv.f90:1-65` |
@@ -112,7 +112,7 @@ Topology interpretation: this is a library-centric native codebase, with optimiz
 | Library API | Compile/link a Fortran consumer using module interfaces | Typed scalar/array arguments and callbacks | Numerical return values, allocated arrays, files, and console messages depending on module | TBD | E3 code-derived | `src/SCIFOR.f90:1-17`; representative interfaces at `src/MATRIX.f90:9-45`, `src/INTEGRATE.f90:8-34`, `src/GREENFUNX.f90:80-91` |
 | Console diagnostics | Calls to `msg`, `warning`, `error`/`abort` | Text and optional ANSI style | Standard output; `error` terminates via `STOP` | TBD | E3 code-derived | `src/COMVARS.f90:86-103,189-227,235-254` |
 
-No linked `BEH-NNN` behavior artifacts exist yet, so behavior IDs are intentionally `TBD`. Observed command names and code paths are not treated as confirmed product requirements.
+No linked `BEH-NNN` behavior artifacts existed at map time. **2026-08-19:** BEH-001 records library `linspace`. Other command names and code paths are still not confirmed product requirements.
 
 ## 6. Data stores and file formats
 
@@ -223,5 +223,6 @@ Measured source-size facts above are repository inventory results, not quality j
 - Assessment: `docs/modernization/ASSESSMENT.md`
 - Dependency ledger: `docs/modernization/dependency-ledger.md`
 - Translation gaps: `docs/modernization/translation-gaps.md`
+- First-slice behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 
-*Created: 2026-08-09 | Incrementally refreshed: 2026-08-10*
+*Created: 2026-08-09 | Incrementally refreshed: 2026-08-10 | First-slice link: 2026-08-19*

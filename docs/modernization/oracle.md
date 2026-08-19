@@ -74,13 +74,13 @@ Exact environment prefix used for every canonical command (snapshot-specific pat
 
 ## 4. Invocation contract
 
-No `BEH-NNN` catalog exists yet. The rows below are the only executed probe scope and remain candidate behavior contracts.
+No `BEH-NNN` catalog existed at probe time. BEH-001 was accepted on 2026-08-19. Other rows remain candidate contracts.
 
 | Behavior | Legacy command / interaction | Inputs | Outputs | Exit / error behavior |
 |----------|------------------------------|--------|---------|-----------------------|
 | `BUILD-TBD` — core plus driver | `<clean-environment-and-sandbox-prefix> /bin/bash <snapshot>/scripts/build.sh` | Accepted source archive; `FC=gfortran`; `FFT_BACKEND=NR`; local OpenBLAS | `lib/libscifor.a`, `lib/libscifor_deb.a`, modules, `.bin/scifor-fidelity` | Exit `0` in both canonical clean snapshots. One expected no-`.git` diagnostic, 310 compiler warning lines, and one duplicate-library linker warning per build. |
 | `BEH-TBD` — fidelity corpus | `<clean-environment-and-sandbox-prefix> /bin/bash <snapshot>/scripts/fidelity.sh` | Built driver; tracked driver literals and `numutils/test/xy2.data`; `TOL=1e-10` | `.fidelity-out/full.out` plus five extracted numeric sections | Exit `0` twice; `5 passed, 0 failed` each run. The script rewrites candidate expected files before comparison, so its PASS result is not fixture-provenance evidence. |
-| `BEH-TBD` — `linspace-5` | Fidelity driver calls `linspace(0,1,5)` | Driver literals | Five formatted real values | E1 execution output; byte-identical across builds. `fidelity/driver.f90:10-17`. |
+| `BEH-001` — `linspace-5` | Fidelity driver calls `linspace(0.d0, 1.d0, 5)` | Driver literals | Five parsed real values accepted as FIX-001 | E1 execution output; byte-identical across builds. Managed-API contract ignores `es24.17` text. `fidelity/driver.f90:12-19`; ADR-001–003. |
 | `BEH-TBD` — `logspace-5` | Fidelity driver calls `logspace(1,1000,5)` | Driver literals | Five formatted real values | E1 execution output; byte-identical across builds. `fidelity/driver.f90:19-25`. |
 | `BEH-TBD` — `arange-5` label only | Fidelity driver prints `real(i,8)` for `i=1..5` | Driver literals | Five formatted real values | E1 driver execution output, but **not** evidence for the legacy `arange` implementation. `fidelity/driver.f90:27-30`. |
 | `BEH-TBD` — `fermi-beta100` | Fidelity driver calls `fermi(x,100)` for five values | `[-2,-1,0,1,2]` | Five two-column rows | E1 execution output; byte-identical across builds. `fidelity/driver.f90:32-39`. |
@@ -93,7 +93,7 @@ No fixture was retained or promoted in probe mode. The rows below record hashes 
 | Fixture ID | Behavior | Inputs | Expected legacy output | Evidence grade | Determinism notes |
 |------------|----------|--------|------------------------|----------------|-------------------|
 | `CAP-20260810-FULL` | Entire fidelity-driver execution | Driver literals plus `numutils/test/xy2.data` | Observed full stdout SHA-256 `14a40532e4e308265dfd09cca956ab7f4249c80de884a1264bc96377d3688dd5`; not retained | `E1 verified` | Same hash in both independent builds. |
-| `CAP-20260810-LINSPACE` | `linspace-5` | `0,1,5` | Observed section SHA-256 `dabd07f92b83714a0e0740223261fc457c517025cf3f4b08cd51380a0082c35c`; not retained | `E1 verified` | 5×1 rows; byte-identical; parsed max difference `0`. |
+| `CAP-20260810-LINSPACE` | `linspace-5` / BEH-001 | `0,1,5` | Parsed values accepted as FIX-001; original stdout not retained. Section SHA-256 `dabd07f92b83714a0e0740223261fc457c517025cf3f4b08cd51380a0082c35c` | `E1 verified` | 5×1 rows; byte-identical; parsed max difference `0`. Promoted 2026-08-19: `docs/modernization/fixtures/FIX-001-linspace-5.md` |
 | `CAP-20260810-LOGSPACE` | `logspace-5` | `1,1000,5` | Observed section SHA-256 `c5b198afbc3ccea1a27ded3ac9f3919952a6662c2465000c84e35e8f964db4fe`; not retained | `E1 verified` | 5×1 rows; byte-identical; parsed max difference `0`. |
 | `CAP-20260810-ARANGE-LABEL` | Driver loop labeled `arange-5` | Integers 1–5 | Observed section SHA-256 `2e104659f3bed55ec95de1c6b444990a60856fc1de30a3ab8aad51e4abda3c17`; not retained | `E1 verified` for driver output only | 5×1 rows; byte-identical; does not exercise legacy `arange`. |
 | `CAP-20260810-FERMI` | `fermi-beta100` | Five X values; beta 100 | Observed section SHA-256 `6f35eadc7f917064b110353cebf6ab6468999625ceae0394744d68be67a1810a`; not retained | `E1 verified` | 5×2 rows; byte-identical; parsed max difference `0`. |
@@ -131,11 +131,11 @@ Passing the script's formula/copy comparison is not a parity claim. T1 establish
 
 ## 8. Open oracle questions
 
-- [ ] Is accepted probe revision `master`/`e586903` also the product/parity baseline, rather than only the revision authorized for this run?
+- [x] Is accepted probe revision `master`/`e586903` also the product/parity baseline, rather than only the revision authorized for this run? **First slice (2026-08-19):** yes for BEH-001 only (ADR-001). Production-wide: still open.
 - [ ] The workflow profile still declares `T3 documented-only` at `.cursor/workflow.config.yml:31`; when should it be reconciled with this scoped T1 decision?
 - [ ] Which library APIs and CLI utilities are supported scope, and which downstream consumers require historical `ZEROS` versus current `OPTIMIZE` contracts?
 - [ ] Which exact production compiler/OS/architecture/numeric libraries define trusted historical behavior, and should this macOS arm64/GNU 16/OpenBLAS/NR environment be accepted for future oracle runs?
-- [ ] Can accepted immutable fixture expectations be obtained? Four current references are Python formulas and one is an unprovenanced copy; none was promoted by this probe.
+- [x] Can accepted immutable fixture expectations be obtained? **FIX-001** records parsed `linspace(0,1,5)` values. Four other references remain formula/copy candidates.
 - [ ] What behavior-specific tolerances, residual/identity rules, ordering, text normalization, locale, complex-column, and error/exit contracts are accepted?
 - [ ] How should non-byte-reproducible archives/executables and blank archive-snapshot revision stamping be corrected without adding `.git` or mutating source?
 - [ ] Which of the compiler warnings, especially conversion and possible/uninitialized-value warnings, affect retained behavior and require defect decisions?
@@ -148,8 +148,9 @@ Passing the script's formula/copy comparison is not a parity claim. T1 establish
 
 ## 9. Links
 
-- Behavior catalog: `docs/modernization/behaviors/BEH-NNN-*.md` (none created yet)
-- Defect ledger: `docs/modernization/defect-ledger.md` (not created yet)
+- Behavior catalog: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Defect ledger: `docs/modernization/defect-ledger.md`
+- Fixture: `docs/modernization/fixtures/FIX-001-linspace-5.md`
 - Parity reports: `docs/modernization/parity/{STORY-ID}-parity.md`
 
-*Created: 2026-08-09 | Probe refreshed: 2026-08-10*
+*Created: 2026-08-09 | Probe refreshed: 2026-08-10 | First-slice promotion: 2026-08-19*
