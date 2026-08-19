@@ -30,7 +30,7 @@ On 2026-08-19 the owner first recovered library `linspace` (BEH-001 / FIX-001, A
 
 A first-slice defect ledger now exists. Apparent defects or historical “fixes” outside BEH-001—including downstream `ZEROS`/`OPTIMIZE` compatibility, FFT sign/backend changes, square-lattice denominator reversal, `logspace` documentation mismatch, complex-column contradictions, and warning-affected routines—must not be silently corrected if those surfaces are later selected. `E1 verified / E3 code-derived / E4 inferred` — `docs/modernization/defect-ledger.md`; `docs/modernization/intent-ledger.md:42-50`; `docs/modernization/oracle.md:122-130,141-144`.
 
-**Planning gate (2026-08-19):** `/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). Implementation-ready C# still starts at BEH-001 after `/refine-feature`.
+**Planning gate (2026-08-19):** `/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). A later coverage pass maps every ADR-005 retained name, including TOOLS convergence checks (SL-014) and `LIST_*`/`VECTORS` internals. Implementation-ready C# still starts at BEH-001 after `/refine-feature`.
 
 ## 2. Evidence consumed
 
