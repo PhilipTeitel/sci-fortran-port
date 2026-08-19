@@ -74,17 +74,17 @@ Exact environment prefix used for every canonical command (snapshot-specific pat
 
 ## 4. Invocation contract
 
-No `BEH-NNN` catalog existed at probe time. BEH-001 was accepted on 2026-08-19. Other rows remain candidate contracts.
+No `BEH-NNN` catalog existed at probe time. **2026-08-19:** BEH-001 accepted; BEH-002–BEH-004 record the other executed library calls; the `arange-5` driver loop is not BEH-005.
 
 | Behavior | Legacy command / interaction | Inputs | Outputs | Exit / error behavior |
 |----------|------------------------------|--------|---------|-----------------------|
 | `BUILD-TBD` — core plus driver | `<clean-environment-and-sandbox-prefix> /bin/bash <snapshot>/scripts/build.sh` | Accepted source archive; `FC=gfortran`; `FFT_BACKEND=NR`; local OpenBLAS | `lib/libscifor.a`, `lib/libscifor_deb.a`, modules, `.bin/scifor-fidelity` | Exit `0` in both canonical clean snapshots. One expected no-`.git` diagnostic, 310 compiler warning lines, and one duplicate-library linker warning per build. |
 | `BEH-TBD` — fidelity corpus | `<clean-environment-and-sandbox-prefix> /bin/bash <snapshot>/scripts/fidelity.sh` | Built driver; tracked driver literals and `numutils/test/xy2.data`; `TOL=1e-10` | `.fidelity-out/full.out` plus five extracted numeric sections | Exit `0` twice; `5 passed, 0 failed` each run. The script rewrites candidate expected files before comparison, so its PASS result is not fixture-provenance evidence. |
 | `BEH-001` — `linspace-5` | Fidelity driver calls `linspace(0.d0, 1.d0, 5)` | Driver literals | Five parsed real values accepted as FIX-001 | E1 execution output; byte-identical across builds. Managed-API contract ignores `es24.17` text. `fidelity/driver.f90:12-19`; ADR-001–003. |
-| `BEH-TBD` — `logspace-5` | Fidelity driver calls `logspace(1,1000,5)` | Driver literals | Five formatted real values | E1 execution output; byte-identical across builds. `fidelity/driver.f90:19-25`. |
-| `BEH-TBD` — `arange-5` label only | Fidelity driver prints `real(i,8)` for `i=1..5` | Driver literals | Five formatted real values | E1 driver execution output, but **not** evidence for the legacy `arange` implementation. `fidelity/driver.f90:27-30`. |
-| `BEH-TBD` — `fermi-beta100` | Fidelity driver calls `fermi(x,100)` for five values | `[-2,-1,0,1,2]` | Five two-column rows | E1 execution output; byte-identical across builds. `fidelity/driver.f90:32-39`. |
-| `BEH-TBD` — `deriv-xy2` | Fidelity driver reads `xy2.data` and calls `deriv(y,dh)` | 1,024 tracked X/Y rows | 1,024 two-column rows | E1 execution output; byte-identical across builds. File-open failure is coded but was not exercised. `fidelity/driver.f90:41-67`. |
+| `BEH-002` — `logspace-5` | Fidelity driver calls `logspace(1,1000,5)` | Driver literals | Five formatted real values | E1 execution output; byte-identical across builds. Parsed values not retained. `fidelity/driver.f90:19-25`. |
+| `BEH-005` — not this row | Fidelity driver prints `real(i,8)` for `i=1..5` | Driver literals | Five formatted real values | E1 driver execution output, but **not** evidence for the legacy `arange` implementation. `fidelity/driver.f90:27-30`. |
+| `BEH-003` — `fermi-beta100` | Fidelity driver calls `fermi(x,100)` for five values | `[-2,-1,0,1,2]` | Five two-column rows | E1 execution output; byte-identical across builds. Parsed values not retained. `fidelity/driver.f90:32-39`. |
+| `BEH-004` — `deriv-xy2` | Fidelity driver reads `xy2.data` and calls `deriv(y,dh)` | 1,024 tracked X/Y rows | 1,024 two-column rows | E1 execution output; byte-identical across builds. File-open failure is coded but was not exercised. Parsed values not retained. `fidelity/driver.f90:41-67`. |
 
 ## 5. Fixture corpus
 

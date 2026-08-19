@@ -29,7 +29,8 @@ modernization:
     framework: ASP.NET Core
 
   # Global default remains conservative. BEH-001/FIX-001 is scoped T1 at probe
-  # revision e586903 (ADR-001). All other surfaces remain T3.
+  # revision e586903 (ADR-001). BEH-002–BEH-004 are T1 hash-only. Other retained
+  # surfaces remain T3 until sliced. Product scope is the whole library (ADR-004).
   oracleTier: T3 documented-only
 
   firstSlice:
@@ -38,6 +39,11 @@ modernization:
     drivingAdapter: managed-api
     architecture: hexagonal
     baselineRevision: e586903a26cc50ca8942f20ca3bccbd8814e6252
+
+  retainedScope:
+    product: whole-library-csharp-poc
+    catalog: docs/modernization/behavior-catalog.md
+    nextCommand: plan-migration
 
   evidenceGrades:
     E1: verified

@@ -54,11 +54,13 @@ For **BEH-001** (`linspace` library behavior) only:
 - This ADR does not cover the 17 CLI utilities, FFT, BLAS/LAPACK, RNG, plotting, or ASP.NET hosting.
 - This ADR does not choose target numeric libraries.
 
----
+## Later amendment (2026-08-19)
+
+ADR-005 extends this baseline from BEH-001-only to the **POC planning baseline for all retained surfaces**. Executable T1 coverage is still the fidelity corpus. This ADR’s non-decision about OpenBLAS/NR as product providers is replaced by ADR-005 POC substitution defaults (reimplement behind ports; do not copy NR/Intel source).
 
 ## Links
 
-- Assessment: `docs/modernization/ASSESSMENT.md` Condition 1 (narrowed to first slice)
+- Assessment: `docs/modernization/ASSESSMENT.md` Condition 1 (POC baseline; T1 corpus still bounded)
 - Oracle: `docs/modernization/oracle.md`
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
-- Related: ADR-002, ADR-003
+- Related: ADR-002, ADR-003, ADR-005

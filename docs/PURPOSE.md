@@ -1,62 +1,63 @@
-# Purpose: SciFortran port exercise (first slice)
+# Purpose: SciFortran C# port (POC)
 
 **Source material:**
-- Owner decisions dated 2026-08-19: select `linspace`, accept the 2026-08-10 probe environment, hexagonal architecture, first driving adapter = managed API
-- `docs/modernization/ASSESSMENT.md` (go-with-conditions for a private framework exercise)
-- `docs/modernization/intent-ledger.md` INT-001 (checkout is an experiment / POC)
-- Repository commit `7c64bd6` (“must never be used for anything but a POC”)
-- Recovered BEH-001 and FIX-001
-- ADRs 001–003
+- Owner correction dated 2026-08-19: port the whole Fortran library surface to usable C#; licensing is irrelevant for this private POC
+- `docs/modernization/ASSESSMENT.md` (go-with-conditions, now narrowed to a whole-library POC)
+- Probe revision `e586903a26cc50ca8942f20ca3bccbd8814e6252`
+- ADRs 001–005
+- Recovered BEH-001 / FIX-001 (first implementation slice, not the product boundary)
 
 **Date:** 2026-08-19
-**Status:** Draft (first-slice recovery; not a production product thesis)
+**Status:** Accepted (whole-library POC thesis)
 
 ---
 
 ## Thesis
 
-This repository exists to prove that Artifact-Driven Development can recover, bound, and re-host a real Fortran numerical behavior as a host-neutral C# capability — not to ship a production SciFortran replacement.
+This repository exists to **port SciFortran’s retained library functionality to C#** so callers get the same numerical results the legacy library produced at the accepted probe baseline. It is a private proof of concept. It is not a license to redistribute restricted Fortran, and it is not an ASP.NET rewrite of a system that had no web topology.
 
 ## The job it does
 
-A numerical-library maintainer (or framework evaluator) needs one actually executed, dependency-light operation — generating an inclusive linear sequence — translated behind a managed API so later CLI or HTTP adapters can be added without changing the arithmetic. The job matters because the assessment forbade implementing a walking skeleton until a behavior, baseline, and boundary were chosen.
+A numerical-library maintainer needs a host-neutral C# library that reproduces the public `SCIFOR` surface (grids, functions, integration, matrix, FFT, optimization, splines, statistics, Green/Padé/lattice helpers, and I/O ports) plus CLI adapters over those same ports. The job matters because a linspace-only exercise cannot plan code production for the rest of the library.
 
 ## North-star outcome
 
-A caller of the managed linspace port gets the same parsed `linspace(0,1,5)` values the 2026-08-10 probe observed, with evidence graded and fixture-backed, while every other SciFortran surface remains explicitly out of scope.
+A C# caller of the managed port can exercise retained SciFortran behavior and obtain legacy-faithful results, starting with exact `linspace(0,1,5)` and expanding module by module under `/plan-migration`. Surfaces that cannot be built from this checkout (`vfplot`/`DLPLOT`, FFTPACK callees) are retired rather than faked.
 
 ## Trade-off rule
 
-When goals conflict, optimize for **honest, host-neutral parity of the selected behavior** over **surface-area coverage, Fortran ABI compatibility, or a premature web host**.
+When goals conflict, optimize for **usable C# with honest parity of retained behavior** over **Fortran ABI compatibility, ASP.NET hosting, or expanding into missing/unexported source**.
 
-The assessment is a controlled POC. Expanding to 17 CLIs, FFT/BLAS providers, or ASP.NET before this slice has recovered documentation would recreate the blockers that stopped progress.
+Do not silently “fix” unexecuted branches. Schedule `/document-legacy` and `/refine-feature` for each slice before claiming implementation-ready stories.
 
 ## Anti-thesis
 
-- A full SciFortran-on-ASP.NET rewrite presented as a drop-in production port.
-- A CLI-format clone of `write(*,*)` treated as the product because that is what Fortran printed.
+- A documentation-only ADD exercise that never ships C#.
+- A linspace-only product presented as a SciFortran port.
+- A full SciFortran-on-ASP.NET rewrite treated as the first deliverable.
+- Copying Intel-confidential headers or Numerical Recipes source into the target tree.
 - Treating Python-generated golden files as legacy truth.
-- Silently “fixing” unexecuted branches, CLI name mismatches, or `STOP` semantics during the first slice.
 
 ## Success signals
 
-- BEH-001 stays the only implementation-ready behavior until further owner selections.
-- FIX-001 is compared with exact parsed equality, not profile `1e-6`.
-- Domain code has no ASP.NET or CLI dependency (ADR-002).
-- Unselected modules remain labeled out of scope rather than half-translated.
+- `/plan-migration` produces an ordered slice plan covering the retained catalog.
+- Each slice yields C# behind hexagonal ports, with CLI adapters calling the same use cases.
+- FIX-001 (and later recovered T1 fixtures) pass with their accepted comparison rules.
+- Retired surfaces are listed as out of product, not half-translated.
 
 ## Open purpose questions
 
-- [ ] If this exercise succeeds, is the next retained behavior another grid helper (`logspace`) or a different family?
-- [ ] Does a later production thesis replace this POC thesis, or is the port permanently exercise-only?
-- [ ] Are historical Fortran consumers of `linspace` in scope after the managed API exists?
+- [ ] After the POC library exists, is a production thesis (legal clearance, packaging, support) ever required?
+- [ ] Should unexported bundled special-function internals later join the public C# API?
+- [ ] Are historical Fortran consumers of `libscifor.a` in scope after the managed API exists?
 
 ## Links
 
 - Related domain model: `docs/DOMAIN.md`
-- Related ADRs: ADR-001, ADR-002, ADR-003
+- Related catalog: `docs/modernization/behavior-catalog.md`
+- Related ADRs: ADR-001–005
 - Related behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 
 ---
 
-*Created: 2026-08-19 | Modeled by: modeler in Legacy recovery mode (in-chat fallback; no subagent delegation)*
+*Updated: 2026-08-19 | Owner purpose correction: whole-library C# port*

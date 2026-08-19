@@ -56,11 +56,13 @@ Concrete type names, project layout, DI container choice, and package IDs are **
 - This ADR does not retain or retire the `linspace` CLI program.
 - Out of scope: MPI/OpenMP-named globals, plotting, expression evaluation, and other library modules.
 
----
+## Later amendment (2026-08-19)
+
+ADR-004/005 make the managed API the product for the **whole retained library**, with CLIs as adapters over the same ports. Fortran ABI is not retained. Concrete signatures remain out of this ADR.
 
 ## Links
 
-- Assessment: `docs/modernization/ASSESSMENT.md` Conditions 3–4 (narrowed to first slice)
+- Assessment: `docs/modernization/ASSESSMENT.md` Conditions 3–4 (POC whole-library boundary)
 - Translation gaps: GAP-019, GAP-020, GAP-026, GAP-028
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
-- Related: ADR-001, ADR-003
+- Related: ADR-001, ADR-003, ADR-004, ADR-005

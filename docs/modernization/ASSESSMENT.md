@@ -10,9 +10,9 @@
 **Legacy repo:** `/Users/philipteitel/code/ADD-migrations/sci-fortran-legacy` (read-only; explicit user override of configured `../scifortran-legacy`)
 **Source stack:** Discovered Fortran 90/95-style modules with Fortran 2003-era command intrinsics; `e586903` operational probe environment verified, authoritative production baseline and exact accepted dialect/compiler/providers/backend unresolved
 **Target stack:** C# / .NET 8 / ASP.NET Core
-**Date:** `2026-08-10` (first-slice owner decisions recorded `2026-08-19`)
-**Verdict:** `go-with-conditions` (controlled framework-translation exercise only; not a production/reusable-port approval)
-**Oracle tier:** `T1 executable` (scoped to the core library plus fidelity driver at operational probe baseline `e586903a26cc50ca8942f20ca3bccbd8814e6252`; BEH-001/`FIX-001` accepted; all other surfaces remain T3)
+**Date:** `2026-08-10` (first-slice recovery `2026-08-19`; whole-library purpose correction `2026-08-19`)
+**Verdict:** `go-with-conditions` (private whole-library C# port POC; not a production/redistribution approval)
+**Oracle tier:** `T1 executable` (scoped to the core library plus fidelity driver at operational probe baseline `e586903a26cc50ca8942f20ca3bccbd8814e6252`; BEH-001/`FIX-001` accepted; BEH-002–BEH-004 hash-characterized; all other retained surfaces remain T3 until sliced)
 
 ---
 
@@ -26,9 +26,11 @@ The oracle is now **scoped `T1 executable` for the core library plus the fidelit
 
 Sixteen of 33 dependency routes remain blocked for a full port. The missing-`ZEROS` internal source blocker is retired because the merged `SCIFOR` facade imports available `OPTIMIZE`; historical downstream `ZEROS` compatibility remains unresolved. OpenBLAS and NR are verified build selections for the probe, not approved product or target-provider choices. For this private framework exercise, the user accepts licensing/provenance risk as out of scope; that exception does not clear any component for redistribution or remove the numeric, process-boundary, and supported-scope decisions required for production. `E1 verified / E2 documented / E3 code-derived / E5 unknown` — `docs/modernization/dependency-ledger.md:18-27,31-38,136-155`; user exercise decision dated 2026-08-10.
 
-A black-box first slice is now **selected**. On 2026-08-19 the owner chose library `linspace` (not the CLI, not the `arange-5` driver loop), accepted the 2026-08-10 probe environment for that behavior, chose hexagonal architecture with a managed-API first driving adapter, and accepted exact parsed equality for `FIX-001`. Recovery artifacts: `docs/modernization/behaviors/BEH-001-linspace.md`, `docs/PURPOSE.md`, `docs/DOMAIN.md`, ADRs 001–003. A normal product-wide skeleton is still not justified. `E1 verified / E2 documented` — owner decision 2026-08-19; `docs/decisions/ADR-001-first-slice-oracle-baseline.md`; `docs/decisions/ADR-002-hexagonal-managed-api.md`.
+On 2026-08-19 the owner first recovered library `linspace` (BEH-001 / FIX-001, ADRs 001–003). The same day the owner **corrected purpose**: the product is a C# port of the whole retained SciFortran surface, licensing is accepted for this private POC, and ADD must reach `/plan-migration`. ADRs 004–005, `docs/PURPOSE.md`, `docs/DOMAIN.md`, and `docs/modernization/behavior-catalog.md` record that gate. BEH-001 remains the first code slice; it is no longer the only retained behavior. `E2 documented` — owner correction 2026-08-19; ADR-004; ADR-005.
 
 A first-slice defect ledger now exists. Apparent defects or historical “fixes” outside BEH-001—including downstream `ZEROS`/`OPTIMIZE` compatibility, FFT sign/backend changes, square-lattice denominator reversal, `logspace` documentation mismatch, complex-column contradictions, and warning-affected routines—must not be silently corrected if those surfaces are later selected. `E1 verified / E3 code-derived / E4 inferred` — `docs/modernization/defect-ledger.md`; `docs/modernization/intent-ledger.md:42-50`; `docs/modernization/oracle.md:122-130,141-144`.
+
+**Planning gate (2026-08-19):** PURPOSE, DOMAIN, behavior catalog, and ADRs 004–005 now authorize `/plan-migration` for the whole retained library. Implementation-ready C# still starts at BEH-001 after `/refine-feature`.
 
 ## 2. Evidence consumed
 
@@ -91,14 +93,14 @@ A first-slice defect ledger now exists. Apparent defects or historical “fixes�
 
 ## 6. Walking-skeleton feasibility
 
-**Result:** `black-box first slice selected` (BEH-001 `linspace` library / managed API)
+**Result:** `library-wide port authorized`; first executable C# slice remains BEH-001
 
-- **Evidence:** Two independent contained builds and runs prove an executable core/driver path at `e586903`; both runs passed 5/5 and produced byte-identical full output. Owner decisions on 2026-08-19 accepted `linspace`, the probe environment, hexagonal/managed-API boundary, and FIX-001 exact parsed values. `E1 verified / E2 documented` — `docs/modernization/oracle.md:19-25,29-39,75-103`; ADR-001–003.
-- **Smallest useful executable path:** Host-neutral evaluation of inclusive `linspace(0,1,5)` behind a managed API, compared to FIX-001. Do **not** use the `arange-5` driver loop. CLI `linspace` remains out of slice. `E1 verified / E2 documented` — `docs/modernization/behaviors/BEH-001-linspace.md`.
-- **If black-box first slice is required, why:** The driver provides an external executable seam while the library is include-composed and compiler/provider-sensitive, and no accepted internal test contract existed until FIX-001. `E1 verified / E3 code-derived / E4 inferred` — `docs/modernization/oracle.md:19-25,101-116`.
-- **Conditions to revisit skeleton planning:** First-slice recovery is complete enough for `/refine-feature` on BEH-001. Product-wide skeleton/migration planning still needs Conditions 1–10 for any wider scope. `E2 documented` — Section 8.
+- **Evidence:** Probe T1 plus owner purpose correction (ADR-004) and planning-gate scope (ADR-005). Catalog: `docs/modernization/behavior-catalog.md`. `E1 verified / E2 documented`.
+- **Smallest useful executable path:** Still host-neutral inclusive `linspace(0,1,5)` (FIX-001). Subsequent slices follow the catalog strangler order. Do **not** treat the `arange-5` driver loop as `arange`. `E1 verified / E2 documented`.
+- **Why not a big-bang rewrite:** Most retained surfaces are T3; each slice still needs `/document-legacy` and `/refine-feature` before C#. `/plan-migration` sequences that work.
+- **Next planning command:** `/plan-migration` against the catalog. `/refine-feature` on BEH-001 is slice 1 of that plan, not a substitute for it.
 
-A compiling .NET solution, ASP.NET health endpoint, dependency-injection setup, or placeholder numerical API remains a **non-parity technical scaffold only**. The executable fidelity driver also remains a **probe**, not the accepted modernization slice, until one observed behavior is approved and carried through a target boundary with accepted comparison evidence. `E1 verified / E3 code-derived / E5 unknown` — `docs/modernization/oracle.md:75-103`; `docs/modernization/translation-gaps.md:60,115-127`.
+A compiling .NET solution or ASP.NET health endpoint without ported numerical contracts remains a **non-parity scaffold**. `E2 documented` — ADR-004.
 
 ## 7. Oracle classification
 
@@ -112,19 +114,19 @@ Scoped T1 is based on runtime repeatability, not binary reproducibility: static 
 
 ## 8. Conditions to proceed
 
-Conditions are ordered by dependency. For a production/reusable port, Conditions 1–8 block modernization planning. For the authorized private framework exercise, Condition 2 is explicitly accepted and Conditions 1, 3–5, and 7–8 are narrowed to the selected first behavior only.
+Conditions are ordered by dependency. For a **production/redistributable** port, Conditions 1–8 still require legal clearance and a production baseline distinct from this POC. For the **authorized private whole-library C# port**, Conditions 1–10 are closed by ADRs 001–005 and the behavior catalog. Per-slice `/document-legacy` and `/refine-feature` remain required before implementation-ready stories.
 
-- [x] **1. Select the authoritative production/parity baseline.** **First slice only (2026-08-19):** owner accepted `e586903` plus the recorded GNU Fortran 16.1.0/OpenBLAS 0.3.34/NR probe as the oracle baseline for BEH-001 (ADR-001). This is not production-wide authority. `E1 verified / E2 documented / E5 unknown` — `docs/modernization/oracle.md:19,45-61,134-138`; `docs/decisions/ADR-001-first-slice-oracle-baseline.md`.
-- [x] **2. Accept licensing/provenance risk for the private framework exercise only.** The user states that the exercise evaluates whether the workflow can translate an internally developed application, that licensing will not be a deployment concern for framework users, and that generated material will not be published in a manner that violates rights. This is not a legal clearance, license grant, redistribution approval, or production exception. `E2 documented` — user exercise decision dated 2026-08-10. For a production/reusable port, obtain written disposition for Intel-confidential interfaces, MKL/FFTW linking, Numerical Recipes-derived code, QUADPACK/MINPACK/spline/special-function snapshots, `libmatheval`, DISLIN/DLPLOT, and any recovered source. `E3 code-derived / E5 unknown` — `docs/modernization/dependency-ledger.md:113-132`; `docs/modernization/oracle.md:62,134`.
-- [x] **3. Define supported product scope and consumers.** **First slice only (2026-08-19):** retained surface is library `linspace` (`TOOLS`). The `linspace` CLI, remaining modules/utilities, `ZEROS`/`OPTIMIZE`, FFTPACK, `vfplot`, plotting, and `func` stay undecided. `E2 documented / E3 code-derived / E5 unknown` — BEH-001; `docs/modernization/legacy-map.md:80-107,181-193`.
-- [x] **4. Choose the target public/process boundary.** **First slice only (2026-08-19):** hexagonal architecture; first driving adapter is a managed API (ADR-002). CLI/HTTP, deployment OS/architecture, auth, serialization, payload limits, job model, cancellation, scaling, SLA, and observability remain undecided. `E2 documented` — `docs/decisions/ADR-002-hexagonal-managed-api.md`.
-- [x] **5. Decide acceptance authority and extend oracle coverage only as required.** **First slice only (2026-08-19):** BEH-001 and FIX-001 are accepted; capture bytes were not retained, parsed values are the contract (ADR-003). Every other surface remains T3 until separately evidenced. `E1 verified / E2 documented` — `docs/modernization/fixtures/FIX-001-linspace-5.md`.
-- [x] **6. Establish a reviewed bounded containment/build recipe for the current probe.** Two disposable clean snapshots used isolated environment/scratch, tested network denial, pinned tools/libraries, source-integrity checks, and environment/output manifests without modifying the legacy checkout. This condition is complete only for reviewed scripts and allowlisted inputs; stronger filesystem/resource isolation remains mandatory before broader or untrusted execution. `E1 verified / E5 unknown` — `docs/modernization/oracle.md:29-39,41-73,147`.
-- [x] **7. Define behavior-specific compatibility contracts.** **First slice only (2026-08-19):** FIX-001 uses exact parsed binary64 equality (ADR-003). Optional endpoint flags, `mesh`, abort-message/process mapping, CLI text, locale, and RNG remain open. `E2 documented` — `docs/decisions/ADR-003-linspace-numeric-contract.md`.
-- [x] **8. Approve required target dependency routes.** **First slice only (2026-08-19):** BEH-001 is a self-contained arithmetic evaluation; no BLAS/LAPACK/FFT/native provider is required. Probe OpenBLAS/NR remain unapproved product choices. All previously blocked DEP routes stay blocked outside this slice. `E2 documented / E3 code-derived` — `docs/modernization/flows/BEH-001-linspace.md`; `docs/modernization/dependency-ledger.md:136-155`.
-- [x] **9. Create the legacy behavior catalog, purpose/domain artifacts, and defect ledger.** **First slice only (2026-08-19):** BEH-001, flow, PURPOSE, DOMAIN, and defect ledger exist. Keep E4/E5 items out of implementation-ready scope except where the owner already decided. `E2 documented` — `docs/modernization/behaviors/BEH-001-linspace.md`; `docs/modernization/defect-ledger.md`.
-- [x] **10. Approve decisions before design or migration planning.** **First slice only (2026-08-19):** ADRs 001–003 record oracle baseline, hexagonal/managed-API boundary, and numeric contract. Production-wide BLAS/FFT/provider/concurrency/cutover ADRs remain open. Do not run `/plan-migration` for a product-wide port until those are resolved. `E2 documented` — `docs/decisions/`.
-- [x] **11. Complete the final incremental `/assess-modernization` synthesis.** The 2026-08-10 assessment stands. **2026-08-19:** first-slice `/document-legacy` completed for BEH-001. Suggested next command is `/refine-feature` against BEH-001, not `/plan-migration`. `E2 documented` — owner decisions 2026-08-19; ADRs 001–003.
+- [x] **1. Select the authoritative production/parity baseline.** **POC (2026-08-19):** owner accepts `e586903` plus the recorded GNU Fortran 16.1.0/OpenBLAS 0.3.34/NR probe as the planning/oracle baseline for all retained surfaces (ADR-001 extended by ADR-005). This is not a public production release. T1 execution still covers only the fidelity corpus. `E1 verified / E2 documented`.
+- [x] **2. Accept licensing/provenance risk for the private POC only.** Reaffirmed 2026-08-19: licensing is irrelevant to this POC; C# must still be produced. Not a legal clearance or redistribution approval. Do not copy Intel-confidential headers or NR source into the target tree (ADR-004, ADR-005). `E2 documented`.
+- [x] **3. Define supported product scope and consumers.** **POC (2026-08-19):** retained `SCIFOR` public modules and buildable CLIs; retire `vfplot`/DLPLOT, FFTPACK backend, CHRPACK, Fortran ABI (ADR-005; `docs/modernization/behavior-catalog.md`). Downstream `libscifor.a` consumers remain unknown and are not required. `E2 documented / E3 code-derived / E5 unknown`.
+- [x] **4. Choose the target public/process boundary.** Hexagonal managed C# API is the product; CLIs are adapters over the same ports; HTTP/ASP.NET optional later; Fortran ABI not retained (ADR-002, ADR-005). Hosting OS, auth, and SLA remain out of the library-port contract. `E2 documented`.
+- [x] **5. Decide acceptance authority and extend oracle coverage only as required.** BEH-001/FIX-001 accepted (ADR-003). BEH-002–BEH-004 are T1 hash-characterized pending fixture recovery. All other retained surfaces stay T3 until their slice. Planning may proceed with mixed oracle. `E1 verified / E2 documented`.
+- [x] **6. Establish a reviewed bounded containment/build recipe for the current probe.** Unchanged: complete for reviewed scripts and allowlisted inputs. `E1 verified / E5 unknown` — `docs/modernization/oracle.md:29-39,41-73,147`.
+- [x] **7. Define behavior-specific compatibility contracts.** FIX-001 exact parsed equality (ADR-003). Other T1 sections use exact parsed equality once fixtures are recovered. Unexecuted surfaces may use profile `1e-6` only as a non-authoritative planning default (ADR-005). CLI text/RNG/matrix-order contracts remain per-slice. `E2 documented`.
+- [x] **8. Approve required target dependency routes.** POC defaults in ADR-005: managed/native numeric ports; reimplement facades; substitute a managed evaluator for `func`; wrap Gnuplot; drop missing FFTPACK/DLPLOT. Previously “blocked” DEP rows are closed for **planning** by those defaults, not by production legal review. `E2 documented`.
+- [x] **9. Create the legacy behavior catalog, purpose/domain artifacts, and defect ledger.** PURPOSE/DOMAIN rewritten for the whole library; `docs/modernization/behavior-catalog.md` lists retained/retired IDs; first-slice defect ledger remains. Keep E4/E5 items out of implementation-ready stories. `E2 documented`.
+- [x] **10. Approve decisions before design or migration planning.** ADRs 001–005 close purpose, baseline, boundary, numeric first fixture, retained/retired scope, and POC substitutions. `/plan-migration` is the next command. `E2 documented`.
+- [x] **11. Complete the final incremental `/assess-modernization` synthesis.** The 2026-08-10 assessment stands as evidence. **2026-08-19 evening:** whole-library purpose correction. Suggested next command is `/plan-migration` (catalog + ADR-004/005). `/refine-feature` on BEH-001 is the first implementation slice inside that plan. `E2 documented`.
 
 ## 9. Tensions / conflicts
 
@@ -157,7 +159,8 @@ Affected planning scope remains stopped for every unresolved conflict above. Thi
 - Oracle: `docs/modernization/oracle.md`
 - Defect ledger: `docs/modernization/defect-ledger.md`
 - First-slice behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Behavior catalog: `docs/modernization/behavior-catalog.md`
 - Purpose / domain: `docs/PURPOSE.md`, `docs/DOMAIN.md`
-- Decisions: `docs/decisions/ADR-001-first-slice-oracle-baseline.md`, `docs/decisions/ADR-002-hexagonal-managed-api.md`, `docs/decisions/ADR-003-linspace-numeric-contract.md`
+- Decisions: ADR-001–005 under `docs/decisions/`
 
-*Created: 2026-08-09 | Incrementally assessed: 2026-08-10 | First-slice recovery: 2026-08-19 | Source stack: discovered Fortran; operational probe baseline accepted for BEH-001 only | Target stack: C# / .NET 8 / ASP.NET Core, hexagonal managed API first*
+*Created: 2026-08-09 | Incrementally assessed: 2026-08-10 | First-slice recovery: 2026-08-19 | Purpose correction (whole-library C# port): 2026-08-19 | Target: C# / .NET 8 hexagonal managed API plus CLI adapters*

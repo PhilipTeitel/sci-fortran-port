@@ -224,5 +224,6 @@ Measured source-size facts above are repository inventory results, not quality j
 - Dependency ledger: `docs/modernization/dependency-ledger.md`
 - Translation gaps: `docs/modernization/translation-gaps.md`
 - First-slice behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Catalog: `docs/modernization/behavior-catalog.md`
 
-*Created: 2026-08-09 | Incrementally refreshed: 2026-08-10 | First-slice link: 2026-08-19*
+*Created: 2026-08-09 | Incrementally refreshed: 2026-08-10 | First-slice link: 2026-08-19 | Whole-library catalog: 2026-08-19*
