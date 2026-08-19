@@ -1,4 +1,4 @@
-# BEH-103: Numeric text formatting and I/O codec contract
+# BEH-303: Numeric text formatting and I/O codec contract
 
 **Status:** Draft
 **Evidence grade:** `E3 code-derived` (overall; partial `E1 verified` for fidelity fixed-format probe under `LC_ALL=C`; locale/NaN/EOF edge cases `E5 unknown`)
@@ -57,9 +57,9 @@ Numeric interchange is plain text via Fortran list-directed (`*`) and fixed-widt
 |------|-----------------|----------|-----------------|
 | EOF on stdin read loops | Exit loop via labeled `end=` / `iostat` | `E3` — `numutils/src/deriv.f90:43-48`; `fidelity/driver.f90:48-51` | none |
 | Malformed numeric token | Unverified (list-directed failure modes) | `E5` — GAP-007; legacy-map §7 | TBD |
-| File open failure in fidelity driver | Prints message; `stop 1` | `E3` — `fidelity/driver.f90:43-46` | see BEH-105 / **DEF-109** |
-| Tolerance / comparison regimes | Workflow `1e-6` vs script `1e-10` vs probe exact | `E1`/`E2`/`E3` — oracle §6; INT-006 | **DEF-108** open/TBD |
-| `r8_to_s_left` comment vs code | Comment G14.6; write `g16.9` | `E3` — `src/COMVARS.f90:495-521` | **DEF-111** open/TBD |
+| File open failure in fidelity driver | Prints message; `stop 1` | `E3` — `fidelity/driver.f90:43-46` | see BEH-305 / **DEF-309** |
+| Tolerance / comparison regimes | Workflow `1e-6` vs script `1e-10` vs probe exact | `E1`/`E2`/`E3` — oracle §6; INT-006 | **DEF-308** open/TBD |
+| `r8_to_s_left` comment vs code | Comment G14.6; write `g16.9` | `E3` — `src/COMVARS.f90:495-521` | **DEF-311** open/TBD |
 | Width overflow in fixed formats | Not characterized | `E5` | TBD |
 | Comma-decimal locale | Not run | `E5` — GAP-007 | TBD |
 
@@ -110,9 +110,9 @@ And comparison policies (exact vs normalized) are decided per surface, not assum
 
 - Intent ledger: `docs/modernization/intent-ledger.md` (INT-006/007)
 - Legacy flow: `docs/modernization/flows/` (none yet)
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-108, DEF-111 (open/TBD); complex-column DEF-101–106 via BEH-104
-- Related gaps: GAP-007, GAP-009, GAP-013 (column order separated in BEH-104)
-- Related behavior: BEH-104 (complex-column order)
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-308, DEF-311 (open/TBD); complex-column DEF-301–306 via BEH-304
+- Related gaps: GAP-007, GAP-009, GAP-013 (column order separated in BEH-304)
+- Related behavior: BEH-304 (complex-column order)
 
 ### Tensions / conflicts
 

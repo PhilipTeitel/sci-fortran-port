@@ -1,4 +1,4 @@
-# BEH-102: Fortran array layout and bounds contract
+# BEH-302: Fortran array layout and bounds contract
 
 **Status:** Draft
 **Evidence grade:** `E3 code-derived` (overall; runtime stride/section/ownership edge cases remain `E5 unknown`)
@@ -97,7 +97,7 @@ And routines that declare bounds such as -N:N or 0:L expose those bounds in thei
 
 - Intent ledger: `docs/modernization/intent-ledger.md`
 - Legacy flow: `docs/modernization/flows/` (none yet; candidate for `/trace-flow` on `fftgf` bounds)
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-112 (`fftgf` unused `STRIDE`, open/TBD)
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-312 (`fftgf` unused `STRIDE`, open/TBD)
 - Related gaps: GAP-005, GAP-014
 
 ### Tensions / conflicts

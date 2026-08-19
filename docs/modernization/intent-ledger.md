@@ -18,6 +18,8 @@
 | INT-006 | The merged fidelity script is intended to compare five numeric sections with a default absolute tolerance of `1e-10`; this threshold is a script choice, not an accepted parity requirement. | Fidelity checks | E3 code-derived | `scripts/fidelity.sh:11,27-78,161-183` | high for script behavior; low for compatibility meaning | oracle / TBD |
 | INT-007 | The five checked-in expected references are not a recorded legacy-output corpus: four are regenerated from Python formulas and one is copied from the historical `xy2.deriv` file. | Fidelity provenance | E3 code-derived / E4 inferred | `scripts/fidelity.sh:105-159`; `fidelity/golden/*.txt`; `numutils/test/xy2.deriv` | high for generation path; low for historical file provenance | oracle |
 | INT-008 | Generated build/fidelity products are intended to stay out of version control, and prior tracked static archives were removed in the merged delta. | Artifact hygiene | E3 code-derived / E4 inferred | `.gitignore:4-13`; `git diff --name-status 5e4e6a3..e586903` | high for mechanism; medium for inferred rationale | legacy map |
+| INT-009 | Owner selected library `linspace` as the first code slice, accepted the 2026-08-10 probe, required hexagonal architecture and a managed API, then corrected purpose to a whole-library C# port POC (licensing accepted; `/plan-migration` unblocked). | Product purpose / first slice | E2 documented | Owner decisions 2026-08-19; ADR-001–005 | high | PURPOSE / catalog / ASSESSMENT |
+| INT-010 | `/plan-migration` sequences retained catalog IDs as SL-001–SL-025; first code-production command is `/refine-feature` on BEH-001; catalog-only rows stay document→refine→design→implement; ADR-005 TOOLS convergence checks travel with SL-014. | Migration sequencing | E2 documented | `docs/modernization/migration-plan.md`; catalog 2026-08-19 | high | migration plan / BEH-001 |
 
 ## 2. Release-note and support commitments
 
@@ -52,19 +54,21 @@ None yet. No release notes, changelog, tag, support record, or accepted build tr
 
 ## 6. Open intent questions
 
-- [ ] Is `master` at `e586903` an accepted production/parity baseline, or only the current repository baseline?
-- [ ] Which exact OS, architecture, compiler/version, flags, BLAS/LAPACK binaries, and environment define an accepted successful build?
-- [ ] Is the NR FFT selection intentional for production compatibility, and is its source/provenance approved?
-- [ ] Does the supported facade replace `ZEROS` with `OPTIMIZE`, and what do downstream Fortran consumers compile against?
+- [x] Is `master` at `e586903` an accepted production/parity baseline, or only the current repository baseline? **POC (2026-08-19):** planning/oracle baseline for all retained surfaces (ADR-005). Not a public production release.
+- [x] Which exact OS, architecture, compiler/version, flags, BLAS/LAPACK binaries, and environment define an accepted successful build? **POC:** the recorded 2026-08-10 probe environment (ADR-001/005).
+- [x] Is the NR FFT selection intentional for production compatibility, and is its source/provenance approved? **POC:** NR is the probe backend to reproduce; do not copy NR source (ADR-005).
+- [x] Does the supported facade replace `ZEROS` with `OPTIMIZE`, and what do downstream Fortran consumers compile against? **POC:** port current `OPTIMIZE`; Fortran ABI/`ZEROS` not retained (ADR-005).
 - [ ] Are the build and fidelity scripts diagnostic reconstruction assets only, or intended supported entrypoints?
-- [ ] Which fidelity cases are accepted behaviors, and why does `arange-5` not invoke the legacy `arange` implementation?
-- [ ] What evidence authorizes `1e-10`, versus the workflow profile's provisional `1e-6` relative/absolute values?
+- [x] Which fidelity cases are accepted behaviors, and why does `arange-5` not invoke the legacy `arange` implementation? **`linspace` is BEH-001 (accepted). `logspace`/`fermi`/`deriv` are BEH-002–004 (T1 hash). `arange-5` remains a driver loop, not legacy `arange` (BEH-005).**
+- [x] What evidence authorizes `1e-10`, versus the workflow profile's provisional `1e-6` relative/absolute values? **Neither is used for FIX-001; exact parsed equality (ADR-003). Other T1 exact once recovered; `1e-6` is a non-authoritative planning default (ADR-005).**
 - [ ] Can `numutils/test/xy2.deriv` be tied to an exact legacy invocation and environment, or must it remain an unprovenanced candidate?
 
 ## 7. Links
 
-- Purpose document: `docs/PURPOSE.md` (not created by this refresh)
-- Domain model: `docs/DOMAIN.md` (not created by this refresh)
-- Behavior catalog: `docs/modernization/behaviors/BEH-NNN-*.md` (none created by this refresh)
+- Purpose document: `docs/PURPOSE.md`
+- Domain model: `docs/DOMAIN.md`
+- Behavior catalog: `docs/modernization/behavior-catalog.md`
+- Migration plan: `docs/modernization/migration-plan.md`
+- Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 
-*Created: 2026-08-10*
+*Created: 2026-08-10 | First-slice intent: 2026-08-19 | Whole-library purpose: 2026-08-19 | `/plan-migration`: 2026-08-19*

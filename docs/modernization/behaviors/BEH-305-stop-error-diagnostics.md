@@ -1,4 +1,4 @@
-# BEH-105: `STOP` / error / diagnostic termination contract
+# BEH-305: `STOP` / error / diagnostic termination contract
 
 **Status:** Draft
 **Evidence grade:** `E3 code-derived` (overall; process exit status, stderr vs stdout, and partial side effects largely `E5 unknown`)
@@ -59,16 +59,16 @@ User-visible failure and help paths typically print diagnostics to Fortran unit 
 
 | Case | Legacy behavior | Evidence | Defect decision |
 |------|-----------------|----------|-----------------|
-| Help requested | Print help; `STOP` (default) | `E3` — `src/PARSECMD.f90:50-57` | none (mechanism); channel/exit via DEF-109/110 |
-| Invalid FFT length | `error(...)` → stdout + `STOP` | `E3` — `numutils/src/fftgf.f90:118,138` | none (mechanism); see DEF-109/110 |
-| List count mismatch | `abort(...)` → same as `error` | `E3` — `numutils/src/fftgf.f90:77` | none (mechanism); see DEF-109/110 |
-| LAPACK failure in diagonalization | `error(...)` → `STOP` | `E3` — `src/MATRIX.f90:100-103` | none (mechanism); see DEF-109/110 |
-| `linspace`/`logspace` invalid `num` | `error`/`abort` messages | `E3` — `src/tools_grids.f90:7-12,41` | none (mechanism); see DEF-109/110 |
+| Help requested | Print help; `STOP` (default) | `E3` — `src/PARSECMD.f90:50-57` | none (mechanism); channel/exit via DEF-309/310 |
+| Invalid FFT length | `error(...)` → stdout + `STOP` | `E3` — `numutils/src/fftgf.f90:118,138` | none (mechanism); see DEF-309/310 |
+| List count mismatch | `abort(...)` → same as `error` | `E3` — `numutils/src/fftgf.f90:77` | none (mechanism); see DEF-309/310 |
+| LAPACK failure in diagonalization | `error(...)` → `STOP` | `E3` — `src/MATRIX.f90:100-103` | none (mechanism); see DEF-309/310 |
+| `linspace`/`logspace` invalid `num` | `error`/`abort` messages | `E3` — `src/tools_grids.f90:7-12,41` | none (mechanism); see DEF-309/310 |
 | Malformed CLI value / bad stdin token | Not characterized | `E5` — GAP-020/026 | TBD |
-| Bare `STOP` vs `stop 1` | Most fatals bare `STOP`; fidelity open fail uses `stop 1` | `E3`/`E5` — `COMVARS.f90:208`; `driver.f90:45-46` | **DEF-109** open/TBD |
-| Diagnostics on stdout with data | `write(*,...)` / unit `*` for errors and help | `E3`/`E5` — `COMVARS.f90:201-247`; GAP-026 | **DEF-110** open/TBD |
+| Bare `STOP` vs `stop 1` | Most fatals bare `STOP`; fidelity open fail uses `stop 1` | `E3`/`E5` — `COMVARS.f90:208`; `driver.f90:45-46` | **DEF-309** open/TBD |
+| Diagnostics on stdout with data | `write(*,...)` / unit `*` for errors and help | `E3`/`E5` — `COMVARS.f90:201-247`; GAP-026 | **DEF-310** open/TBD |
 | Partial file side effects before `STOP` | Possible (e.g. deletes) but uncatalogued here | `E3`/`E5` — `numutils/src/ffcmplx.f90:52`; GAP-021/026 | TBD |
-| Fidelity missing input | `stop 1` (explicit code) | `E3` — `fidelity/driver.f90:45-46` | **DEF-109** open/TBD |
+| Fidelity missing input | `stop 1` (explicit code) | `E3` — `fidelity/driver.f90:45-46` | **DEF-309** open/TBD |
 
 ## 7. Draft Gherkin
 
@@ -114,7 +114,7 @@ And warnings/messages alone must not terminate the process
 
 - Intent ledger: `docs/modernization/intent-ledger.md`
 - Legacy flow: `docs/modernization/flows/` (none yet)
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-109, DEF-110 (open/TBD)
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-309, DEF-310 (open/TBD)
 - Related gaps: GAP-020, GAP-026
 - Assessment Condition 7: error/diagnostic mapping
 
