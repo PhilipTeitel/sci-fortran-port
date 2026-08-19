@@ -40,7 +40,7 @@ Do not silently “fix” unexecuted branches. Schedule `/document-legacy` and `
 
 ## Success signals
 
-- `/plan-migration` produces an ordered slice plan covering the retained catalog.
+- [x] `/plan-migration` produces an ordered slice plan covering the retained catalog (`docs/modernization/migration-plan.md`).
 - Each slice yields C# behind hexagonal ports, with CLI adapters calling the same use cases.
 - FIX-001 (and later recovered T1 fixtures) pass with their accepted comparison rules.
 - Retired surfaces are listed as out of product, not half-translated.
@@ -55,9 +55,10 @@ Do not silently “fix” unexecuted branches. Schedule `/document-legacy` and `
 
 - Related domain model: `docs/DOMAIN.md`
 - Related catalog: `docs/modernization/behavior-catalog.md`
+- Related plan: `docs/modernization/migration-plan.md`
 - Related ADRs: ADR-001–005
 - Related behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 
 ---
 
-*Updated: 2026-08-19 | Owner purpose correction: whole-library C# port*
+*Updated: 2026-08-19 | Owner purpose correction: whole-library C# port | Plan: `/plan-migration`*

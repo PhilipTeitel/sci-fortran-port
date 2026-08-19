@@ -130,5 +130,6 @@ Blocked ledger routes are decided as follows for **planning and implementation**
 ## Links
 
 - Catalog: `docs/modernization/behavior-catalog.md`
+- Migration plan: `docs/modernization/migration-plan.md`
 - Dependency ledger: `docs/modernization/dependency-ledger.md`
 - Related: ADR-001–004

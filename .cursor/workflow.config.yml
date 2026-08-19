@@ -43,7 +43,8 @@ modernization:
   retainedScope:
     product: whole-library-csharp-poc
     catalog: docs/modernization/behavior-catalog.md
-    nextCommand: plan-migration
+    nextCommand: refine-feature
+    plan: docs/modernization/migration-plan.md
 
   evidenceGrades:
     E1: verified

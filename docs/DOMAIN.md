@@ -112,7 +112,7 @@ Process-global `COMMON_VARS` / RNG state is an adapter or domain-service concern
 
 ## 9. Open modeling questions
 
-Library-wide (do not block `/plan-migration`):
+Library-wide (do not block `/refine-feature` on BEH-001):
 
 - [ ] Canonical C# names: keep Fortran identifiers (`linspace`, `fftgf`) as aliases, or rename to ubiquitous-language types only?
 - [ ] How is process-global RNG/timer/diagnostic state exposed without ASP.NET request races?
@@ -134,9 +134,10 @@ First-slice (block `/refine-feature` on BEH-001, not library planning):
 
 - Purpose: `docs/PURPOSE.md`
 - Catalog: `docs/modernization/behavior-catalog.md`
+- Migration plan: `docs/modernization/migration-plan.md`
 - ADRs: ADR-001–005
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 
 ---
 
-*Updated: 2026-08-19 | Whole-library bounded contexts added; linspace subdomain retained*
+*Updated: 2026-08-19 | Whole-library bounded contexts added; linspace subdomain retained | Plan: SL-001–SL-025*

@@ -162,5 +162,6 @@ No dependency-specific CVE claim is made because exact legacy versions are not k
 - Translation gaps: `docs/modernization/translation-gaps.md`
 - ADRs: ADR-001–005 under `docs/decisions/`
 - Catalog: `docs/modernization/behavior-catalog.md`
+- Migration plan: `docs/modernization/migration-plan.md`
 
 *Created: 2026-08-09 | Incrementally refreshed: 2026-08-10 | First-slice decisions: 2026-08-19 | Whole-library POC planning gate: 2026-08-19*

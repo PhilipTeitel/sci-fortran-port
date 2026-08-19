@@ -56,8 +56,13 @@ The owner has now corrected that purpose: the project must port the Fortran libr
 
 ---
 
+## Later amendment (2026-08-19)
+
+`/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). Next command is `/refine-feature` on BEH-001.
+
 ## Links
 
 - Assessment: `docs/modernization/ASSESSMENT.md` Conditions 1–11
 - Catalog: `docs/modernization/behavior-catalog.md`
+- Migration plan: `docs/modernization/migration-plan.md`
 - Related: ADR-001, ADR-002, ADR-003, ADR-005
