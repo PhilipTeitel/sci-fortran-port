@@ -108,21 +108,21 @@ Process-global `COMMON_VARS` / RNG state is an adapter or domain-service concern
 | Event | When | Source |
 |-------|------|--------|
 | LinearSequenceProduced | Evaluation succeeds | BEH-001 |
-| LinearSequenceRejected | Length/endpoint rule fails | BEH-001; mapping TBD in `/refine-feature` |
+| LinearSequenceRejected | Length/endpoint rule fails | BEH-001; REQ-001 S3/S4 (typed domain failure, no sequence; concrete type names are design) |
 
 ## 9. Open modeling questions
 
-Library-wide (do not block `/refine-feature` on BEH-001):
+Library-wide (do not block SL-001 design; resolve on later slices):
 
 - [ ] Canonical C# names: keep Fortran identifiers (`linspace`, `fftgf`) as aliases, or rename to ubiquitous-language types only?
 - [ ] How is process-global RNG/timer/diagnostic state exposed without ASP.NET request races?
 - [ ] Which MATRIX/FFT results require order/sign canonicalization?
 
-First-slice (block `/refine-feature` on BEH-001, not library planning):
+First-slice (closed or deferred by `/refine-feature` / REQ-001; library planning is separate):
 
-- [ ] Expose `includeStart` / `includeStop` / `step` on the first managed port?
-- [ ] Decreasing intervals and `start == stop` now or later?
-- [ ] Domain-failure vocabulary vs leftover `N<0` / `N<2` strings?
+- [x] Expose `includeStart` / `includeStop` / `step` on the first managed port? **No — deferred.** REQ-001 non-goal until fixtures exist.
+- [x] Decreasing intervals and `start == stop` now or later? Formula is REQ-001 S2; FIX-001 remains the only exact-equality parity fixture.
+- [x] Domain-failure vocabulary vs leftover `N<0` / `N<2` strings? Typed domain failure, distinguishable S3 vs S4; Fortran strings not first-slice parity. Concrete type names wait for `/design-application`.
 
 ## 10. Tensions / conflicts
 
@@ -137,7 +137,8 @@ First-slice (block `/refine-feature` on BEH-001, not library planning):
 - Migration plan: `docs/modernization/migration-plan.md`
 - ADRs: ADR-001–005
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Requirements: `docs/requirements/REQ-001-linspace.md`
 
 ---
 
-*Updated: 2026-08-19 | Whole-library bounded contexts added; linspace subdomain retained | Plan: SL-001–SL-025*
+*Updated: 2026-08-19 | Whole-library bounded contexts added; linspace subdomain retained | Plan: SL-001–SL-025 | Refine: REQ-001*

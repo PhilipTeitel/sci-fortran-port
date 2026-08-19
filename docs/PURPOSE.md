@@ -58,7 +58,8 @@ Do not silently “fix” unexecuted branches. Schedule `/document-legacy` and `
 - Related plan: `docs/modernization/migration-plan.md`
 - Related ADRs: ADR-001–005
 - Related behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Related requirements: `docs/requirements/REQ-001-linspace.md`
 
 ---
 
-*Updated: 2026-08-19 | Owner purpose correction: whole-library C# port | Plan: `/plan-migration`*
+*Updated: 2026-08-19 | Owner purpose correction: whole-library C# port | Plan: `/plan-migration` | Refine: REQ-001*

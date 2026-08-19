@@ -17,7 +17,7 @@
 **Defect policy:** reproduce-then-refactor
 **Authority:** ADR-004, ADR-005, `docs/modernization/behavior-catalog.md`
 
-This plan sequences code production. It does not authorize implementation-ready stories except where a slice has completed `/refine-feature`. It does not claim T1 parity outside recovered fixtures.
+This plan sequences code production. It does not authorize implementation-ready port stories except where a slice has completed `/refine-feature` **and** `/plan-port-story`. It does not claim T1 parity outside recovered fixtures.
 
 ---
 
@@ -27,9 +27,9 @@ The product is a host-neutral C# port of the retained `SCIFOR` public surface pl
 
 Work proceeds as a **strangler of the managed API**: each slice adds ports for one retained family. CLI programs are later driving adapters over those ports; they do not reimplement arithmetic. ASP.NET remains an optional later adapter and is not on the critical path.
 
-Only **SL-001 (BEH-001)** is recovered enough to start requirements. Every other retained ID still needs `/document-legacy` (and, for T1 hash-only rows, recovered parsed fixtures) before `/refine-feature`.
+Only **SL-001 (BEH-001)** has recovered behavior **and** a refined REQ. REQ-001 is `Draft` until the owner marks `Ready for Design`. Every other retained ID still needs `/document-legacy` (and, for T1 hash-only rows, recovered parsed fixtures) before `/refine-feature`.
 
-**Next ADD command:** `/refine-feature` against `docs/modernization/behaviors/BEH-001-linspace.md`.
+**Next ADD command:** `/design-application` against `docs/requirements/REQ-001-linspace.md`, then `/plan-port-story` for SL-001.
 
 ---
 
@@ -45,7 +45,7 @@ Only **SL-001 (BEH-001)** is recovered enough to start requirements. Every other
 
 **Preserve-then-refactor:** reproduce accepted legacy results (and recorded defects) at the port first. Do not silently “fix” unexecuted branches (PURPOSE; defect policy). Refactor after parity for that slice is accepted.
 
-**Solution layout, type names, and DI** are SL-001 design work after `/refine-feature` (ADR-002, ADR-004 explicit non-decisions). This plan does not invent them.
+**Solution layout, type names, and DI** are SL-001 design work after REQ-001 (`/design-application`; ADR-002, ADR-004 explicit non-decisions). This plan does not invent them.
 
 ---
 
@@ -56,8 +56,8 @@ Every slice except SL-001 starts with recovery. Skip a step only when its artifa
 | Step | Command / activity | Exit criterion |
 |------|--------------------|----------------|
 | 1. Recover | `/document-legacy` | BEH file, flow, fixtures/captures, DEF rows for contradictions on that surface |
-| 2. Requirements | `/refine-feature` | Implementation-ready stories; open questions closed or explicitly deferred |
-| 3. Design | slice design (after refine) | Port signatures, types, test list, adapter mapping; no new product-scope decisions |
+| 2. Requirements | `/refine-feature` | REQ file with `Sn` scenarios; open questions closed or explicitly deferred |
+| 3. Design | `/design-application` then `/plan-port-story` | Port signatures, types, test list, adapter mapping; no new product-scope decisions |
 | 4. Implement | C# behind hexagonal ports | Stories for that slice; FIX/captures pass their comparison rules |
 | 5. UAT | parity against accepted fixtures | No claim beyond recovered evidence |
 
@@ -103,7 +103,7 @@ flowchart TD
 
 | Slice | Behaviors | Status now | Next command | Implementation-ready? |
 |-------|-----------|------------|--------------|------------------------|
-| SL-001 | BEH-001 `TOOLS.linspace` | Recovered; FIX-001 accepted | `/refine-feature` | **No** until refine closes first-slice questions |
+| SL-001 | BEH-001 `TOOLS.linspace` | Recovered; REQ-001 Draft (S1–S5) | `/design-application` then `/plan-port-story` | **No** until `/plan-port-story` (refine produced requirements, not stories) |
 
 ### Wave B — remaining grids
 
@@ -167,10 +167,10 @@ Internal modules that are **not** product slices: `VECTORS` (used by retained nu
 
 ### SL-001 — BEH-001 linspace (first code slice)
 
-- **In:** host-neutral inclusive `linspace` port; FIX-001 exact parsed equality (ADR-003); typed domain failure instead of `STOP` (ADR-002); hexagonal solution bootstrap as **design after refine** (not specified here).
-- **Out:** CLI `linspace` (BEH-201 / SL-017); optional `istart`/`iend`/`mesh` until refine decides; Fortran stdout/`es24.17`.
-- **Defects:** DEF-001 reproduce-faithfully (probe values, not Python golden). DEF-002 (`num<0` sizing) must be decided at refine. DEF-003/004 stay with CLI slices.
-- **Open questions that block refine, not this plan:** expose endpoint flags on the first port? decreasing/`start==stop` now or later? failure vocabulary vs leftover `N<0`/`N<2` strings (`docs/DOMAIN.md` §9; BEH-001 §10).
+- **In:** host-neutral inclusive `linspace` port; FIX-001 exact parsed equality (ADR-003); typed domain failure instead of `STOP` (ADR-002); hexagonal solution bootstrap as **design after REQ-001** (not specified here).
+- **Out:** CLI `linspace` (BEH-201 / SL-017); optional `istart`/`iend`/`mesh` (REQ-001 non-goal); Fortran stdout/`es24.17`.
+- **Defects:** DEF-001 reproduce-faithfully (probe values, not Python golden). DEF-002 Fortran sizing-before-check remains an M3 ledger label; REQ-001 S3 already requires typed rejection with no sequence. DEF-003/004 stay with CLI slices.
+- **Refine outcomes:** REQ-001 S1–S5. Optional flags deferred; formula is the S2 rule; FIX-001 is the only exact-equality parity fixture; S3 vs S4 are distinguishable domain failures without Fortran string parity.
 - **Dependencies:** none of DEP-012–018. GAP-008/009 are closed for FIX-001 only.
 
 ### SL-002 — BEH-002 logspace
@@ -366,7 +366,7 @@ These do not block SL-001 refine. They must be resolved in the listed slices, no
 
 Library-wide design already exists: hexagonal ports, managed API as product, CLI as adapter, probe baseline, retirements (ADR-002, ADR-004, ADR-005).
 
-**Slice design starts after `/refine-feature` for that slice.** For SL-001 that is the next command after this plan. Design then chooses concrete C# names, project layout, and the first port signature — the items ADR-002 explicitly deferred.
+**Slice design starts after `/refine-feature` for that slice.** SL-001 refine produced `docs/requirements/REQ-001-linspace.md` (`Draft`). `/design-application` then chooses concrete C# names, project layout, and the first port signature — the items ADR-002 explicitly deferred. `/plan-port-story` writes the implementation-ready port story.
 
 Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 
@@ -374,9 +374,9 @@ Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 
 ## 11. Next command
 
-**`/refine-feature` on BEH-001** (`docs/modernization/behaviors/BEH-001-linspace.md`).
+**`/design-application` on REQ-001** (`docs/requirements/REQ-001-linspace.md`), then **`/plan-port-story`** for SL-001 / BEH-001.
 
-Do not start SL-002+ implementation stories from this plan. After SL-001 C# exists and FIX-001 passes, the following slice is SL-002 `/document-legacy`.
+Owner should mark REQ-001 `Ready for Design` after review. Do not start SL-002+ implementation stories from this plan. After SL-001 C# exists and FIX-001 passes, the following slice is SL-002 `/document-legacy`.
 
 ---
 
@@ -386,6 +386,7 @@ Do not start SL-002+ implementation stories from this plan. After SL-001 C# exis
 - Assessment: `docs/modernization/ASSESSMENT.md`
 - Catalog: `docs/modernization/behavior-catalog.md`
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Requirements: `docs/requirements/REQ-001-linspace.md`
 - Fixture: `docs/modernization/fixtures/FIX-001-linspace-5.md`
 - Defects: `docs/modernization/defect-ledger.md`
 - Oracle: `docs/modernization/oracle.md`
@@ -394,4 +395,4 @@ Do not start SL-002+ implementation stories from this plan. After SL-001 C# exis
 
 ---
 
-*Created: 2026-08-19 | Command: `/plan-migration` | Input catalog: `docs/modernization/behavior-catalog.md` | ADR-005 name coverage added 2026-08-19*
+*Created: 2026-08-19 | Command: `/plan-migration` | Input catalog: `docs/modernization/behavior-catalog.md` | ADR-005 name coverage added 2026-08-19 | Refine: REQ-001*

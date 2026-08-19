@@ -14,6 +14,7 @@ This catalog is the retained-surface list sequenced by `docs/modernization/migra
 | Status | Meaning |
 |--------|---------|
 | Recovered | BEH file exists; next is `/refine-feature`, then slice design, then C# |
+| Requirements drafted | REQ file exists (often `Draft` until owner marks `Ready for Design`); next is `/design-application` then `/plan-port-story` |
 | T1 characterized | Probe executed the library call; recover fixtures/docs next |
 | Catalog-only | Public surface retained; `/document-legacy` when the slice is scheduled |
 | Adapter | CLI or I/O host over a library port |
@@ -25,7 +26,7 @@ This catalog is the retained-surface list sequenced by `docs/modernization/migra
 
 | ID | Job | Legacy surface | Status | Evidence | Next ADD command |
 |----|-----|----------------|--------|----------|------------------|
-| BEH-001 | Inclusive linear sequence | `TOOLS.linspace` | Recovered; ready for requirements | FIX-001 exact parsed `0,0.25,0.5,0.75,1` | `/refine-feature` (SL-001) |
+| BEH-001 | Inclusive linear sequence | `TOOLS.linspace` | Recovered; REQ-001 Draft | FIX-001 exact parsed `0,0.25,0.5,0.75,1` | `/design-application` then `/plan-port-story` (SL-001) |
 | BEH-002 | Logarithmic sequence | `TOOLS.logspace` | T1 characterized | `CAP-20260810-LOGSPACE` SHA-256 `c5b198af…`; parsed values not retained | `/document-legacy` |
 | BEH-003 | Fermi function | `FUNCTIONS.fermi` | T1 characterized | `CAP-20260810-FERMI` SHA-256 `6f35eadc…` | `/document-legacy` |
 | BEH-004 | Numerical derivative | `TOOLS.deriv` | T1 characterized | `CAP-20260810-DERIV` SHA-256 `8a8879bc…`; input `numutils/test/xy2.data` | `/document-legacy` |
@@ -102,6 +103,7 @@ Superseded by `docs/modernization/migration-plan.md` (SL-001–SL-025). Summary:
 - Oracle: `docs/modernization/oracle.md`
 - ADRs: ADR-004, ADR-005
 - Recovered behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Requirements: `docs/requirements/REQ-001-linspace.md`
 - Migration plan: `docs/modernization/migration-plan.md`
 
-*Created: 2026-08-19 | Sequenced: 2026-08-19 | ADR-005 name coverage: 2026-08-19*
+*Created: 2026-08-19 | Sequenced: 2026-08-19 | ADR-005 name coverage: 2026-08-19 | Refine: REQ-001*

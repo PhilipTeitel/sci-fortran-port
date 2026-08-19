@@ -10,8 +10,8 @@
 
 | ID | Defect / mismatch | Affected behavior | Evidence | Decision | UAT impact | Backlog / story |
 |----|-------------------|-------------------|----------|----------|------------|-----------------|
-| DEF-001 | Checked-in `fidelity/golden/linspace-5.txt` is regenerated from a Python formula, not a retained legacy capture, even though it numerically matched the probe | BEH-001 / FIX-001 | `E1 verified / E3 code-derived / E4 inferred` — `docs/modernization/oracle.md:20,101`; ADR-001 | reproduce-faithfully the **probe parsed values**; do not treat the golden file as authority | Parity must use FIX-001, not the golden path | TBD port story |
-| DEF-002 | `linspace` declares `array(num)` before checking `num<0`, so negative length may be processor-dependent prior to `error`/`STOP` | BEH-001 error path | `E3 code-derived` — `src/tools_grids.f90:1-7`; unexecuted | TBD | Blocks error-path parity until decided | TBD |
+| DEF-001 | Checked-in `fidelity/golden/linspace-5.txt` is regenerated from a Python formula, not a retained legacy capture, even though it numerically matched the probe | BEH-001 / FIX-001 | `E1 verified / E3 code-derived / E4 inferred` — `docs/modernization/oracle.md:20,101`; ADR-001 | reproduce-faithfully the **probe parsed values**; do not treat the golden file as authority | Parity must use FIX-001, not the golden path | REQ-001 S1; port story TBD |
+| DEF-002 | `linspace` declares `array(num)` before checking `num<0`, so negative length may be processor-dependent prior to `error`/`STOP` | BEH-001 error path | `E3 code-derived` — `src/tools_grids.f90:1-7`; unexecuted | TBD (M3). REQ-001 S3 already requires typed rejection with **no sequence**; Fortran negative-length allocation is not a managed-API contract (ADR-005) | Does not block S3; ledger label still open | REQ-001 S3; port story TBD |
 | DEF-003 | CLI program unit is `linsp` while help/NAME is `linspace` | CLI surface (not first slice) | `E3 code-derived` — `numutils/src/linspace.f90:1-13` | TBD | None for managed-API slice | TBD |
 | DEF-004 | Fidelity driver prints `es24.17`; CLI prints list-directed `write(*,*)` | Text surfaces (not first slice) | `E3 code-derived` — `fidelity/driver.f90:17`; `numutils/src/linspace.f90:47-49` | TBD | None while parity is parsed managed-API values (ADR-003) | TBD |
 
@@ -33,14 +33,15 @@ None yet.
 
 ## 5. Open defect decisions
 
-- [ ] DEF-002 — `reproduce-faithfully`, `fix-now`, or `fix-later` for negative `num` sizing/`STOP`
+- [ ] DEF-002 — `reproduce-faithfully`, `fix-now`, or `fix-later` for the Fortran negative-length sizing/`STOP` hazard. REQ-001 S3 already specifies managed-port rejection with no sequence; this row is the M3 label for the Fortran allocation-before-check quirk, not a missing product behavior.
 - [ ] DEF-003 — only if the CLI becomes in scope
 - [ ] DEF-004 — only if Fortran text compatibility becomes in scope
 
 ## 6. Links
 
 - Behavior catalog: `docs/modernization/behaviors/BEH-NNN-*.md`
+- Requirements: `docs/requirements/REQ-001-linspace.md`
 - Oracle: `docs/modernization/oracle.md`
 - Migration plan: `docs/modernization/migration-plan.md`
 
-*Created: 2026-08-19*
+*Created: 2026-08-19 | Refine note: 2026-08-19 (REQ-001 S3 maps abort; DEF-002 label still open)*
