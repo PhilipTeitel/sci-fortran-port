@@ -69,7 +69,7 @@ Catalog-only rows **must not** jump to design or C#. T1 hash-only rows (BEH-002�
 
 Dependency-light numeric ports first. Provider-heavy and I/O/CLI slices later. The catalog’s suggested order is kept except:
 
-1. **BEH-010 is split.** Remaining grids/sort helpers stay with TOOLS (SL-004). Bethe DOS / lattice-adjacent TOOLS helpers move with many-body (SL-014), because they are not required for `linspace`/`logspace`/`arange`.
+1. **BEH-010 is split.** Remaining grids/sort helpers stay with TOOLS (SL-004). Bethe DOS / lattice-adjacent TOOLS helpers **and TOOLS convergence checks** move with many-body (SL-014), because they are not required for `linspace`/`logspace`/`arange`.
 2. **CLI adapters are a later wave**, not interleaved with SL-001. ADR-002 keeps the first driving adapter as the managed API. CLI text/locale/exit contracts (GAP-007, DEF-003, DEF-004) would otherwise stall the walking skeleton.
 3. **BEH-110 is scheduled immediately before the CLI wave.** Port-level `STOP` → typed domain failure starts in SL-001 (ADR-002). PARSE_CMD, timer, and host diagnostics are adapter work for CLIs.
 
@@ -141,7 +141,7 @@ flowchart TD
 
 | Slice | Behaviors | Status now | Next command | Implementation-ready? |
 |-------|-----------|------------|--------------|------------------------|
-| SL-014 | BEH-090 Green / Padé / square lattice **plus** TOOLS Bethe helpers deferred from BEH-010 | Catalog-only | `/document-legacy` | No |
+| SL-014 | BEH-090 Green / Padé / square lattice **plus** TOOLS Bethe helpers and convergence checks deferred from BEH-010 | Catalog-only | `/document-legacy` | No |
 | SL-015 | BEH-100 `IOTOOLS` file and plot-data helpers | Catalog-only | `/document-legacy` | No |
 
 ### Wave G — CLI adapters (after matching ports exist)
@@ -154,12 +154,12 @@ flowchart TD
 | SL-019 | BEH-205 `deriv` CLI | SL-007, SL-016 | `/document-legacy` |
 | SL-020 | BEH-206 `spline` CLI | SL-008, SL-016 | `/document-legacy` |
 | SL-021 | BEH-207 `fftgf` CLI | SL-013, SL-016 | `/document-legacy` |
-| SL-022 | BEH-208, BEH-209 (`wmatsubara`, `pade`) | SL-014, SL-016 | `/document-legacy` |
+| SL-022 | BEH-208, BEH-209 (`wmatsubara`, `pade`) | SL-014, SL-016; add SL-004 if recovery shows a TOOLS grid | `/document-legacy` |
 | SL-023 | BEH-210–BEH-213 (`random`, `histogram`, `kdensity`, `numstat`) | SL-010, SL-016 | `/document-legacy` |
 | SL-024 | BEH-214 `func` + managed expression port | SL-016; ADR-005 evaluator substitution | `/document-legacy` |
 | SL-025 | BEH-215, BEH-216 (`splot`, `ffcmplx`) | SL-015, SL-016 | `/document-legacy` |
 
-`VECTORS` stays an internal dependency of retained modules. It is not a standalone product slice.
+Internal modules that are **not** product slices: `VECTORS` (used by retained numeric modules) and the `LIST_*` accumulators (used by stream-processing CLIs). Implement them only as needed by a scheduled port or adapter; do not invent catalog IDs for them.
 
 ---
 
@@ -187,7 +187,7 @@ flowchart TD
 ### SL-004 — BEH-010 remaining grids
 
 - `powspace` / `upmspace` / `upminterval` / sort-uniq-shift only.
-- Split allowed by the catalog when dependencies demand it. Bethe/convergence wait for SL-014.
+- Split allowed by the catalog when dependencies demand it. TOOLS Bethe DOS/lattice-adjacent helpers and TOOLS convergence checks (`tools_check_scalar`, `tools_test_convergence`, optional `error.err`) wait for SL-014.
 
 ### SL-005 / SL-006 — FUNCTIONS
 
@@ -226,7 +226,8 @@ flowchart TD
 
 ### SL-014 — many-body helpers
 
-- `GREENFUNX`, `PADE`, `SQUARE_LATTICE`, plus TOOLS Bethe helpers.
+- `GREENFUNX`, `PADE`, `SQUARE_LATTICE`, plus the BEH-010 remainder: TOOLS Bethe helpers and TOOLS convergence checks (ADR-005).
+- Convergence helpers may write `error.err` / `ERROR.README`; treat that as a file side-effect to recover, not as SL-015 I/O.
 - Square-lattice denominator reversal and related history stay on the defect ledger until a reproduce/fix decision (ASSESSMENT RISK-011). Do not silently correct.
 
 ### SL-015 — I/O and plot data
@@ -243,14 +244,16 @@ flowchart TD
 
 - Each CLI calls existing ports. Byte-level Fortran formatting is out of SL-001 and is decided per adapter (DEF-004, GAP-007).
 - SL-021 must treat complex-column order as a refine/defect decision, not a silent swap.
+- SL-022 (`wmatsubara`) is cataloged as depending on BEH-010 / many-body helpers. After the BEH-010 split, `/document-legacy` must name the library port (SL-004 grid vs SL-014 many-body) before the adapter starts; do not reimplement the generator in the CLI project.
 - SL-024 substitutes a managed evaluator; recover grammar from characterization (DEP-026, GAP-024).
 - SL-025 wraps Gnuplot; `vfplot` stays retired.
+- Stream-reading CLIs may need `LIST_*` accumulators; those internals travel with the adapter that first requires them.
 
 ---
 
 ## 6. Coverage checklist
 
-Every retained catalog ID appears exactly once as a primary slice (BEH-010 is split as noted).
+Every retained catalog ID appears exactly once as a primary slice (BEH-010 is split as noted). ADR-005 public names are mapped below so TOOLS convergence checks and non-catalog internals cannot drop out of the split.
 
 | Catalog ID | Slice | Wave |
 |------------|-------|------|
@@ -259,7 +262,7 @@ Every retained catalog ID appears exactly once as a primary slice (BEH-010 is sp
 | BEH-003 | SL-005 | C |
 | BEH-004 | SL-007 | C |
 | BEH-005 | SL-003 | B |
-| BEH-010 | SL-004 (grids) + SL-014 (Bethe helpers) | B / F |
+| BEH-010 | SL-004 (grids) + SL-014 (Bethe helpers and convergence checks) | B / F |
 | BEH-020 | SL-006 | C |
 | BEH-030 | SL-009 | D |
 | BEH-040 | SL-011 | E |
@@ -283,6 +286,32 @@ Every retained catalog ID appears exactly once as a primary slice (BEH-010 is sp
 | BEH-214 | SL-024 | G |
 | BEH-215 | SL-025 | G |
 | BEH-216 | SL-025 | G |
+
+### ADR-005 retained names → slices
+
+Catalog IDs are planning handles. This table is the procedure-level coverage check against ADR-005.
+
+| ADR-005 surface | Catalog | Slice |
+|-----------------|---------|-------|
+| `TOOLS.linspace` | BEH-001 | SL-001 |
+| `TOOLS.logspace` | BEH-002 | SL-002 |
+| `TOOLS.arange` | BEH-005 | SL-003 |
+| `TOOLS.powspace`, `upmspace`, `upminterval`, sort/uniq/shift | BEH-010 | SL-004 |
+| `TOOLS.deriv` | BEH-004 | SL-007 |
+| `FUNCTIONS.fermi` | BEH-003 | SL-005 |
+| `FUNCTIONS` public remainder (`heaviside`, `step`, `sgn`, `wfun`, `zerf`) | BEH-020 | SL-006 |
+| `INTEGRATE` (`trapz`, `simps`, `kronig` / `kramers_kronig`, `finter_*`) | BEH-030 | SL-009 |
+| `SPLINE` | BEH-070 | SL-008 |
+| `RANDOM` / `STATISTICS` | BEH-080 | SL-010 |
+| `MATRIX` | BEH-040 | SL-011 |
+| `OPTIMIZE` (current facade, not historical `ZEROS`) | BEH-060 | SL-012 |
+| `FFTGF` NR (`cfft_1d_*`, `fftgf_*`, `fftff_*`) | BEH-050 | SL-013 |
+| `GREENFUNX`, `PADE`, `SQUARE_LATTICE` | BEH-090 | SL-014 |
+| TOOLS Bethe helpers; TOOLS convergence checks | BEH-010 remainder | SL-014 |
+| `IOTOOLS` (`file_*`, `data_open`/`data_store`, `splot`/`sread`) | BEH-100 | SL-015 |
+| `PARSE_CMD`, `COMMON_VARS` diagnostics, `TIMER` | BEH-110 | SL-016 |
+| Default `all` CLIs plus `ffcmplx` | BEH-201–BEH-216 | SL-017–SL-025 |
+| `VECTORS`; `LIST_*` accumulators | none (internal) | consumed by retained modules / stream CLIs |
 
 ---
 
@@ -365,4 +394,4 @@ Do not start SL-002+ implementation stories from this plan. After SL-001 C# exis
 
 ---
 
-*Created: 2026-08-19 | Command: `/plan-migration`*
+*Created: 2026-08-19 | Command: `/plan-migration` | Input catalog: `docs/modernization/behavior-catalog.md` | ADR-005 name coverage added 2026-08-19*

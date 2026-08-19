@@ -35,11 +35,11 @@ This catalog is the retained-surface list sequenced by `docs/modernization/migra
 
 ## 3. Catalog-only library families
 
-Slice IDs are planning handles. `docs/modernization/migration-plan.md` splits BEH-010 (grids vs Bethe) and schedules CLI adapters after library ports.
+Slice IDs are planning handles. `docs/modernization/migration-plan.md` splits BEH-010 (grids vs Bethe/convergence) and schedules CLI adapters after library ports.
 
 | ID | Family | Public names (non-exhaustive) | Module | Notes |
 |----|--------|-------------------------------|--------|-------|
-| BEH-010 | Remaining `TOOLS` grids/helpers | `powspace`, `upmspace`, `upminterval`, sort/uniq/shift; Bethe deferred to SL-014 | `TOOLS` | Grids in SL-004; Bethe with BEH-090 |
+| BEH-010 | Remaining `TOOLS` grids/helpers | `powspace`, `upmspace`, `upminterval`, sort/uniq/shift; Bethe DOS and convergence checks deferred to SL-014 | `TOOLS` | Grids in SL-004; Bethe/convergence with BEH-090 |
 | BEH-020 | Remaining `FUNCTIONS` | `heaviside`, `step`, `sgn`, `wfun`, `zerf` | `FUNCTIONS` | Bundled special-function **internals** not public |
 | BEH-030 | Quadrature | `trapz`, `simps`, `kronig`, `kramers_kronig`, `finter_*` | `INTEGRATE` | QUADPACK behind facade |
 | BEH-040 | Dense linear algebra | `matrix_inverse*`, `m_invert*`, `matrix_diagonalize`, `solve_linear_system` | `MATRIX` | Needs numeric-port provider (ADR-005) |
@@ -81,7 +81,7 @@ Each row is a driving adapter over the library ports above. Do not reimplement a
 
 ## 5. Suggested strangler order
 
-Superseded by `docs/modernization/migration-plan.md` (SL-001–SL-025). Summary: BEH-001 first; remaining grids; functions and `deriv`; spline/integrate/stats; matrix/optimize/FFT; many-body and I/O; then BEH-110 and CLI adapters. BEH-010 Bethe helpers travel with BEH-090.
+Superseded by `docs/modernization/migration-plan.md` (SL-001–SL-025). Summary: BEH-001 first; remaining grids; functions and `deriv`; spline/integrate/stats; matrix/optimize/FFT; many-body and I/O; then BEH-110 and CLI adapters. BEH-010 Bethe helpers and convergence checks travel with BEH-090.
 
 ---
 
@@ -104,4 +104,4 @@ Superseded by `docs/modernization/migration-plan.md` (SL-001–SL-025). Summary:
 - Recovered behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 - Migration plan: `docs/modernization/migration-plan.md`
 
-*Created: 2026-08-19 | Sequenced: 2026-08-19*
+*Created: 2026-08-19 | Sequenced: 2026-08-19 | ADR-005 name coverage: 2026-08-19*
