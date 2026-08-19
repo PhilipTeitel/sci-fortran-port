@@ -41,6 +41,6 @@ None yet.
 
 - Behavior catalog: `docs/modernization/behaviors/BEH-NNN-*.md`
 - Oracle: `docs/modernization/oracle.md`
-- Migration plan: `docs/modernization/migration-plan.md` (**not created yet**; next command is `/plan-migration`)
+- Migration plan: `docs/modernization/migration-plan.md`
 
 *Created: 2026-08-19*

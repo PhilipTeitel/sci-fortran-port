@@ -1,6 +1,6 @@
 # BEH-001: Generate an inclusive linear sequence (linspace)
 
-**Status:** Recovered; first code slice of the whole-library port (ADR-004). Ready for `/refine-feature` after `/plan-migration` sequences work.
+**Status:** Recovered; first code slice (SL-001). Ready for `/refine-feature`.
 **Evidence grade:** `E1 verified` for `FIX-001`; `E3 code-derived` for default-endpoint formula and abort conditions; `E5 unknown` for unexecuted optional flags, `mesh`, invalid `num`, and the CLI surface (out of first-slice scope)
 **Legacy surfaces:** Library function `TOOLS.linspace`; exercised by `fidelity/driver.f90`. CLI `numutils/src/linspace.f90` is documented as related and **out of first-slice scope**.
 **Date:** `2026-08-19`
@@ -127,5 +127,6 @@ Scenario: Invalid negative length
 - Legacy flow: `docs/modernization/flows/BEH-001-linspace.md`
 - Defect ledger: `docs/modernization/defect-ledger.md`
 - ADRs: `docs/decisions/ADR-001-first-slice-oracle-baseline.md`, `docs/decisions/ADR-002-hexagonal-managed-api.md`, `docs/decisions/ADR-003-linspace-numeric-contract.md`
+- Migration plan: `docs/modernization/migration-plan.md` (SL-001)
 
 *Created: 2026-08-19*

@@ -162,7 +162,7 @@ Not applicable as a source-family matrix. The target is modern .NET 8, and no .N
 ## 9. Links
 
 - Dependency ledger: `docs/modernization/dependency-ledger.md`
-- Migration plan: `docs/modernization/migration-plan.md` (not created yet; next command is `/plan-migration`)
+- Migration plan: `docs/modernization/migration-plan.md`
 - ADRs: ADR-001–005 under `docs/decisions/`
 
 *Created: 2026-08-09 | Incrementally refreshed: 2026-08-10 | First-slice decisions: 2026-08-19*
