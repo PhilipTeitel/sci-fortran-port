@@ -81,7 +81,7 @@ No database, network API, message bus, scheduler, web framework, container, or o
 |--------|-------------------|----------|--------------------|-------------|--------------|
 | DEP-001 | .NET 8 SDK, C# compiler, and CLR | substitute | Fortran kinds, array layout, floating-point flags, static initialization, STOP/error behavior, and formatted I/O differ | yes — target runtime/numeric baseline | Compile/run trusted `ifort` fixtures if recoverable; compare routine and CLI outputs at behavior-specific tolerances |
 | DEP-002 | .NET 8 SDK, C# compiler, and CLR | substitute | Same language/runtime mismatch as DEP-001; the merged default does not pin GNU version/flags or prove formatting/numeric behavior | yes — target runtime/numeric baseline | In a disposable copy, pin `gfortran`, clean-build/run twice, record environment and outputs, and detect compiler-dependent behavior before accepting an oracle |
-| DEP-003 | TBD: managed library API, ASP.NET endpoints, CLI compatibility layer, or native adapter | blocked | Fortran module ABI, allocatable arrays, callbacks, column-major arrays, and unknown external consumers prevent choosing wrap versus replace | yes — public/process boundary | Obtain consumer manifests; compile representative consumers; contract-test every accepted boundary |
+| DEP-003 | TBD: managed library API, ASP.NET endpoints, CLI compatibility layer, or native adapter | blocked for full library ABI; **first slice: managed API** | Fortran module ABI, allocatable arrays, callbacks, column-major arrays, and unknown external consumers prevent choosing wrap versus replace for the whole library. BEH-001 uses a host-neutral managed port (ADR-002) and does not preserve `.mod`/`libscifor.a`. | yes — public/process boundary (ADR-002 for first slice) | Obtain consumer manifests before expanding beyond BEH-001; contract-test the managed linspace port against FIX-001 |
 | DEP-004 | `dotnet build` / MSBuild and target CI | reimplement | The merged shell entrypoint makes hidden inputs more explicit but still mutates a tracked FFT symlink, creates in-tree links/artifacts, omits CLI utilities, and depends on machine paths | yes — build/release strategy | First verify the legacy script in a disposable clean copy; target CI must then produce reproducible declared artifacts with source/version metadata and no host aliases or untracked inputs |
 | DEP-005 | MSBuild/.NET artifact generation and managed file-copy tasks | reimplement | Static archives and compiler-specific `.mod` files have no managed analogue | no — subordinate to build strategy | Clean build produces only declared artifacts; installation manifest test |
 | DEP-006 | Assembly informational version plus CI-injected source revision | substitute | Legacy metadata is mutable, checked in, and can become stale | no | Build twice from a pinned commit and assert runtime-reported revision equals source revision |
@@ -156,8 +156,8 @@ No dependency-specific CVE claim is made because exact legacy versions are not k
 
 ## 6. Links
 
-- Assessment: `docs/modernization/ASSESSMENT.md` (not created yet)
+- Assessment: `docs/modernization/ASSESSMENT.md`
 - Translation gaps: `docs/modernization/translation-gaps.md`
-- ADRs: `docs/decisions/` (no ADRs created by this phase)
+- ADRs: `docs/decisions/ADR-001-first-slice-oracle-baseline.md`, `docs/decisions/ADR-002-hexagonal-managed-api.md`, `docs/decisions/ADR-003-linspace-numeric-contract.md`
 
-*Created: 2026-08-09 | Incrementally refreshed: 2026-08-10*
+*Created: 2026-08-09 | Incrementally refreshed: 2026-08-10 | First-slice decisions: 2026-08-19*
