@@ -123,9 +123,10 @@ Closed: retained surface inventory (ADR-005 §5); process-boundary success crite
 - Related assessment: `docs/modernization/ASSESSMENT.md`
 - Related ADRs: ADR-001–008 (ADR-006/007/008 are the operative scope decisions)
 - Related behaviors: `docs/modernization/behaviors/BEH-001-linspace.md`; `BEH-301-*.md` … `BEH-305-*.md`
+- Related requirements: `docs/requirements/REQ-001-linspace.md`
 - Related defect ledger: `docs/modernization/defect-ledger.md`
 - Supersedes: purpose drafts dated 2026-08-10 and 2026-08-18 (same file); 2026-08-18 decisions 2, 4, and 5
 
 ---
 
-*Created: 2026-08-10 | Updated: 2026-08-18, 2026-08-19 (managed-API boundary; CLI retired; adapter classification; demonstration-first scope) | Plan: `docs/modernization/migration-plan.md`*
+*Created: 2026-08-10 | Updated: 2026-08-18, 2026-08-19 (managed-API boundary; CLI retired; adapter classification; demonstration-first scope), 2026-08-20 (`REQ-001`) | Plan: `docs/modernization/migration-plan.md`*

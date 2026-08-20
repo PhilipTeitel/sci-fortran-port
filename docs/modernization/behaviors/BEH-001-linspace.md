@@ -1,6 +1,6 @@
 # BEH-001: Generate an inclusive linear sequence (linspace)
 
-**Status:** Recovered; first code slice (VS-1, formerly SL-001). Ready for `/refine-feature`.
+**Status:** Recovered; first code slice (VS-1, formerly SL-001). Requirements refined in `REQ-001` (`Draft`). Next: `/design-application`.
 **Evidence grade:** `E1 verified` for `FIX-001`; `E3 code-derived` for default-endpoint formula and abort conditions; `E5 unknown` for unexecuted optional flags, `mesh`, invalid `num`, and the CLI surface (out of first-slice scope)
 **Legacy surfaces:** Library function `TOOLS.linspace`; exercised by `fidelity/driver.f90`. CLI `numutils/src/linspace.f90` is documented as related and **out of first-slice scope**.
 **Date:** `2026-08-19`
@@ -49,26 +49,28 @@ The 2026-08-10 probe observed `linspace(0,1,5)` → `0, 0.25, 0.5, 0.75, 1`. The
 | Default `istart` and `iend` are true: both endpoints are included. | `E3 code-derived` — `src/tools_grids.f90:8-14` | no for first-slice default path |
 | With both endpoints included and `num >= 2`, `step = (stop-start)/real(num-1,8)` and `array(i) = start + real(i-1,8)*step`. | `E3 code-derived` — `src/tools_grids.f90:11-14`; `E1` confirms FIX-001 | no |
 | FIX-001 values are `0, 0.25, 0.5, 0.75, 1` with exact parsed equality. | `E1 verified` — `docs/modernization/oracle.md:96,109`; ADR-003 | no |
-| `num < 0` calls `error("linspace: N<0, abort.")` then `STOP`. | `E3 code-derived` — `src/tools_grids.f90:7`; `src/COMVARS.f90:189-199` | yes — managed exception mapping accepted in principle (ADR-002); message/process compatibility not specified |
-| Both endpoints included and `num < 2` calls `error("linspace: N<2 with both start and end points")`. | `E3 code-derived` — `src/tools_grids.f90:12` | yes — unexecuted |
+| `num < 0` calls `error("linspace: N<0, abort.")` then `STOP`. | `E3 code-derived` — `src/tools_grids.f90:7`; `src/COMVARS.f90:189-199` | no for this slice — `REQ-001` S5 maps to typed domain failure; message/process not the managed contract |
+| Both endpoints included and `num < 2` calls `error("linspace: N<2 with both start and end points")`. | `E3 code-derived` — `src/tools_grids.f90:12` | no for classification — `REQ-001` S6; unexecuted so not T1 |
 | If only start is included, `step = (stop-start)/num` and samples are `start + (i-1)*step` for `i=1..num` (stop excluded). | `E3 code-derived` — `src/tools_grids.f90:16-18` | yes — unexecuted; out of first-slice parity |
 | If only stop is included, `step = (stop-start)/num` and samples are `start + i*step` for `i=1..num` (start excluded). | `E3 code-derived` — `src/tools_grids.f90:20-22` | yes — unexecuted; out of first-slice parity |
 | If neither endpoint is included, `step = (stop-start)/(num+1)` and samples are `start + i*step` for `i=1..num`. | `E3 code-derived` — `src/tools_grids.f90:24-27` | yes — unexecuted; out of first-slice parity |
-| Result array is sized as `array(num)` in the function header before the `num<0` check. | `E3 code-derived` — `src/tools_grids.f90:1-7` | yes — see DEF-002 |
+| Result array is sized as `array(num)` in the function header before the `num<0` check. | `E3 code-derived` — `src/tools_grids.f90:1-7` | no for the managed port — DEF-002 **fix-now**: do not reproduce declaration-before-check |
 | CLI help describes the same job (“evenly spaced numbers over a specified interval”) with defaults `wmin=-5`, `wmax=5`, `L=1024`. | `E3 code-derived` — `numutils/src/linspace.f90:17-25` | yes — CLI not in first slice |
 
 ## 6. Error handling and edge cases
 
 | Case | Legacy behavior | Evidence | Defect decision |
 |------|-----------------|----------|-----------------|
-| `num < 0` | `error` + `STOP` | `E3` — `src/tools_grids.f90:7` | TBD — DEF-002 notes sizing-before-check; decision open |
-| Inclusive endpoints and `num < 2` | `error` + `STOP` | `E3` — `src/tools_grids.f90:12` | none for happy-path slice; parity out of scope until executed |
-| `start == stop`, `num >= 2`, inclusive | Constant sequence at `start` by the formula | `E4 inferred` from formula; not executed | TBD — not in FIX-001 |
-| Decreasing interval (`start > stop`) | Negative step; still includes both ends | `E4 inferred` from formula; not executed | TBD |
+| `num < 0` | `error` + `STOP` | `E3` — `src/tools_grids.f90:7` | **fix-now** at the managed port (DEF-002): typed domain failure, no sequence allocation; Fortran declaration-before-check is not retained |
+| Inclusive endpoints and `num < 2` | `error` + `STOP` | `E3` — `src/tools_grids.f90:12` | Specified as typed domain failure (`REQ-001` S6); not T1 |
+| `start == stop`, `num >= 2`, inclusive | Constant sequence at `start` by the formula | `E4 inferred` from formula; not executed | Specified (`REQ-001` S4); not T1 until an additional fixture exists |
+| Decreasing interval (`start > stop`) | Negative step; still includes both ends | `E4 inferred` from formula; not executed | Specified (`REQ-001` S3); not T1 until an additional fixture exists |
 | Optional endpoint flags | Four mutually exclusive spacing rules | `E3` — `src/tools_grids.f90:11-27` | Out of first-slice parity |
 | CLI malformed `RANGE` / missing args | PARSE_CMD + defaults; unverified | `E5 unknown` | Out of scope |
 
 ## 7. Draft Gherkin
+
+Canonical scenarios are `REQ-001` S1–S6. The blocks below are the recovered drafts that refinement consumed.
 
 ```gherkin
 Scenario: Inclusive five-point unit interval
@@ -84,7 +86,7 @@ Scenario: Invalid negative length
   Given a linspace request whose length is less than 0
   When  the host-neutral linspace port is invoked
   Then  the call fails as a typed domain error
-  # Legacy: error("linspace: N<0, abort.") then STOP. Exact message/process mapping is open.
+  # Refined: REQ-001 S5. Legacy message/process mapping is not the managed contract (ADR-007).
 ```
 
 ## 8. Legacy code and documentation citations
@@ -110,10 +112,10 @@ Scenario: Invalid negative length
 - [x] Is `linspace` the first retained behavior? Yes — owner 2026-08-19.
 - [x] Is the probe environment accepted for this behavior? Yes — ADR-001.
 - [x] Managed API vs CLI vs HTTP for the first driving adapter? Managed API — ADR-002.
-- [ ] Should optional `istart`/`iend`/`mesh` be part of the managed port in this slice or deferred?
-- [ ] What typed exception/result type and message stability are required for aborting cases?
-- [ ] Must `start == stop` and decreasing intervals be specified before implementation, or only FIX-001?
-- [ ] Are any downstream Fortran `linspace` callers in supported scope besides the fidelity driver?
+- [x] Should optional `istart`/`iend`/`mesh` be part of the managed port in this slice or deferred? Deferred from `REQ-001`; inclusive defaults only.
+- [x] What typed exception/result type and message stability are required for aborting cases? Typed domain failure; Fortran message text is not the managed contract (`REQ-001` S5/S6). Concrete type name is design.
+- [x] Must `start == stop` and decreasing intervals be specified before implementation, or only FIX-001? Specified from the accepted formula (`REQ-001` S3/S4); not T1 until additional fixtures exist.
+- [x] Are any downstream Fortran `linspace` callers in supported scope besides the fidelity driver? No — ADR-005.
 
 ## 11. Tensions / conflicts
 
@@ -127,6 +129,7 @@ Scenario: Invalid negative length
 - Legacy flow: `docs/modernization/flows/BEH-001-linspace.md`
 - Defect ledger: `docs/modernization/defect-ledger.md`
 - ADRs: `docs/decisions/ADR-001-first-slice-oracle-baseline.md`, `docs/decisions/ADR-002-hexagonal-managed-api.md`, `docs/decisions/ADR-003-linspace-numeric-contract.md`
+- Requirements: `docs/requirements/REQ-001-linspace.md` (S1–S6)
 - Migration plan: `docs/modernization/migration-plan.md` (VS-1)
 
-*Created: 2026-08-19*
+*Created: 2026-08-19 | Refined: 2026-08-20 (`REQ-001`)*
