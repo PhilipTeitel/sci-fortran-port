@@ -12,7 +12,7 @@
 
 **Scope:** Two `/document-legacy` passes are recorded here and use disjoint identifier blocks.
 
-- `DEF-001`–`DEF-004` — first implementation slice (`BEH-001` linspace and adjacent CLI/text surfaces).
+- `DEF-001`–`DEF-005` — first implementation slice (`BEH-001` linspace and adjacent CLI/text surfaces). `DEF-005` was found during VS1-1 implementation, not by `/document-legacy`.
 - `DEF-301`–`DEF-313` — cross-cutting numeric / text / error contracts (`BEH-301`–`BEH-305`).
 
 Library-wide contradictions remain listed as open when they must not be silently “fixed” later.
@@ -21,7 +21,7 @@ Library-wide contradictions remain listed as open when they must not be silently
 
 ## 1. Defect decisions
 
-### 1a. First-slice defects (`DEF-001`–`DEF-004`)
+### 1a. First-slice defects (`DEF-001`–`DEF-005`)
 
 | ID | Defect / mismatch | Affected behavior | Evidence | Decision | UAT impact | Backlog / story |
 |----|-------------------|-------------------|----------|----------|------------|-----------------|
@@ -29,6 +29,7 @@ Library-wide contradictions remain listed as open when they must not be silently
 | DEF-002 | `linspace` declares `array(num)` before checking `num<0`, so negative length may be processor-dependent prior to `error`/`STOP` | BEH-001 error path | `E3 code-derived` — `src/tools_grids.f90:1-7`; unexecuted | **fix-now** at the managed port: reject `length < 0` as a typed domain failure without allocating a sequence. Do not reproduce Fortran declaration-before-check. Caller-visible classification (failure, no sequence) is retained (`REQ-001` S5) | Error-path parity is classification only, not Fortran allocation order | `REQ-001` S5 |
 | DEF-003 | CLI program unit is `linsp` while help/NAME is `linspace` | CLI surface | `E3 code-derived` — `numutils/src/linspace.f90:1-13` | **retired with evidence** (ADR-006) | None; no CLI is built | Reopen only with a CLI adapter |
 | DEF-004 | Fidelity driver prints `es24.17`; CLI prints list-directed `write(*,*)` | Text surfaces | `E3 code-derived` — `fidelity/driver.f90:17`; `numutils/src/linspace.f90:47-49` | **retired with evidence** (ADR-007) | None; text codecs are adapter concerns and parity is parsed managed-API values (ADR-003) | Reopen only for legacy-format interop |
+| DEF-005 | The recovered inclusive formula does not reach `stop` exactly for every length. `array(num) = start + real(num-1,8)*step` with `step = (stop-start)/real(num-1,8)` is off by one ULP for many lengths: over `[0,1]` it fails for 2504 of the lengths in `2..20000`, the smallest being `num=50`, which yields `0.9999999999999999`. The legacy code has **no** endpoint fixup. This contradicts `REQ-001` S2, which asserts both the formula and "the last sample is `T`" — the two clauses are not simultaneously satisfiable in binary64 | BEH-001 happy path | `E3 code-derived` — `src/tools_grids.f90:11-14` (no fixup present); `E1 verified` — binary64 enumeration during VS1-1 implementation 2026-08-20, reproduced by `Generate_EndpointFollowsFormulaNotFixup_A2a`; `E5 unknown` — no legacy capture exists at any affected length, since FIX-001 uses `num=5`, which is dyadic and unaffected | **undecided — owner input needed.** VS1-1 shipped the faithful reading (formula, no fixup), since snapping the endpoint would be a silent precision improvement over the behavior the slice exists to reproduce. Choosing `fix-now` instead would mean amending `REQ-001` S2 and adding the fixup | Does **not** block `P1`: FIX-001 at `num=5` reaches `1.0` exactly, so the parity criterion is unaffected either way. Blocks any future criterion asserting endpoint exactness at an affected length | `REQ-001` S2; story `VS1-1` §12 |
 
 Known assessment-era mismatches **outside** both passes (FFT backends, `ZEROS`/`OPTIMIZE`, `logspace` docs, 310 warnings) are **not** given `DEF-NNN` rows here. They must still not be silently corrected if those surfaces are later selected. `E1/E3/E4` — `docs/modernization/ASSESSMENT.md:31`; `docs/modernization/intent-ledger.md:42-50`. Complex-column order was previously listed as an unrecorded mismatch and is now carried explicitly as `DEF-301`–`DEF-306` and `DEF-313`.
 
@@ -76,8 +77,9 @@ Owner must choose `reproduce-faithfully`, `fix-now`, or `fix-later` for each:
 
 - [x] **DEF-002** — negative `num` sizing/`STOP` on the `linspace` error path. **fix-now** at the managed port (`REQ-001` S5). Does not block VS-1.
 - [ ] **DEF-308** — Accepted numeric comparison policy: `1e-6` vs `1e-10` vs exact, per built surface. Blocks VS-2 and VS-3 acceptance criteria. Does **not** block VS-1 / `FIX-001` (ADR-003).
+- [ ] **DEF-005** — Inclusive endpoint exactness: the recovered formula misses `stop` by one ULP at many lengths and has no fixup, contradicting `REQ-001` S2's "the last sample is `T`". VS1-1 shipped the faithful reading; `reproduce-faithfully` ratifies it, `fix-now` requires amending S2 and adding a fixup. Does **not** block VS-1 / `FIX-001`, whose `num=5` is dyadic and unaffected.
 
-That is the whole open set. Fourteen of the seventeen rows are retired (below) and `DEF-001` and `DEF-002` are decided.
+That is the whole open set. Fourteen of the eighteen rows are retired (below) and `DEF-001` and `DEF-002` are decided.
 
 New rows are expected from VS-2 and VS-3 `/document-legacy`, particularly around eigenvalue ordering and sign conventions in `MATRIX`.
 
@@ -143,6 +145,7 @@ Still live:
 Closed for VS-1 by `/refine-feature` (2026-08-20):
 
 - The `linspace` negative-`num` path allocates before validating in Fortran (DEF-002). **fix-now** at the managed port: typed domain failure, no sequence allocation. `E3`.
+- `REQ-001` S2 asserts both the recovered formula and that the last sample equals `stop`, which binary64 does not grant simultaneously (DEF-005). The accepted requirement is internally inconsistent, and no capture exists at an affected length. `E1`/`E3`/`E5`. Does not block VS-1 / `FIX-001`.
 
 Recorded but retired, and unresolved as findings:
 
@@ -152,4 +155,4 @@ Recorded but retired, and unresolved as findings:
 
 Under hard rules, none of these may be described as fixed. Retiring a surface closes the row for this effort; it does not resolve the contradiction, and the finding stands for anyone who later builds that surface.
 
-*Created: 2026-08-10 (cross-cutting pass) | 2026-08-19 (first-slice pass) | Ledgers merged: 2026-08-19 | Dispositions per ADR-006/007: 2026-08-19 | DEF-002 fix-now: 2026-08-20 (`REQ-001`)*
+*Created: 2026-08-10 (cross-cutting pass) | 2026-08-19 (first-slice pass) | Ledgers merged: 2026-08-19 | Dispositions per ADR-006/007: 2026-08-19 | DEF-002 fix-now: 2026-08-20 (`REQ-001`) | DEF-005 opened: 2026-08-20 (VS1-1 implementation)*

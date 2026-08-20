@@ -42,10 +42,10 @@ Consumed requirement files (append-only):
 - [docs/decisions/ADR-006-retire-cli-surface.md](docs/decisions/ADR-006-retire-cli-surface.md) — Accepted; no CLI adapter
 - [docs/decisions/ADR-007-io-and-host-concerns-are-adapters.md](docs/decisions/ADR-007-io-and-host-concerns-are-adapters.md) — Accepted; I/O, diagnostics channel, and exit status are adapters
 - [docs/decisions/ADR-008-demonstration-first-slice-scope.md](docs/decisions/ADR-008-demonstration-first-slice-scope.md) — Accepted; build VS-1, VS-2, VS-3 only
-- [docs/decisions/ADR-009-vs1-managed-port-and-layout.md](docs/decisions/ADR-009-vs1-managed-port-and-layout.md) — **Proposed**; solution layout, `IGenerateLinearSequence`, `Grids.Linspace`; consumed by story [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md)
-- [docs/decisions/ADR-010-typed-domain-failure.md](docs/decisions/ADR-010-typed-domain-failure.md) — **Proposed**; `LinearSequenceRejectedException` / `LinearSequenceRejection`
+- [docs/decisions/ADR-009-vs1-managed-port-and-layout.md](docs/decisions/ADR-009-vs1-managed-port-and-layout.md) — **Accepted**; solution layout, `IGenerateLinearSequence`, `Grids.Linspace`; implemented by story [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md)
+- [docs/decisions/ADR-010-typed-domain-failure.md](docs/decisions/ADR-010-typed-domain-failure.md) — **Accepted**; `LinearSequenceRejectedException` / `LinearSequenceRejection`
 
-`REQ-001` is **Ready for Design** as of 2026-08-20 (Gate 2 closed). ADR-009 and ADR-010 are still **Proposed** (Gate 4), so implementation waits on those two.
+`REQ-001` is **Ready for Design** and ADR-009/ADR-010 are **Accepted**, both as of 2026-08-20. Gates 2 and 4 are closed, and VS-1 is implemented by story [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md).
 
 ## High-Level Architecture
 
@@ -139,7 +139,8 @@ This design names projects and types. `/plan-project` then `/plan-port-story` pr
 ```
 sci-fortran-port/
 ├── README.md                          # this design doc
-├── SciFor.sln                         # created by the first port story
+├── .gitignore                         # bin/ obj/ (INT-008)
+├── SciFor.sln                         # created by story VS1-1
 ├── src/
 │   ├── SciFor.Domain/
 │   │   ├── DomainFailureException.cs
@@ -156,10 +157,11 @@ sci-fortran-port/
 │       └── Grids.cs                   # driving adapter; NuGet ID SciFor
 ├── tests/
 │   └── SciFor.Tests/
-│       ├── Unit/
-│       ├── Contract/
-│       ├── Integration/
+│       ├── Unit/                      # domain value objects and failure types
+│       ├── Contract/                  # the inbound port via the real use case
+│       ├── Integration/               # Grids, plus the Phase Y boundary guards
 │       └── Parity/                    # FIX-001 via Grids.Linspace
+│           └── Fixtures/              # transcribed probe values, provenance header
 └── docs/
     ├── PURPOSE.md
     ├── DOMAIN.md
@@ -217,8 +219,9 @@ Not applicable. This slice is a class library.
 | `dotnet build SciFor.sln` | Build / type-check |
 | `dotnet test SciFor.sln` | Unit, contract, integration, and parity tests |
 | `dotnet pack src/SciFor.Managed/SciFor.Managed.csproj` | Private POC package (`SciFor`); do not publish as SciFortran |
+| `dotnet format SciFor.sln --verify-no-changes` | Format check; the `Z2` stand-in for a lint command |
 
-No lint command is chosen yet. `/plan-port-story` may add `dotnet format --verify-no-changes` as the Z2 stand-in. Treat warnings as errors in the project files (ADR-009).
+No dedicated lint command is chosen. `dotnet format --verify-no-changes` serves as the `Z2` stand-in, and warnings are errors in every project file (ADR-009).
 
 ## UI Components
 
@@ -263,7 +266,7 @@ Port the recovered inclusive `linspace` behind `IGenerateLinearSequence` and `Gr
 
 | ID | Status | Story | Size | Notes |
 |----|--------|-------|------|-------|
-| [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md) | `Not Started` | Inclusive linspace at the managed port | M | **Not Ready.** `REQ-001` Gate 2 closed 2026-08-20; still blocked on ADR-009/ADR-010 `Proposed` → `Accepted` |
+| [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md) | `In Progress` | Inclusive linspace at the managed port | M | Gates 2 and 4 closed 2026-08-20. Code complete: 34 tests pass, `FIX-001` parity green. `Z6`–`Z8` await `/review-story` and `/verify-parity`. `DEF-005` needs an owner decision |
 
 VS-2 (`fermi`) and VS-3 (`MATRIX`) remain later epics per [docs/modernization/migration-plan.md](docs/modernization/migration-plan.md). They each still need `/document-legacy` before refine/design, so they have no epic row yet.
 

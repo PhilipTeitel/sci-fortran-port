@@ -37,7 +37,7 @@ Everything else retained by ADR-005 §3 stays catalogued as **reserve** — avai
 
 Only **VS-1** has refined requirements (`REQ-001`, `Ready for Design` as of 2026-08-20; Gate 2 closed). VS-2 and VS-3 need `/document-legacy` and fixture capture first.
 
-**Next ADD command:** `/plan-project` (VS-1 design is in `README.md`; ADR-009/010 Accepted; VS-1 ported by story `VS1-1`). Do not start VS-2 or VS-3 implementation stories from this plan.
+**Next ADD command:** `/review-story VS1-1`, then `/verify-parity VS1-1`, then `/plan-project` to open VS-2. Do not start VS-2 or VS-3 implementation stories from this plan.
 
 ---
 
@@ -92,7 +92,7 @@ flowchart TD
 
 | Slice | Behaviors | Status now | Next command | Implementation-ready? |
 |-------|-----------|------------|--------------|------------------------|
-| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` `Ready for Design` (S1–S6); design in `README.md` (ADR-009/010 Accepted); **implemented** by story `VS1-1` | `/plan-project` | **Yes** — implemented; `FIX-001` parity green |
+| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` `Ready for Design` (S1–S6); design in `README.md` (ADR-009/010 Accepted); **implemented** by story `VS1-1` | `/review-story VS1-1` | **Yes** — implemented; `FIX-001` parity green |
 | VS-2 | `BEH-003` `fermi` | T1 hash only; no parsed fixture | `/document-legacy` | No |
 | VS-3 | `BEH-040` `MATRIX` (inverse, diagonalize, solve) | Catalog-only; no T1 evidence | `/document-legacy` | No |
 | VS-4 *(optional)* | `BEH-004` `deriv` | T1 hash only; 1,024-row capture not retained | `/document-legacy` | No |
@@ -234,7 +234,7 @@ Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 
 ## 11. Next command
 
-**`/plan-project`**, consuming `README.md` and `docs/requirements/REQ-001-linspace.md`.
+**`/review-story VS1-1`** and **`/verify-parity VS1-1`** to close the story's `Z6`–`Z8` gates, then **`/plan-project`** to open VS-2, consuming `README.md` and `docs/requirements/REQ-001-linspace.md`.
 
 Do not start VS-2 or VS-3 implementation stories from this plan. After VS-1 C# exists and `FIX-001` passes, the next step is VS-2 `/document-legacy`.
 

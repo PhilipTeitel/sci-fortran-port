@@ -43,7 +43,10 @@ modernization:
   retainedScope:
     product: whole-library-csharp-poc
     catalog: docs/modernization/behavior-catalog.md
-    nextCommand: plan-project
+    # VS-1 (BEH-001) is implemented by story VS1-1; its Z6-Z8 gates need review-story
+    # then verify-parity. plan-project is the next retained-scope command after that,
+    # to open VS-2.
+    nextCommand: review-story
     plan: docs/modernization/migration-plan.md
 
   evidenceGrades:
