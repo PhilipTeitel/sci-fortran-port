@@ -58,7 +58,7 @@ The owner has now corrected that purpose: the project must port the Fortran libr
 
 ## Later amendment (2026-08-19)
 
-`/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). On 2026-08-20 `/refine-feature` produced `docs/requirements/REQ-001-linspace.md` (S1–S6), which the owner then marked `Ready for Design`; `/design-application` produced `README.md` with ADR-009/010 (`Proposed`); and `/plan-port-story` produced `docs/features/VS1-1-managed-linspace-port.md`. Next command is `/plan-project`. VS-1 implementation waits on ADR-009/010 acceptance.
+`/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). On 2026-08-20 `/refine-feature` produced `docs/requirements/REQ-001-linspace.md` (S1–S6), which the owner then marked `Ready for Design`; `/design-application` produced `README.md` with ADR-009/010, which the owner accepted the same day; and `/plan-port-story` produced `docs/features/VS1-1-managed-linspace-port.md`, which `/implement-story` then delivered with `FIX-001` parity green. Next command is `/review-story VS1-1`; `/plan-project` follows to open VS-2. One slice of the whole-library surface is now built, which does not narrow the ADR-008 rule that unbuilt modules must not be implied as covered.
 
 ## Second amendment (2026-08-19)
 
