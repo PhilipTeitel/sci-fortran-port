@@ -372,7 +372,7 @@ No approved lifecycle yet. Provisional knobs exist; promotion to accepted policy
 | Event | When | Source |
 |-------|------|--------|
 | LinearSequenceProduced | Evaluation succeeds | BEH-001 |
-| LinearSequenceRejected | Length/endpoint rule fails | BEH-001; `REQ-001` S5 (`length < 0`) and S6 (inclusive `length < 2`); concrete C# type is design |
+| LinearSequenceRejected | Length/endpoint rule fails | BEH-001; `REQ-001` S5/S6; `LinearSequenceRejectedException` (ADR-010, Proposed) |
 
 ### 9b. Contract-level events
 
@@ -388,9 +388,9 @@ No approved lifecycle yet. Provisional knobs exist; promotion to accepted policy
 
 ### 10a. Library and first-slice questions
 
-Library-wide (do not block `/refine-feature` on BEH-001):
+Library-wide (do not block VS-1):
 
-- [ ] Canonical C# names: keep Fortran identifiers (`linspace`, `fftgf`) as aliases, or rename to ubiquitous-language types only?
+- [x] Canonical C# names for **VS-1**: domain types use ubiquitous language (`LinearSequenceRequest`, `LinearSequence`); the managed adapter method is `Linspace` (ADR-009, Proposed). Other Fortran identifiers (`fermi`, `fftgf`, MATRIX names) wait for their slice.
 - [ ] **Blocks VS-3.** Which MATRIX results require order/sign canonicalization? Eigenvalue ordering and eigenvector sign conventions are uncharacterized and must be settled in the VS-3 numeric-contract ADR.
 - [x] How is process-global RNG/timer/diagnostic state exposed without request races — largely dissolved by ADR-007: `TIMER` is dropped and diagnostics are adapter concerns. Process-global RNG state survives only as a reserve concern for `BEH-080`, which is not built.
 
@@ -398,7 +398,7 @@ First-slice (closed by `/refine-feature` → `REQ-001`, 2026-08-20):
 
 - [x] Expose `includeStart` / `includeStop` / `step` on the first managed port? **No for VS-1.** Inclusive start/stop/length only. Flags stay recovered in BEH-001 and unaccepted for parity.
 - [x] Decreasing intervals and `start == stop` now or later? **Now, as formula-specified behavior** (`REQ-001` S3/S4). Not T1 until additional fixtures exist.
-- [x] Domain-failure vocabulary vs leftover `N<0` / `N<2` strings? **Typed domain failure** (`REQ-001` S5/S6). Fortran message text is not the managed contract (ADR-007). Concrete type name remains design.
+- [x] Domain-failure vocabulary vs leftover `N<0` / `N<2` strings? **Typed domain failure** (`REQ-001` S5/S6). Fortran message text is not the managed contract (ADR-007). C# type: `LinearSequenceRejectedException` with `LinearSequenceRejection` (ADR-010, Proposed).
 
 ### 10b. Cross-cutting contract questions
 
@@ -465,7 +465,8 @@ Retirement closes these for this effort. It does not resolve them, and each must
 - Purpose: `docs/PURPOSE.md`
 - Catalog: `docs/modernization/behavior-catalog.md`
 - Migration plan: `docs/modernization/migration-plan.md`
-- ADRs: ADR-001-005; further triggers in `docs/modernization/translation-gaps.md` GAP-005/007/008/009/013/026
+- ADRs: ADR-001-010; further triggers in `docs/modernization/translation-gaps.md` GAP-005/007/008/009/013/026
+- Design: `README.md`
 - First-slice behavior: `docs/modernization/behaviors/BEH-001-linspace.md`; flow `docs/modernization/flows/BEH-001-linspace.md`
 - Requirements: `docs/requirements/REQ-001-linspace.md`
 - Cross-cutting behaviors: `docs/modernization/behaviors/BEH-301-*.md` ... `BEH-305-*.md`
@@ -474,4 +475,4 @@ Retirement closes these for this effort. It does not resolve them, and each must
 
 ---
 
-*Created: 2026-08-10 (contract recovery) | Updated: 2026-08-19 | Whole-library bounded contexts and cross-cutting contracts merged; rescoped per ADR-006/007/008 | `/refine-feature` BEH-001 → `REQ-001`: 2026-08-20 | Plan: VS-1–VS-3 in `docs/modernization/migration-plan.md`*
+*Created: 2026-08-10 (contract recovery) | Updated: 2026-08-19 | Whole-library bounded contexts and cross-cutting contracts merged; rescoped per ADR-006/007/008 | `/refine-feature` BEH-001 → `REQ-001`: 2026-08-20 | `/design-application` ADR-009/010: 2026-08-20 | Plan: VS-1–VS-3 in `docs/modernization/migration-plan.md`*
