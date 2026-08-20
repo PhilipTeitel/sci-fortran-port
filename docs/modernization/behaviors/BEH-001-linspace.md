@@ -1,6 +1,6 @@
 # BEH-001: Generate an inclusive linear sequence (linspace)
 
-**Status:** Recovered; first code slice (VS-1, formerly SL-001). Requirements refined in `REQ-001` (`Draft`). Next: `/design-application`.
+**Status:** Recovered; first code slice (VS-1). Requirements in `REQ-001` (Draft). Design in `README.md` (ADR-009/010 Proposed). Next: `/plan-project`.
 **Evidence grade:** `E1 verified` for `FIX-001`; `E3 code-derived` for default-endpoint formula and abort conditions; `E5 unknown` for unexecuted optional flags, `mesh`, invalid `num`, and the CLI surface (out of first-slice scope)
 **Legacy surfaces:** Library function `TOOLS.linspace`; exercised by `fidelity/driver.f90`. CLI `numutils/src/linspace.f90` is documented as related and **out of first-slice scope**.
 **Date:** `2026-08-19`
@@ -128,8 +128,9 @@ Scenario: Invalid negative length
 - Intent ledger: `docs/modernization/intent-ledger.md` (INT-009)
 - Legacy flow: `docs/modernization/flows/BEH-001-linspace.md`
 - Defect ledger: `docs/modernization/defect-ledger.md`
-- ADRs: `docs/decisions/ADR-001-first-slice-oracle-baseline.md`, `docs/decisions/ADR-002-hexagonal-managed-api.md`, `docs/decisions/ADR-003-linspace-numeric-contract.md`
+- ADRs: `docs/decisions/ADR-001-first-slice-oracle-baseline.md`, `docs/decisions/ADR-002-hexagonal-managed-api.md`, `docs/decisions/ADR-003-linspace-numeric-contract.md`, `docs/decisions/ADR-009-vs1-managed-port-and-layout.md`, `docs/decisions/ADR-010-typed-domain-failure.md`
 - Requirements: `docs/requirements/REQ-001-linspace.md` (S1–S6)
+- Design: `README.md`
 - Migration plan: `docs/modernization/migration-plan.md` (VS-1)
 
-*Created: 2026-08-19 | Refined: 2026-08-20 (`REQ-001`)*
+*Created: 2026-08-19 | Refined: 2026-08-20 (`REQ-001`) | Designed: 2026-08-20*

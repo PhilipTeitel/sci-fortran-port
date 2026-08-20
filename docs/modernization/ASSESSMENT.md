@@ -106,7 +106,7 @@ Implementation-ready C# still starts at BEH-001 after `/design-application` and 
 - **Evidence:** Probe T1 plus owner purpose correction (ADR-004) and planning-gate scope (ADR-005). Catalog: `docs/modernization/behavior-catalog.md`. `E1 verified / E2 documented`.
 - **Smallest useful executable path:** Still host-neutral inclusive `linspace(0,1,5)` (FIX-001). Two further slices follow (`fermi`, `MATRIX`) per ADR-008. Do **not** treat the `arange-5` driver loop as `arange`. `E1 verified / E2 documented`.
 - **Why not a big-bang rewrite:** Most retained surfaces are T3; each slice still needs `/document-legacy` and `/refine-feature` before C#.
-- **Next command:** `/design-application` for VS-1, consuming `docs/requirements/REQ-001-linspace.md`. Later slices follow `docs/modernization/migration-plan.md`.
+- **Next command:** `/plan-project` after Gate 2/4 on `REQ-001` and ADR-009/010. Later slices follow `docs/modernization/migration-plan.md`.
 
 A compiling .NET solution or ASP.NET health endpoint without ported numerical contracts remains a **non-parity scaffold**. `E2 documented` — ADR-004.
 
@@ -134,7 +134,7 @@ Conditions are ordered by dependency. For a **production/redistributable** port,
 - [x] **8. Approve required target dependency routes.** POC defaults in ADR-005: managed/native numeric ports; reimplement facades; drop missing FFTPACK/DLPLOT. The `func` evaluator and Gnuplot wrapping were withdrawn with the CLI (ADR-006). Previously “blocked” DEP rows are closed for **planning** by those defaults, not by production legal review. The BLAS/LAPACK route stops being a planning default and becomes real work at VS-3. `E2 documented`.
 - [x] **9. Create the legacy behavior catalog, purpose/domain artifacts, and defect ledger.** PURPOSE/DOMAIN rewritten for the whole library; `docs/modernization/behavior-catalog.md` lists retained/retired IDs; first-slice defect ledger remains. Keep E4/E5 items out of implementation-ready stories. `E2 documented`.
 - [x] **10. Approve decisions before design or migration planning.** ADRs 001–005 close purpose, baseline, boundary, numeric first fixture, retained/retired scope, and POC substitutions. ADRs 006–008 close CLI disposition, the domain/adapter split, and build scope. `/plan-migration` completed 2026-08-19 and was rescoped the same day. `/refine-feature` produced `REQ-001` (Draft) on 2026-08-20. Slice design is next. `E2 documented`.
-- [x] **11. Complete the final incremental `/assess-modernization` synthesis.** The 2026-08-10 assessment stands as evidence. **2026-08-19 evening:** whole-library purpose correction, `/plan-migration`, then the demonstration-first rescoping in ADR-006/007/008. **2026-08-20:** `/refine-feature` produced `REQ-001` (Draft). Suggested next command is `/design-application` for VS-1. `E2 documented`.
+- [x] **11. Complete the final incremental `/assess-modernization` synthesis.** The 2026-08-10 assessment stands as evidence. **2026-08-19 evening:** whole-library purpose correction, `/plan-migration`, then the demonstration-first rescoping in ADR-006/007/008. **2026-08-20:** `/refine-feature` produced `REQ-001` (Draft); `/design-application` produced `README.md` and ADR-009/010 (Proposed). Suggested next command is `/plan-project`. `E2 documented`.
 
 ## 9. Tensions / conflicts
 
@@ -171,6 +171,7 @@ Affected planning scope remains stopped for every unresolved conflict above. Thi
 - Behavior catalog: `docs/modernization/behavior-catalog.md`
 - Migration plan: `docs/modernization/migration-plan.md`
 - Purpose / domain: `docs/PURPOSE.md`, `docs/DOMAIN.md`
-- Decisions: ADR-001–005 under `docs/decisions/`
+- Decisions: ADR-001–010 under `docs/decisions/`
+- Design: `README.md`
 
-*Created: 2026-08-09 | Incrementally assessed: 2026-08-10 | First-slice recovery: 2026-08-19 | Purpose correction (whole-library C# port): 2026-08-19 | `/plan-migration`: 2026-08-19 | Demonstration-first rescoping (ADR-006/007/008): 2026-08-19 | `/refine-feature` BEH-001 → `REQ-001`: 2026-08-20 | Target: C# / .NET 8 hexagonal managed API; no CLI*
+*Created: 2026-08-09 | Incrementally assessed: 2026-08-10 | First-slice recovery: 2026-08-19 | Purpose correction (whole-library C# port): 2026-08-19 | `/plan-migration`: 2026-08-19 | Demonstration-first rescoping (ADR-006/007/008): 2026-08-19 | `/refine-feature` BEH-001 → `REQ-001`: 2026-08-20 | `/design-application`: 2026-08-20 | Target: C# / .NET 8 hexagonal managed API; no CLI*
