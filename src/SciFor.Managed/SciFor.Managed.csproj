@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>SciFor</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- ADR-009 §1: the packable product. Private POC package, not a SciFortran
+       redistribution, and not a claim of coverage over unbuilt modules (ADR-008). -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>SciFor</PackageId>
+    <Description>Host-neutral managed C# port of representative SciFortran behaviors. Private ADD demonstration; VS-1 covers inclusive linspace only.</Description>
+  </PropertyGroup>
+
+  <!-- No ASP.NET, CLI, or filesystem package on this slice (ADR-002 §2, ADR-006, ADR-007). -->
+  <ItemGroup>
+    <ProjectReference Include="..\SciFor.Application\SciFor.Application.csproj" />
+  </ItemGroup>
+
+</Project>

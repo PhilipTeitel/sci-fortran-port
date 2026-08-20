@@ -1,0 +1,8 @@
+# Build output. INT-008 records that generated build products stay out of version
+# control; the legacy repo had tracked static archives removed for the same reason.
+bin/
+obj/
+
+# Local tool and test artifacts
+[Tt]est[Rr]esults/
+*.user

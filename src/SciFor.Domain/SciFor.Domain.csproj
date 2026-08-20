@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>SciFor.Domain</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- ADR-009 §1: Domain references nothing in Application or adapters, and takes no
+       package reference. The absence below is the mechanically inspectable form of the
+       PURPOSE rule that domain code has no compile-time I/O, CLI, timing, or hosting
+       dependency. Verified by ArchitectureBoundaryTests (story VS1-1, Y1). -->
+
+</Project>

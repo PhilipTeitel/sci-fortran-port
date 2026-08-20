@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>SciFor.Application</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- ADR-009 §1: Application may reference Domain and nothing else. -->
+  <ItemGroup>
+    <ProjectReference Include="..\SciFor.Domain\SciFor.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
