@@ -1,0 +1,23 @@
+# FIX-001: linspace(0, 1, 5), default inclusive endpoints
+#
+# Provenance (docs/modernization/fixtures/FIX-001-linspace-5.md):
+#   Source revision : e586903a26cc50ca8942f20ca3bccbd8814e6252
+#   Probe date      : 2026-08-10
+#   Capture ID      : CAP-20260810-LINSPACE
+#   Evidence grade  : E1 verified for parsed values; capture bytes were not retained
+#   Authority       : ADR-001, ADR-003
+#
+# These are the PROBE PARSED VALUES. DEF-001: the checked-in Fortran-side file
+# fidelity/golden/linspace-5.txt is regenerated from a Python formula and is NOT the
+# authority, even though it matches numerically. Do not repoint this test at it.
+#
+# Comparison rule (ADR-003, REQ-001 S1): exact parsed numeric equality. No relative or
+# absolute tolerance. Not the workflow 1e-6, not the fidelity script 1e-10. Text
+# formatting is out of scope, so these literals are parsed as binary64 before comparison.
+#
+# Legacy index origin is 1; stored here as a zero-based managed sequence (ADR-009 §6).
+0.00000000000000000e+00
+2.50000000000000000e-01
+5.00000000000000000e-01
+7.50000000000000000e-01
+1.00000000000000000e+00
