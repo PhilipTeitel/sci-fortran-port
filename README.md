@@ -255,13 +255,17 @@ None for VS-1.
 
 ## Backlog Items
 
-TBD — `/plan-project` appends epics and stories. This design does not invent story IDs.
+`/plan-project` has not run. The VS-1 epic below was written directly by `/plan-port-story`; its epic number and story ID are **provisional** and a later `/plan-project` pass should reconcile them rather than renumber silently.
 
-Intended VS-1 epic (not scheduled until `/plan-project`):
+### Epic 1: VS-1 — inclusive linear sequence (`BEH-001`)
 
-- Port `BEH-001` / `REQ-001` behind `IGenerateLinearSequence` and `Grids.Linspace`, with `FIX-001` parity (S1) and specified formula/failure coverage (S2–S6).
+Port the recovered inclusive `linspace` behind `IGenerateLinearSequence` and `Grids.Linspace`, with `FIX-001` parity (S1) and specified formula and failure coverage (S2–S6). This epic also establishes `SciFor.sln`, the three-project layout, and the typed-domain-failure pattern that VS-2 and VS-3 reuse.
 
-VS-2 (`fermi`) and VS-3 (`MATRIX`) remain later epics per [docs/modernization/migration-plan.md](docs/modernization/migration-plan.md). They each still need `/document-legacy` before refine/design.
+| ID | Status | Story | Size | Notes |
+|----|--------|-------|------|-------|
+| [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md) | `Not Started` | Inclusive linspace at the managed port | M | **Not Ready.** Blocked on `REQ-001` `Draft` → `Ready for Design` and ADR-009/ADR-010 `Proposed` → `Accepted` |
+
+VS-2 (`fermi`) and VS-3 (`MATRIX`) remain later epics per [docs/modernization/migration-plan.md](docs/modernization/migration-plan.md). They each still need `/document-legacy` before refine/design, so they have no epic row yet.
 
 ## License
 
