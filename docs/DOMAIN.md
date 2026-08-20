@@ -392,15 +392,15 @@ Blocking for design/story planning in the affected scope:
 
 - [ ] Exact kind-8 storage width, endianness, IEEE mode, and edge (NaN/Infinity/signed-zero/subnormal) contract for the accepted compiler? `E5` — BEH-301
 - [ ] Is `ddp=16` future intent, dead scaffolding, or required by unexamined paths? `E3`/`E5` — BEH-301
-- [ ] Per retained surface: accepted `ComparisonPolicy` (exact-byte vs parsed; absolute/relative/ULP/residual)? `E1`/`E2`/`E3`/`E4`/`E5` — BEH-301/303; INT-006
+- [ ] Per retained surface: accepted `ComparisonPolicy` (absolute/relative/ULP/residual)? Exact-byte comparison is off the table for computational surfaces under the managed-API boundary, but remains open for the retained IOTOOLS file helpers. `E1`/`E2`/`E3`/`E4`/`E5` — BEH-301/303; INT-006
 - [ ] Which public APIs must preserve non-default lower bounds vs normalize copies? Slice/view vs copy at host boundary? `E3`/`E5` — BEH-302
 - [ ] Observable effect of `fftgf` `stride` (parsed, unused in inspected body)? `E3`/`E5` — BEH-302/304 flow
-- [ ] Per retained complex surface: canonical external order and disposition of help-vs-code contradictions (`reproduce-faithfully` / `fix-*`)? `E2`/`E3` — BEH-304; DEF-301/302 recorded, decisions open
+- [ ] Per retained complex surface: canonical external order and disposition of help-vs-code contradictions (`reproduce-faithfully` / `fix-*`)? Deferred for CLI stdout, but **still binding for the retained IOTOOLS `splot`/`sread` helpers**, whose file formats stay library behavior. `E2`/`E3` — BEH-304; DEF-301/302 recorded, decisions open
 - [ ] Does `ffcmplx` `sread(fin,Gread,wm)` resolve/build, and is unused `ex` dead help, broken feature, or unsupported utility? `E3`/`E5` — BEH-304 flow
 - [ ] Are `sreadM_*` allocation/format anomalies latent defects or unreachable? `E3` — BEH-304
 - [ ] Does `r8_to_s_left` intend comment `G14.6` or code `g16.9` for diagnostic formatting? `E3` — BEH-303
-- [ ] Must ANSI styling and stdout-mixed diagnostics be preserved for CLI compatibility? What exit status does bare `STOP` produce on the accepted runtime? `E3`/`E5` — BEH-305
-- [ ] Which failures remain process-aborting vs become typed non-terminating results for host adapters (parity vs host addition)? `E3`/`E5` — BEH-305; GAP-026
+- [ ] Must ANSI styling and stdout-mixed diagnostics be preserved for CLI compatibility? What exit status does bare `STOP` produce on the accepted runtime? `E3`/`E5` — BEH-305. **No longer blocks the managed API** (adapter concern per the 2026-08-19 boundary decision); still required before any CLI adapter claims legacy compatibility. Tracked as DEF-309/310.
+- [x] Which failures remain process-aborting vs become typed non-terminating results — closed by ADR-002 section 4 and the 2026-08-19 boundary decision: `error`/`STOP` becomes a typed domain failure at the managed port; host exit codes and Problem Details are adapter concerns. `E2` — GAP-026 remains open only for adapter work.
 - [x] Retained `NumericSurface` inventory — closed by ADR-005 section 5 (retained/retired list, `ffcmplx` retained).
 
 ## 11. Tensions / conflicts
@@ -413,20 +413,20 @@ Blocking for design/story planning in the affected scope:
 
 ### 11b. Contract tensions
 
-Do not pick a winner; affected design/story scope is stopped until disposition.
+Do not pick a winner; affected design/story scope is stopped until disposition. Rows marked *deferred* were moved outside the product boundary by the 2026-08-19 managed-API decision — they no longer block managed-API stories, but they are not resolved and must be settled before an adapter claims legacy compatibility.
 
 | Conflict | Sources | Impact |
 |----------|---------|--------|
 | Workflow relative/absolute `1e-6` vs fidelity absolute `1e-10` vs probe exact equality — three comparison regimes; none is accepted product policy | `E1`/`E2`/`E3`/`E4` — BEH-301/303; INT-006; ASSESSMENT §9 | Blocks parity stories and `ComparisonPolicy` approval |
 | Kind-8 declarations abundant; portable equivalence to C# `double`/`Complex` unproven | `E3`/`E5` — BEH-301; GAP-008 | Blocks numeric representation ADR-level claims |
 | Fortran 1-based/column-major vs default C# 0-based/row-major; no accepted buffer decision | `E3`/`E5` — BEH-302; GAP-005 | Blocks array-boundary design for matrix/FFT surfaces |
-| `r8_to_s_left` comment `G14.6` vs code `g16.9` | `E3` — BEH-303 | Blocks diagnostic format contract |
-| Fidelity probe mixes `es24.17` and list-directed sections — no single global text codec even for the probe corpus | `E3` — BEH-303 | Blocks one-codec-for-all stories |
-| `fftgf` help claims Fortran `(re,im)`; default writer emits `(Im, Re)` | `E2`/`E3` — BEH-304; flow §5 | Blocks complex-column codec choice for `fftgf` |
-| `fftgf` default input `(Re,Im)` vs default output `(Im,Re)` — asymmetric ends | `E3` — BEH-304 | Blocks round-trip stories without disposition |
-| `ffcmplx` documents `ex` but never uses it; `sread` argument order vs `pade` unresolved | `E2`/`E3`/`E5` — BEH-304 | Blocks `ffcmplx` support/defect decisions |
-| `SLREAD`/`SLPLOT` integer-X complex `(Re,Im)` vs real-X complex `(Im,Re)`; `txtfy` always `(re,im)` | `E3` — BEH-304 | Blocks global complex DTO/column assumptions |
-| Bare `STOP` vs fidelity `stop 1`; diagnostics on stdout vs Unix stderr / ASP.NET Problem Details | `E3`/`E5` — BEH-305; GAP-026 | Blocks unified error-mapping stories claiming legacy parity |
+| `r8_to_s_left` comment `G14.6` vs code `g16.9` | `E3` — BEH-303 | **Deferred** — diagnostic string formatting is an adapter concern |
+| Fidelity probe mixes `es24.17` and list-directed sections — no single global text codec even for the probe corpus | `E3` — BEH-303 | **Deferred** for computational surfaces; still blocks a one-codec assumption for the retained IOTOOLS helpers |
+| `fftgf` help claims Fortran `(re,im)`; default writer emits `(Im, Re)` | `E2`/`E3` — BEH-304; flow §5 | **Deferred** — the contradiction is in the `fftgf` CLI utility, not the FFTGF library procedures |
+| `fftgf` default input `(Re,Im)` vs default output `(Im,Re)` — asymmetric ends | `E3` — BEH-304 | **Deferred** — CLI round-trip; blocks any adapter claiming legacy stream compatibility |
+| `ffcmplx` documents `ex` but never uses it; `sread` argument order vs `pade` unresolved | `E2`/`E3`/`E5` — BEH-304 | **Deferred** — CLI utility; the `sread` call-site question still bears on the IOTOOLS port |
+| `SLREAD`/`SLPLOT` integer-X complex `(Re,Im)` vs real-X complex `(Im,Re)`; `txtfy` always `(re,im)` | `E3` — BEH-304 | **Binding** — IOTOOLS is a retained library module, so these file formats remain product behavior |
+| Bare `STOP` vs fidelity `stop 1`; diagnostics on stdout vs Unix stderr / ASP.NET Problem Details | `E3`/`E5` — BEH-305; GAP-026 | **Deferred** — channel and exit status are adapter concerns under ADR-002 section 4. Does not block managed-API stories; blocks any adapter claiming legacy parity |
 | Exercise authorization vs production/redistribution approval | `E2` — ASSESSMENT §1, Condition 2 | Blocks product-wide migration planning framed as production-ready |
 | Operational probe baseline vs production/parity authority | `E1`/`E5` — ASSESSMENT Condition 1; INT open Qs | Blocks treating probe captures as accepted product goldens without owner decision |
 

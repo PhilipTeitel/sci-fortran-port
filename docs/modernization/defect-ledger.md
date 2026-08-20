@@ -77,21 +77,28 @@ Owner must choose `reproduce-faithfully`, `fix-now`, or `fix-later` for each:
 - [ ] **DEF-002** — negative `num` sizing/`STOP` on the `linspace` error path
 - [ ] **DEF-003** — only if the CLI becomes in scope
 - [ ] **DEF-004** — only if Fortran text compatibility becomes in scope
-- [ ] **DEF-301** — `fftgf` help `(re,im)` vs default writer `(Im,Re)`
-- [ ] **DEF-302** — `fftgf` default input `(Re,Im)` vs default output `(Im,Re)` asymmetry
-- [ ] **DEF-303** — `ffcmplx` unused `ex` despite help
-- [ ] **DEF-304** — `ffcmplx` `sread(fin,Gread,wm)` resolve/argument-order anomaly
 - [ ] **DEF-305** — IOTOOLS IC `(Re,Im)` vs RC `(Im,Re)` overload split (accept as per-surface contract vs unify)
-- [ ] **DEF-306** — `txtfy` `(re,im)` vs file/CLI `(im,re)` writers
 - [ ] **DEF-307** — `sreadM_*` unallocated/`imY` / duplicate `imY(2)` anomalies
 - [ ] **DEF-308** — Accepted numeric comparison policy: `1e-6` vs `1e-10` vs exact (per retained surface)
-- [ ] **DEF-309** — Bare `STOP` vs `stop 1` exit-status contract
-- [ ] **DEF-310** — Fatal/help diagnostics on stdout mixed with data
-- [ ] **DEF-311** — `r8_to_s_left` comment `G14.6` vs code `g16.9`
-- [ ] **DEF-312** — `fftgf` unused `STRIDE`
-- [ ] **DEF-313** — `fftgf` `tau2iw` help (real input) vs two-column read
 
-**Policy note:** Project `defectPolicy: reproduce-then-refactor` suggests a default preference toward faithful reproduction before later cleanup, but **does not auto-fill** any Decision column. Mismatches without decisions block affected Phase P parity criteria.
+### Deferred outside the product boundary (2026-08-19 managed-API decision)
+
+The owner set the process boundary at the managed C# API (ADR-002 §3/§4, ADR-003; `docs/PURPOSE.md`). CLI stdout formatting, diagnostic channel, ANSI styling, and process exit codes are adapter concerns, so the rows below **no longer block managed-API slices**. They are **deferred, not dispositioned**: each must be settled before any CLI adapter claims legacy stream compatibility, and none may be silently “fixed” in the meantime.
+
+- [ ] **DEF-301** — `fftgf` help `(re,im)` vs default writer `(Im,Re)` — CLI utility
+- [ ] **DEF-302** — `fftgf` default input `(Re,Im)` vs default output `(Im,Re)` asymmetry — CLI utility
+- [ ] **DEF-303** — `ffcmplx` unused `ex` despite help — CLI utility
+- [ ] **DEF-304** — `ffcmplx` `sread(fin,Gread,wm)` resolve/argument-order anomaly — CLI utility, but the call-site question still bears on the IOTOOLS port
+- [ ] **DEF-306** — `txtfy` `(re,im)` vs file/CLI `(im,re)` writers — diagnostic strings are adapter output; the *file* writers remain in scope via DEF-305
+- [ ] **DEF-309** — Bare `STOP` vs `stop 1` exit-status contract — exit status is a host concern
+- [ ] **DEF-310** — Fatal/help diagnostics on stdout mixed with data — channel is a host concern
+- [ ] **DEF-311** — `r8_to_s_left` comment `G14.6` vs code `g16.9` — diagnostic formatting
+- [ ] **DEF-312** — `fftgf` unused `STRIDE` — CLI utility
+- [ ] **DEF-313** — `fftgf` `tau2iw` help (real input) vs two-column read — CLI utility
+
+**Boundary note:** DEF-305 and DEF-307 stay **binding** because ADR-005 §3 retains IOTOOLS (`IOFILE`, `SLPLOT`, `SLREAD`) as library modules. Those procedures exist to read and write text files, so their formats and any latent reader defects are observable managed-API behavior, not adapter styling. ADR-003’s “text/complex-column codecs are out of scope” was scoped to the BEH-001 slice and must not be read library-wide.
+
+**Policy note:** Project `defectPolicy: reproduce-then-refactor` suggests a default preference toward faithful reproduction before later cleanup, but **does not auto-fill** any Decision column. Purpose decision 3 (2026-08-19 re-scoping) sets `reproduce-faithfully` as the default *intent* for behavior observable at the managed API; it still does not fill a Decision column without an owner row. Mismatches without decisions block affected Phase P parity criteria.
 
 ### Out of scope for both passes (not assigned DEF IDs here)
 
