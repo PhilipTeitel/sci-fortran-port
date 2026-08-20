@@ -20,7 +20,7 @@ Refined-requirements contract:
 - ADR-001 (probe baseline for BEH-001), ADR-002 (hexagonal managed API; typed domain failure), ADR-003 (binary64; exact parsed equality; general inclusive formula), ADR-005 (Fortran ABI not retained), ADR-006 (CLI retired), ADR-007 (message text / channel / exit are adapters), ADR-008 (VS-1 is the settled-oracle slice)
 
 **Date:** `2026-08-20`
-**Status:** Draft
+**Status:** Ready for Design
 
 ---
 
@@ -184,4 +184,4 @@ Do **not** create those ADRs in this command. `/design-application` or `/plan-po
 
 ---
 
-*Created: 2026-08-20 | Refined by: architect in Discovery Mode | Design types: ADR-009/010 Proposed*
+*Created: 2026-08-20 | Refined by: architect in Discovery Mode | Design types: ADR-009/010 Proposed | Marked `Ready for Design` by owner: 2026-08-20*

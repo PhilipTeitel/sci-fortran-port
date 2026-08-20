@@ -13,7 +13,7 @@
 **Modernization slice:** `strangler`
 **Structure fidelity:** `preserve-then-refactor`
 
-> **This story is not Ready.** Two owner gates in §3 are open: `REQ-001` is `Draft`, and ADR-009 / ADR-010 are `Proposed`. See §12 Tensions / conflicts. Do not start implementation until those close — the type names and layout in §4b, §5, and §7 come from ADRs that are not yet `Accepted`.
+> **This story is not Ready.** One owner gate in §3 remains open: ADR-009 and ADR-010 are `Proposed`. See §12 Tensions / conflicts. Do not start implementation until it closes — the type names, namespaces, project paths, and failure codes in §4b, §5, and §7 all come from those two ADRs. `REQ-001` was marked `Ready for Design` on 2026-08-20, closing the other gate.
 
 ---
 
@@ -71,7 +71,7 @@ Scope is start, stop, and length with inclusive endpoints. Optional legacy `ista
 - [x] Oracle tier and fixtures / acceptance data are documented. — `FIX-001` is scoped `T1` at probe `e586903` (ADR-001); the global profile `oracleTier` stays `T3 documented-only`.
 - [x] Defect-ledger decisions are recorded for known mismatches. — `DEF-001` reproduce-faithfully (probe parsed values); `DEF-002` **fix-now**; `DEF-003` / `DEF-004` retired with evidence (ADR-006 / ADR-007); `DEF-308` open but does not bind S1.
 - [ ] **BLOCKED — Linked ADRs are `Accepted` or this story is explicitly a spike.** ADR-009 and ADR-010 are `Proposed`. This story is **not** a spike: it claims parity. Every type name, namespace, project path, and failure code in §4b, §5, and §7 is provisional until the owner accepts both.
-- [ ] **BLOCKED — `REQ-001` is `Ready for Design`.** `REQ-001` is `Draft` (`docs/modernization/migration-plan.md` §1, "Draft pending Gate 2"). The scenario set S1–S6 that Phase A and Phase P trace to is therefore not owner-accepted.
+- [x] **`REQ-001` is `Ready for Design`.** Marked by the owner on 2026-08-20, closing Gate 2. The scenario set S1–S6 that Phase A and Phase P trace to is owner-accepted, and so are the `E4`/`E5` decisions recorded below.
 
 **Recorded decisions for weak-evidence coverage.** The `/plan-port-story` contract forbids marking a story ready when covered behavior is `E4 inferred` or `E5 unknown` without a recorded user decision. `BEH-001` has both:
 
@@ -82,7 +82,7 @@ Scope is start, stop, and length with inclusive endpoints. Optional legacy `ista
 | Downstream Fortran `linspace` consumers | `E5 unknown` | Out of scope; Fortran ABI not retained | `REQ-001` Q9; ADR-005 |
 | NaN / Infinity / signed-zero / subnormal / overflow / `ddp=16` | `E5 unknown` | Out of scope for VS-1 | `REQ-001` Q10; ADR-003 explicit non-decisions |
 
-Those decisions are recorded in `REQ-001`, which is still `Draft`. They become owner-accepted when `REQ-001` is marked `Ready for Design`, which is why the second DoR gate above is blocking rather than advisory.
+Those decisions are recorded in `REQ-001`, which the owner marked `Ready for Design` on 2026-08-20. They are therefore owner-accepted, and this DoR item is satisfied. What they license is still narrow: S3 and S4 may be implemented and covered in Phase A, and they may **not** be described as parity or given a Phase P criterion until a fixture exists.
 
 ## 4. Binding constraints (non-negotiable)
 
@@ -190,7 +190,7 @@ Paths follow README "Project Structure" and ADR-009 §1/§5.
 
 ### Files to leave UNCHANGED
 
-- `docs/requirements/REQ-001-linspace.md` — only the owner moves `Draft` → `Ready for Design`
+- `docs/requirements/REQ-001-linspace.md` — `Ready for Design` as of 2026-08-20; a later change of scope is a new REQ or a `Superseded` link, not an edit here
 - `docs/decisions/ADR-009-*.md`, `docs/decisions/ADR-010-*.md` — only the owner moves `Proposed` → `Accepted`
 - `docs/modernization/fixtures/FIX-001-linspace-5.md` — the fixture is evidence; transcribe it, never edit it
 - `docs/modernization/oracle.md`, `docs/modernization/behaviors/`, `docs/modernization/flows/` — recovered evidence, not product
@@ -319,7 +319,7 @@ Global profile `oracleTier` remains `T3 documented-only`. Only `FIX-001` is scop
 | Risk | Impact | Mitigation | Evidence |
 |------|--------|------------|----------|
 | ADR-009 / ADR-010 are `Proposed`; owner changes a type name, namespace, or the exception-vs-`Result` choice | Rework across §4b, §5, §7, and most test names | Do not start until the DoR gate closes; the arithmetic and the `Sn` mapping survive a rename, so churn is confined to names and paths | ADR-009/010 Status; ADR-010 Alternatives (a `Result` type was a live option) |
-| `REQ-001` is `Draft`; a scenario is renumbered or restated at Gate 2 | Test Plan `Covers Sn` column and Phase A/P mapping drift | Trace by `Sn` in one column so a renumber is a mechanical edit; the parallel-refine incident already showed two numbering schemes for the same behavior | `REQ-001` Status; `migration-plan.md` §1 |
+| A later REQ restates or renumbers `S1`–`S6` | Test Plan `Covers Sn` column and Phase A/P mapping drift | Largely retired: Gate 2 closed on 2026-08-20, so the numbering is now owner-accepted. Residual risk is a future REQ superseding this one; `Sn` stays in one Test Plan column so a renumber is a mechanical edit. The parallel-refine incident already produced two numbering schemes for this behavior | `REQ-001` Status `Ready for Design`; PR #5 conflict resolution |
 | Four exact dyadic values make S1 look trivially passable | A weak implementation passes P1 while the formula is wrong for non-dyadic spacings | Keep A2's formula coverage in Phase A with non-dyadic triples; do not let P1 stand alone as proof of the formula | ADR-003 authorizes exact equality only for `FIX-001` |
 | Someone points the parity test at `fidelity/golden/linspace-5.txt` because it is a convenient file that numerically matches | Silent regression to a non-authoritative oracle; `DEF-001` reopened | B5 plus Y4 test; fixture file carries a provenance header naming `FIX-001` | `DEF-001`; ADR-001; `oracle.md:20,101` |
 | Three projects and a test taxonomy for one function reads as over-engineering | Reviewer or client dismisses the demonstration | Accept it: the ceremony is the demonstration, and VS-2/VS-3 amortize the layout | ADR-009 Consequences; `migration-plan.md` §5 |
@@ -328,7 +328,7 @@ Global profile `oracleTier` remains `T3 documented-only`. Only `FIX-001` is scop
 
 ## Implementation Order
 
-1. **Do not start** until both DoR gates in §3 close. Confirm `REQ-001` is `Ready for Design` and ADR-009/ADR-010 are `Accepted`; if any name changed on acceptance, update §4b, §5, §7, and the Test Plan first.
+1. **Do not start** until the remaining DoR gate in §3 closes: ADR-009 and ADR-010 must be `Accepted`. If any name changed on acceptance, update §4b, §5, §7, and the Test Plan before writing code. (`REQ-001` reached `Ready for Design` on 2026-08-20.)
 2. Create `SciFor.sln` and the four projects with nullable enabled and warnings as errors, wiring only the references B2 allows. Confirm `dotnet build` succeeds on empty projects (Z1).
 3. Transcribe `FIX-001` into `tests/SciFor.Tests/Parity/Fixtures/` with a provenance header, then write `parity_BEH_001_P1` and **observe it fail** because `Grids.Linspace` does not exist yet. That failure is the required starting evidence.
 4. Add the Domain value objects and failure types (`LinearSequenceRequest`, `LinearSequence`, `LinearSequenceRejection`, `LinearSequenceRejectedException`, `DomainFailureException`), with A7 covering validate-before-allocate.
@@ -356,19 +356,19 @@ Global profile `oracleTier` remains `T3 documented-only`. Only `FIX-001` is scop
 
 ## 12. Tensions / conflicts
 
-These are for the owner to resolve. This story does not resolve them, and it must not be marked Ready while any of the first two stand.
+These are for the owner to resolve. This story does not resolve them, and it must not be marked Ready while item 1 stands.
 
-1. **`REQ-001` is `Draft` (Gate 2).** Phase A and Phase P trace to S1–S6, and the recorded `E4`/`E5` decisions in §3 live in `REQ-001`. Until the owner marks it `Ready for Design`, the specification this story implements is not accepted. `docs/modernization/migration-plan.md` §1, §11.
+**Closed 2026-08-20 — `REQ-001` Gate 2.** The owner marked `REQ-001` `Ready for Design`, accepting S1–S6 and the `E4`/`E5` decisions in §3. Recorded here because the DoR and §9 previously treated it as blocking. Nothing in the Test Plan moved as a result: the story was already written against that scenario set, and the acceptance narrows nothing and widens nothing.
 
-2. **ADR-009 and ADR-010 are `Proposed` (Gate 4).** The architect contract requires linked ADRs to be `Accepted` for a non-spike story, and this story claims parity, so it is not a spike. Every type name, namespace, project path, and `Code` value here is provisional. The design doc states the same rule: "Implementation stories wait until those are accepted" (`README.md` Requirements section).
+1. **ADR-009 and ADR-010 are `Proposed` (Gate 4).** The architect contract requires linked ADRs to be `Accepted` for a non-spike story, and this story claims parity, so it is not a spike. Every type name, namespace, project path, and `Code` value here is provisional. The design doc states the same rule: "Implementation stories wait until those are accepted" (`README.md` Requirements section). **This is now the only gate holding the story.**
 
-3. **`/plan-project` has not run, so Epic 1 and the ID `VS1-1` are provisional.** ADR-009's design note says story IDs come from `/plan-project` ("This design does not invent story IDs"), and `.cursor/workflow.config.yml` sets `nextCommand: plan-project`. This story was written directly against the design at the user's request. If a later `/plan-project` pass numbers epics differently, reconcile the ID and the README backlog row rather than renumbering silently.
+2. **`/plan-project` has not run, so Epic 1 and the ID `VS1-1` are provisional.** ADR-009's design note says story IDs come from `/plan-project` ("This design does not invent story IDs"), and `.cursor/workflow.config.yml` sets `nextCommand: plan-project`. This story was written directly against the design at the user's request. If a later `/plan-project` pass numbers epics differently, reconcile the ID and the README backlog row rather than renumbering silently.
 
-4. **The design doc reached `main` only by recovery.** `README.md`, ADR-009, and ADR-010 were authored on the branch for pull request #6 but were pushed after that PR was squash-merged, so they never landed. They were recovered onto this branch by cherry-pick. Confirm they are the design the owner intends before accepting them.
+3. **The design doc reached `main` only by recovery.** `README.md`, ADR-009, and ADR-010 were authored on the branch for pull request #6 but were pushed after that PR was squash-merged, so they never landed. They were recovered onto this branch by cherry-pick. Confirm they are the design the owner intends before accepting them.
 
-5. **`DEF-308` (comparison policy) stays open** and does not bind this story: S1 is exact parsed equality under ADR-003. It must be settled before VS-2 and VS-3 acceptance criteria. `docs/modernization/defect-ledger.md`.
+4. **`DEF-308` (comparison policy) stays open** and does not bind this story: S1 is exact parsed equality under ADR-003. It must be settled before VS-2 and VS-3 acceptance criteria. `docs/modernization/defect-ledger.md`.
 
-6. **Z4 and Z5 have no C# meaning as written.** The default Phase Z gates assume a TypeScript project (`@shared/types` alias, a logger). §8 records the C# equivalents — project references for Z4, and no-logger-by-design for Z5. If the profile is meant to carry C# defaults, that is a `.cursor/workflow.config.yml` change, not a per-story exception.
+5. **Z4 and Z5 have no C# meaning as written.** The default Phase Z gates assume a TypeScript project (`@shared/types` alias, a logger). §8 records the C# equivalents — project references for Z4, and no-logger-by-design for Z5. If the profile is meant to carry C# defaults, that is a `.cursor/workflow.config.yml` change, not a per-story exception.
 
 ---
 
