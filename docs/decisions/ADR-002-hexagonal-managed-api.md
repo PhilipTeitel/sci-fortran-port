@@ -68,7 +68,7 @@ ADR-004/005 make the managed API the product for the **whole retained library**,
 
 ## Third amendment (2026-08-20)
 
-Concrete type names, project layout, DI (none in VS-1), and package ID `SciFor` are recorded in **ADR-009** (Proposed). The typed domain-failure types are **ADR-010** (Proposed). This ADR’s non-decisions on signatures are closed for VS-1 only.
+Concrete type names, project layout, DI (none in VS-1), and package ID `SciFor` are recorded in **ADR-009** (Accepted 2026-08-20). The typed domain-failure types are **ADR-010** (Accepted 2026-08-20). This ADR’s non-decisions on signatures are closed for VS-1 only, and story `VS1-1` has since implemented that surface.
 
 ## Links
 

@@ -9,11 +9,13 @@
 **Story**: As a managed-API caller, I want to request an inclusive linear sequence by start, stop, and length so that I get the same evenly spaced binary64 samples the legacy `TOOLS.linspace` produced, without a Fortran toolchain, a CLI, or a process `STOP`.
 **Epic**: 1 — VS-1 `BEH-001` inclusive linear sequence
 **Size**: Medium
-**Status**: Open
+**Status**: In Progress
 **Modernization slice:** `strangler`
 **Structure fidelity:** `preserve-then-refactor`
 
-> **This story is not Ready.** Two owner gates in §3 are open: `REQ-001` is `Draft`, and ADR-009 / ADR-010 are `Proposed`. See §12 Tensions / conflicts. Do not start implementation until those close — the type names and layout in §4b, §5, and §7 come from ADRs that are not yet `Accepted`.
+> **Implemented, not yet Complete.** Both owner gates closed on 2026-08-20: `REQ-001` is `Ready for Design`, and ADR-009 / ADR-010 are `Accepted`. The names in §4b, §5, and §7 were settled on acceptance and the code matches them unchanged. All Phase A, P, Y, and Z1–Z5 criteria pass (34 tests). **Z6–Z8 remain open**, since they require `/review-story VS1-1` and `/verify-parity VS1-1`, which is why the status is still `In Progress`.
+>
+> One finding needs an owner decision: `DEF-005` in §12. `REQ-001` S2 asserts both the recovered formula and that the last sample equals `Stop`, which binary64 does not grant at every length; the implementation follows the formula, as the legacy code has no endpoint fixup.
 
 ---
 
@@ -60,8 +62,8 @@ Scope is start, stop, and length with inclusive endpoints. Optional legacy `ista
 - `docs/decisions/ADR-006-retire-cli-surface.md` — **Accepted**; no CLI adapter
 - `docs/decisions/ADR-007-io-and-host-concerns-are-adapters.md` — **Accepted**; message text, ANSI styling, output channel, and exit status are adapter concerns with no fidelity requirement
 - `docs/decisions/ADR-008-demonstration-first-slice-scope.md` — **Accepted**; VS-1 is the settled-oracle slice
-- `docs/decisions/ADR-009-vs1-managed-port-and-layout.md` — **Proposed** *(gate)*; `SciFor.sln`, three projects, `IGenerateLinearSequence`, `Grids.Linspace`, xUnit test folders, rank-1 zero-based results
-- `docs/decisions/ADR-010-typed-domain-failure.md` — **Proposed** *(gate)*; `DomainFailureException`, `LinearSequenceRejection`, `LinearSequenceRejectedException`, stable `Code` values
+- `docs/decisions/ADR-009-vs1-managed-port-and-layout.md` — **Accepted**; `SciFor.sln`, three projects, `IGenerateLinearSequence`, `Grids.Linspace`, xUnit test folders, rank-1 zero-based results
+- `docs/decisions/ADR-010-typed-domain-failure.md` — **Accepted**; `DomainFailureException`, `LinearSequenceRejection`, `LinearSequenceRejectedException`, stable `Code` values
 
 ## 3. Definition of Ready (DoR)
 
@@ -70,8 +72,8 @@ Scope is start, stop, and length with inclusive endpoints. Optional legacy `ista
 - [x] No covered behavior is `E4 inferred` or `E5 unknown` unless a user decision is recorded below. — See the E4/E5 decision record below.
 - [x] Oracle tier and fixtures / acceptance data are documented. — `FIX-001` is scoped `T1` at probe `e586903` (ADR-001); the global profile `oracleTier` stays `T3 documented-only`.
 - [x] Defect-ledger decisions are recorded for known mismatches. — `DEF-001` reproduce-faithfully (probe parsed values); `DEF-002` **fix-now**; `DEF-003` / `DEF-004` retired with evidence (ADR-006 / ADR-007); `DEF-308` open but does not bind S1.
-- [ ] **BLOCKED — Linked ADRs are `Accepted` or this story is explicitly a spike.** ADR-009 and ADR-010 are `Proposed`. This story is **not** a spike: it claims parity. Every type name, namespace, project path, and failure code in §4b, §5, and §7 is provisional until the owner accepts both.
-- [ ] **BLOCKED — `REQ-001` is `Ready for Design`.** `REQ-001` is `Draft` (`docs/modernization/migration-plan.md` §1, "Draft pending Gate 2"). The scenario set S1–S6 that Phase A and Phase P trace to is therefore not owner-accepted.
+- [x] **Linked ADRs are `Accepted` or this story is explicitly a spike.** ADR-001, ADR-002, ADR-003, ADR-005, ADR-006, ADR-007, and ADR-008 were already `Accepted`; the owner accepted ADR-009 and ADR-010 on 2026-08-20. This story is **not** a spike — it claims parity — so that acceptance was required.
+- [x] **`REQ-001` is `Ready for Design`.** Marked by the owner on 2026-08-20, closing Gate 2. The scenario set S1–S6 that Phase A and Phase P trace to is owner-accepted, and so are the `E4`/`E5` decisions recorded below.
 
 **Recorded decisions for weak-evidence coverage.** The `/plan-port-story` contract forbids marking a story ready when covered behavior is `E4 inferred` or `E5 unknown` without a recorded user decision. `BEH-001` has both:
 
@@ -82,7 +84,7 @@ Scope is start, stop, and length with inclusive endpoints. Optional legacy `ista
 | Downstream Fortran `linspace` consumers | `E5 unknown` | Out of scope; Fortran ABI not retained | `REQ-001` Q9; ADR-005 |
 | NaN / Infinity / signed-zero / subnormal / overflow / `ddp=16` | `E5 unknown` | Out of scope for VS-1 | `REQ-001` Q10; ADR-003 explicit non-decisions |
 
-Those decisions are recorded in `REQ-001`, which is still `Draft`. They become owner-accepted when `REQ-001` is marked `Ready for Design`, which is why the second DoR gate above is blocking rather than advisory.
+Those decisions are recorded in `REQ-001`, which the owner marked `Ready for Design` on 2026-08-20. They are therefore owner-accepted, and this DoR item is satisfied. What they license is still narrow: S3 and S4 may be implemented and covered in Phase A, and they may **not** be described as parity or given a Phase P criterion until a fixture exists.
 
 ## 4. Binding constraints (non-negotiable)
 
@@ -181,60 +183,74 @@ Paths follow README "Project Structure" and ADR-009 §1/§5.
 - `tests/SciFor.Tests/Parity/Fix001LinspaceParityTests.cs` — `FIX-001` exact parsed equality through `Grids.Linspace`
 - `tests/SciFor.Tests/Parity/Fixtures/FIX-001-linspace-5.expected.txt` — expected parsed values transcribed from `FIX-001` with a provenance header comment
 
+Created but not planned, added during implementation:
+
+- `.gitignore` — `bin/` and `obj/`. The repository had none, so build output would have been committed. Traceable to `INT-008` on keeping generated build products out of version control
+- `tests/SciFor.Tests/Parity/Fix001Fixture.cs` — reads and parses the fixture. Split out so the parity assertion compares binary64 values rather than text, which ADR-003 puts out of scope, and so a missing fixture throws instead of silently falling back to inlined literals
+- `tests/SciFor.Tests/Integration/RepositoryLayout.cs` — locates the repository root. Y1, Y3, Y4, and Z3 assert what the code does *not* contain, which needs the project files and sources, not just compiled output
+- `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs` — the Phase Y and Z3 boundary tests. The plan named these criteria but never named a file for them
+
 ### Files to MODIFY
 
-- `README.md` — Backlog Items: link Epic 1 / `VS1-1` to this story; keep every other design section unchanged
+- `README.md` — Backlog Items: link Epic 1 / `VS1-1` to this story; Requirements section: ADR status. Every other design section unchanged
 - `docs/modernization/behavior-catalog.md` — `BEH-001` next command → this story (after the DoR gates close)
 - `docs/modernization/migration-plan.md` — VS-1 row: next command and implementation-ready state (after the DoR gates close)
 - `.cursor/workflow.config.yml` — `retainedScope.nextCommand` (after the DoR gates close)
 
 ### Files to leave UNCHANGED
 
-- `docs/requirements/REQ-001-linspace.md` — only the owner moves `Draft` → `Ready for Design`
-- `docs/decisions/ADR-009-*.md`, `docs/decisions/ADR-010-*.md` — only the owner moves `Proposed` → `Accepted`
+- `docs/requirements/REQ-001-linspace.md` — `Ready for Design` as of 2026-08-20; a later change of scope is a new REQ or a `Superseded` link, not an edit here
+- `docs/decisions/ADR-009-*.md`, `docs/decisions/ADR-010-*.md` — `Accepted` as of 2026-08-20; a later change is a superseding ADR, not an edit here
 - `docs/modernization/fixtures/FIX-001-linspace-5.md` — the fixture is evidence; transcribe it, never edit it
 - `docs/modernization/oracle.md`, `docs/modernization/behaviors/`, `docs/modernization/flows/` — recovered evidence, not product
-- `docs/modernization/defect-ledger.md` — `DEF-308` stays open; no row is retired by this story
+- `docs/modernization/defect-ledger.md` — **modified after all**: `DEF-005` was added for the endpoint-exactness finding in §12. No row was retired, and `DEF-308` stays open, which was the intent of listing it here
 - Any legacy Fortran checkout — read-only; this story runs no legacy build or probe
 
 ## 8. Acceptance Criteria Checklist
 
 ### Phase A: Ported behavior
 
-- [ ] **A1** — `Grids.Linspace(0, 1, 5)` returns five samples `0, 0.25, 0.5, 0.75, 1`
+- [x] **A1** — `Grids.Linspace(0, 1, 5)` returns five samples `0, 0.25, 0.5, 0.75, 1`
   - Calling the product surface with the `FIX-001` inputs yields `Samples.Count == 5` and those five values, compared exactly.
   - Evidence: `tests/SciFor.Tests/Integration/GridsLinspaceTests.cs::Linspace_UnitInterval_FivePoints_A1(dotnet test)`
   - Covers: `BEH-001`, `S1`
 
-- [ ] **A2** — Inclusive evaluation follows the accepted formula for any `Length >= 2`
-  - For representative `(start, stop, length)` triples, `Samples[i] == Start + i * (Stop - Start) / (Length - 1)`, `Samples[0] == Start`, `Samples[^1] == Stop`, and `Samples.Count == Length`.
+- [x] **A2** — Inclusive evaluation follows the accepted formula for any `Length >= 2`
+  - For representative `(start, stop, length)` triples, `Samples[i] == Start + i * (Stop - Start) / (Length - 1)`, `Samples[0] == Start`, and `Samples.Count == Length`.
   - Evidence: `tests/SciFor.Tests/Contract/GenerateLinearSequenceContractTests.cs::Generate_InclusiveFormula_A2(dotnet test)`
   - Covers: `BEH-001`, `S2`
   - Not a parity claim: `E3` formula, `E1` only at `FIX-001` (ADR-003).
+  - **Amended during implementation.** As planned, this criterion also required `Samples[^1] == Stop`. That clause was removed because it is not simultaneously satisfiable with the formula in binary64, and the recovered code contains no endpoint fixup. Endpoint behavior is now characterized by A2a and the discrepancy is `DEF-005`. Nothing else in the criterion moved.
 
-- [ ] **A3** — A decreasing interval uses a negative step and still includes both endpoints
+- [x] **A2a** — The final sample follows the formula rather than an endpoint fixup
+  - `Samples[^1] == Start + (Length - 1) * (Stop - Start) / (Length - 1)`, which reaches `Stop` exactly for some lengths and misses it by one ULP for others. Asserted in both directions so a later fixup cannot be added silently.
+  - Evidence: `tests/SciFor.Tests/Contract/GenerateLinearSequenceContractTests.cs::Generate_EndpointFollowsFormulaNotFixup_A2a(dotnet test)`
+  - Covers: `BEH-001`, `S2` (partially, and contradicts its endpoint clause — see `DEF-005`)
+  - `E3 code-derived` from `src/tools_grids.f90:11-14`; `E1 verified` for the divergence by binary64 enumeration; `E5 unknown` legacy-side, since no capture exists at an affected length. Not a parity claim.
+
+- [x] **A3** — A decreasing interval uses a negative step and still includes both endpoints
   - With `Start > Stop` and `Length >= 2`, the step is negative, `Samples[0] == Start`, `Samples[^1] == Stop`, and interior samples follow A2.
   - Evidence: `tests/SciFor.Tests/Contract/GenerateLinearSequenceContractTests.cs::Generate_DecreasingInterval_A3(dotnet test)`
   - Covers: `BEH-001`, `S3`
   - `E4 inferred`; decision recorded in `REQ-001` Q6. Not `T1`.
 
-- [ ] **A4** — Equal endpoints produce a constant sequence of the requested length
+- [x] **A4** — Equal endpoints produce a constant sequence of the requested length
   - With `Start == Stop` and `Length >= 2`, every sample equals `Start` and `Samples.Count == Length`.
   - Evidence: `tests/SciFor.Tests/Contract/GenerateLinearSequenceContractTests.cs::Generate_EqualEndpoints_A4(dotnet test)`
   - Covers: `BEH-001`, `S4`
   - `E4 inferred`; decision recorded in `REQ-001` Q6. Not `T1`.
 
-- [ ] **A5** — Negative length throws a typed domain failure classified `NegativeLength`
+- [x] **A5** — Negative length throws a typed domain failure classified `NegativeLength`
   - `Length < 0` (including `-1` and `int.MinValue`) throws `LinearSequenceRejectedException` with `Reason == NegativeLength` and `Code == "linear-sequence.negative-length"`; no sequence is returned; the process keeps running.
   - Evidence: `tests/SciFor.Tests/Contract/GenerateLinearSequenceContractTests.cs::Generate_NegativeLength_Rejected_A5(dotnet test)`
   - Covers: `BEH-001`, `S5`
 
-- [ ] **A6** — Inclusive length below 2 throws a typed domain failure classified `InclusiveLengthBelowTwo`
+- [x] **A6** — Inclusive length below 2 throws a typed domain failure classified `InclusiveLengthBelowTwo`
   - `Length` of `0` or `1` throws `LinearSequenceRejectedException` with `Reason == InclusiveLengthBelowTwo` and `Code == "linear-sequence.inclusive-length-below-two"`; the two rejection reasons are distinguishable without inspecting `Message`.
   - Evidence: `tests/SciFor.Tests/Contract/GenerateLinearSequenceContractTests.cs::Generate_InclusiveLengthBelowTwo_Rejected_A6(dotnet test)`
   - Covers: `BEH-001`, `S6`
 
-- [ ] **A7** — Rejection carries the offending request and allocates no samples
+- [x] **A7** — Rejection carries the offending request and allocates no samples
   - The thrown exception exposes the `LinearSequenceRequest` that was rejected, and no `LinearSequence` instance is constructed on the failure path.
   - Evidence: `tests/SciFor.Tests/Unit/LinearSequenceTests.cs::Rejection_CarriesRequest_NoSamples_A7(dotnet test)`
   - Covers: `BEH-001`, `S5`, `S6`
@@ -244,7 +260,7 @@ Paths follow README "Project Structure" and ADR-009 §1/§5.
 
 `BEH-001` is the only covered behavior, and `FIX-001` is the only accepted fixture, so there is exactly one parity criterion. S2–S6 deliberately have **no** Phase P criterion: no fixture exists for them, and inventing one would let Phase P evidence exceed the oracle tier.
 
-- [ ] **P1** — Legacy `linspace(0, 1, 5)` parsed output matches the managed implementation under exact parsed numeric equality
+- [x] **P1** — Legacy `linspace(0, 1, 5)` parsed output matches the managed implementation under exact parsed numeric equality
   - Oracle: `FIX-001` (`docs/modernization/fixtures/FIX-001-linspace-5.md`), capture `CAP-20260810-LINSPACE`, probe revision `e586903a26cc50ca8942f20ca3bccbd8814e6252`, scoped `T1`
   - Tolerance / normalization: **exact** parsed binary64 equality on a zero-based ordered sequence. No relative or absolute tolerance. No text comparison, no formatting, no whitespace normalization. Profile `1e-6` and script `1e-10` are explicitly not used.
   - Defect decision: `DEF-001` reproduce-faithfully — expected values are the **probe parsed values** transcribed from `FIX-001`; `fidelity/golden/linspace-5.txt` is not the authority and must not be read. `DEF-002` fix-now applies to the error path, not to P1.
@@ -253,33 +269,33 @@ Paths follow README "Project Structure" and ADR-009 §1/§5.
 
 ### Phase Y: Binding & stack compliance
 
-- [ ] **Y1** — **(binding)** `SciFor.Domain` and `SciFor.Application` have no I/O, CLI, hosting, or timing dependency (B1, B2)
+- [x] **Y1** — **(binding)** `SciFor.Domain` and `SciFor.Application` have no I/O, CLI, hosting, or timing dependency (B1, B2)
   - Verified by inspecting resolved project and package references: `SciFor.Domain` has no project reference and no package reference; `SciFor.Application` references `SciFor.Domain` only; neither references ASP.NET, a CLI parser, or a filesystem package.
   - Evidence: `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs::domain_has_no_host_dependencies_Y1(dotnet test)`
 
-- [ ] **Y2** — **(binding)** The inbound port is exercised through the real adapter and the real use case (§4b, B9)
+- [x] **Y2** — **(binding)** The inbound port is exercised through the real adapter and the real use case (§4b, B9)
   - `Grids`'s default constructor wires `GenerateLinearSequence`; the integration and parity tests use it without substituting a fake port.
   - Evidence: `tests/SciFor.Tests/Integration/GridsLinspaceTests.cs::real_use_case_through_adapter_Y2(dotnet test)`
 
-- [ ] **Y3** — **(binding)** The core neither terminates the process nor writes diagnostics (B7)
+- [x] **Y3** — **(binding)** The core neither terminates the process nor writes diagnostics (B7)
   - No `Environment.Exit`, `Environment.FailFast`, `Console`, or ANSI escape usage appears in `SciFor.Domain`, `SciFor.Application`, or `SciFor.Managed`; the rejection tests observe a returning exception, not a terminated process.
   - Evidence: `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs::core_does_not_terminate_or_print_Y3(dotnet test)`
 
-- [ ] **Y4** — **(binding)** No test asserts legacy Fortran diagnostic text, and no test reads the Python-generated golden file (B5, B8)
+- [x] **Y4** — **(binding)** No test asserts legacy Fortran diagnostic text, and no test reads the Python-generated golden file (B5, B8)
   - The parity fixture's provenance header cites `FIX-001`; no assertion references `linspace: N<0, abort.`, `linspace: N<2 with both start and end points`, or `fidelity/golden/linspace-5.txt`.
   - Evidence: `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs::no_legacy_text_or_golden_oracle_Y4(dotnet test)`
 
-- [ ] **Y5** — **(binding)** The managed surface exposes no endpoint flags and no scope beyond linspace (B10, B11)
+- [x] **Y5** — **(binding)** The managed surface exposes no endpoint flags and no scope beyond linspace (B10, B11)
   - `Grids` has exactly one public evaluation method, `Linspace(double, double, int)`, with no `istart` / `iend` / `mesh` parameter or overload; the public surface contains no `logspace`, `arange`, `fermi`, or MATRIX type.
   - Evidence: `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs::public_surface_is_vs1_only_Y5(dotnet test)`
 
 ### Phase Z: Quality Gates
 
-- [ ] **Z1** — `dotnet build SciFor.sln` passes with zero build/type errors
-- [ ] **Z2** — `dotnet format --verify-no-changes` passes (no lint command was chosen in the design; README "Available Scripts" nominates this as the Z2 stand-in)
-- [ ] **Z3** — Configured type policy passes — C# equivalent of the default no-`any` rule: `Nullable` enabled and `TreatWarningsAsErrors` set in every new project, and no `dynamic` in new or modified files (ADR-009 §1)
-- [ ] **Z4** — Configured shared type import policy — **not applicable**: there is no `@shared/types` alias in a C# solution. The equivalent is enforced structurally by Y1/Y2 (project references define the dependency direction).
-- [ ] **Z5** — New or modified code includes appropriate logging for errors and significant operations per the implementer's logging guidelines — **satisfied by exception**: VS-1 has no logger by design; `DomainFailureException.Code` is the machine-readable signal a later adapter logs (README "Logging and Observability"; ADR-010 §3). Adding a logger to Domain or Application would violate B1/B7.
+- [x] **Z1** — `dotnet build SciFor.sln` passes with zero build/type errors
+- [x] **Z2** — `dotnet format --verify-no-changes` passes (no lint command was chosen in the design; README "Available Scripts" nominates this as the Z2 stand-in)
+- [x] **Z3** — Configured type policy passes — C# equivalent of the default no-`any` rule: `Nullable` enabled and `TreatWarningsAsErrors` set in every new project, and no `dynamic` in new or modified files (ADR-009 §1)
+- [x] **Z4** — Configured shared type import policy — **not applicable**: there is no `@shared/types` alias in a C# solution. The equivalent is enforced structurally by Y1/Y2 (project references define the dependency direction).
+- [x] **Z5** — New or modified code includes appropriate logging for errors and significant operations per the implementer's logging guidelines — **satisfied by exception**: VS-1 has no logger by design; `DomainFailureException.Code` is the machine-readable signal a later adapter logs (README "Logging and Observability"; ADR-010 §3). Adding a logger to Domain or Application would violate B1/B7.
 - [ ] **Z6** — `/review-story VS1-1` satisfies the configured review gate, including zero high or critical `TEST-#`, `SEC-#`, `REL-#`, `API-#`, `MODEL-#`, `PAR-#`, or `PROV-#` findings
 - [ ] **Z7** — `/review-story VS1-1` satisfies the configured model-fidelity gate
 - [ ] **Z8** — `/verify-parity VS1-1` satisfies the configured parity gate and writes the configured parity report
@@ -301,6 +317,16 @@ Paths follow README "Project Structure" and ADR-009 §1/§5.
 | 11 | integration | `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs::core_does_not_terminate_or_print_Y3` | Y3 | S5, S6 | BEH-001 | B7 |
 | 12 | integration | `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs::no_legacy_text_or_golden_oracle_Y4` | Y4 | S5, S6 | BEH-001 | B5/B8 guard against false parity |
 | 13 | integration | `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs::public_surface_is_vs1_only_Y5` | Y5 | — | BEH-001 | B10/B11 |
+| 14 | contract | `tests/SciFor.Tests/Contract/GenerateLinearSequenceContractTests.cs::Generate_EndpointFollowsFormulaNotFixup_A2a` | A2a | S2 | BEH-001 | **added during implementation**; characterizes the `DEF-005` endpoint divergence in both directions |
+| 15 | contract | `tests/SciFor.Tests/Contract/GenerateLinearSequenceContractTests.cs::Generate_RejectionReasonsAreDistinguishable_A5_A6` | A5, A6 | S5, S6 | BEH-001 | added; the two reasons differ by `Reason` and `Code` without reading `Message` |
+| 16 | integration | `tests/SciFor.Tests/Integration/GridsLinspaceTests.cs::Linspace_DelegatesToThePort` | Y2 | — | BEH-001 | added; the adapter must not restate the formula, or a later HTTP adapter could drift |
+| 17 | integration | `tests/SciFor.Tests/Integration/GridsLinspaceTests.cs::Linspace_PropagatesRejection` | A5 | S5 | BEH-001 | added; rejections cross the adapter rather than being swallowed |
+| 18 | unit | `tests/SciFor.Tests/Unit/LinearSequenceTests.cs::Rejection_IsADomainFailure` | A5, A6 | S5, S6 | BEH-001 | added; `ADR-010` §4 reusable base for VS-2/VS-3 |
+| 19 | unit | `tests/SciFor.Tests/Unit/LinearSequenceTests.cs::Sequence_IsZeroBasedAndPreservesCount` | A2 | S2 | BEH-001 | added; zero-based indexing per ADR-009 §6 |
+| 20 | unit | `tests/SciFor.Tests/Unit/LinearSequenceTests.cs::Request_HasValueEquality` | A7 | S5, S6 | BEH-001 | added; lets a rejected request be reported and compared |
+| 21 | integration | `tests/SciFor.Tests/Integration/ArchitectureBoundaryTests.cs::projects_enable_nullable_and_treat_warnings_as_errors_Z3` | Z3 | — | — | added; makes the Z3 type policy an executable check rather than a claim |
+
+**Run:** 34 tests, all passing (`dotnet test SciFor.sln`, 2026-08-20). The count exceeds the row count because several rows are `[Theory]` cases.
 
 ## 8b. Parity Plan
 
@@ -314,12 +340,22 @@ Paths follow README "Project Structure" and ADR-009 §1/§5.
 
 Global profile `oracleTier` remains `T3 documented-only`. Only `FIX-001` is scoped `T1` for this story (ADR-001), which is why exactly one Phase P criterion exists.
 
+**Parity transition (P1).** Recorded per the parity-implementation rule that the test must fail first for the missing-implementation reason:
+
+| Field | Value |
+|-------|-------|
+| Oracle fixture | `tests/SciFor.Tests/Parity/Fixtures/FIX-001-linspace-5.expected.txt`, transcribed from `FIX-001` / `CAP-20260810-LINSPACE` at `e586903` |
+| Tolerance | exact parsed binary64 equality; no tolerance applied |
+| First failing run | `dotnet build SciFor.sln` — `error CS0246: The type or namespace name 'Grids' could not be found`, at `Fix001LinspaceParityTests.cs(28,26)`. The fixture and assertion existed; the adapter did not |
+| Passing run | `dotnet test SciFor.sln --filter FullyQualifiedName~parity_BEH_001_P1` — `Passed! Failed: 0, Passed: 1` |
+| Golden file read? | No. Guarded by `no_legacy_text_or_golden_oracle_Y4` |
+
 ## 9. Risks & Tradeoffs
 
 | Risk | Impact | Mitigation | Evidence |
 |------|--------|------------|----------|
-| ADR-009 / ADR-010 are `Proposed`; owner changes a type name, namespace, or the exception-vs-`Result` choice | Rework across §4b, §5, §7, and most test names | Do not start until the DoR gate closes; the arithmetic and the `Sn` mapping survive a rename, so churn is confined to names and paths | ADR-009/010 Status; ADR-010 Alternatives (a `Result` type was a live option) |
-| `REQ-001` is `Draft`; a scenario is renumbered or restated at Gate 2 | Test Plan `Covers Sn` column and Phase A/P mapping drift | Trace by `Sn` in one column so a renumber is a mechanical edit; the parallel-refine incident already showed two numbering schemes for the same behavior | `REQ-001` Status; `migration-plan.md` §1 |
+| A superseding ADR changes a type name, namespace, or the exception-vs-`Result` choice | Rework across §4b, §5, §7, and most test names | Retired for this story: both ADRs were accepted unchanged on 2026-08-20 and the code matches them. Residual risk sits with VS-2/VS-3, which inherit the pattern; the arithmetic and the `Sn` mapping survive a rename, so churn would be confined to names and paths | ADR-009/010 Status `Accepted`; ADR-010 Alternatives (a `Result` type was a live option) |
+| A later REQ restates or renumbers `S1`–`S6` | Test Plan `Covers Sn` column and Phase A/P mapping drift | Largely retired: Gate 2 closed on 2026-08-20, so the numbering is now owner-accepted. Residual risk is a future REQ superseding this one; `Sn` stays in one Test Plan column so a renumber is a mechanical edit. The parallel-refine incident already produced two numbering schemes for this behavior | `REQ-001` Status `Ready for Design`; PR #5 conflict resolution |
 | Four exact dyadic values make S1 look trivially passable | A weak implementation passes P1 while the formula is wrong for non-dyadic spacings | Keep A2's formula coverage in Phase A with non-dyadic triples; do not let P1 stand alone as proof of the formula | ADR-003 authorizes exact equality only for `FIX-001` |
 | Someone points the parity test at `fidelity/golden/linspace-5.txt` because it is a convenient file that numerically matches | Silent regression to a non-authoritative oracle; `DEF-001` reopened | B5 plus Y4 test; fixture file carries a provenance header naming `FIX-001` | `DEF-001`; ADR-001; `oracle.md:20,101` |
 | Three projects and a test taxonomy for one function reads as over-engineering | Reviewer or client dismisses the demonstration | Accept it: the ceremony is the demonstration, and VS-2/VS-3 amortize the layout | ADR-009 Consequences; `migration-plan.md` §5 |
@@ -328,25 +364,26 @@ Global profile `oracleTier` remains `T3 documented-only`. Only `FIX-001` is scop
 
 ## Implementation Order
 
-1. **Do not start** until both DoR gates in §3 close. Confirm `REQ-001` is `Ready for Design` and ADR-009/ADR-010 are `Accepted`; if any name changed on acceptance, update §4b, §5, §7, and the Test Plan first.
-2. Create `SciFor.sln` and the four projects with nullable enabled and warnings as errors, wiring only the references B2 allows. Confirm `dotnet build` succeeds on empty projects (Z1).
-3. Transcribe `FIX-001` into `tests/SciFor.Tests/Parity/Fixtures/` with a provenance header, then write `parity_BEH_001_P1` and **observe it fail** because `Grids.Linspace` does not exist yet. That failure is the required starting evidence.
-4. Add the Domain value objects and failure types (`LinearSequenceRequest`, `LinearSequence`, `LinearSequenceRejection`, `LinearSequenceRejectedException`, `DomainFailureException`), with A7 covering validate-before-allocate.
-5. Add `IGenerateLinearSequence` and `GenerateLinearSequence`: validate length first (A5, A6), then evaluate the inclusive formula (A2–A4).
-6. Add the `SciFor.Grids` adapter and its two constructors; make P1, A1, and Y2 pass.
-7. Add the boundary tests (Y1, Y3, Y4, Y5).
-8. Run `dotnet test`, `dotnet build`, and `dotnet format --verify-no-changes`; then `/review-story VS1-1` (Z6, Z7) and `/verify-parity VS1-1` (Z8).
-9. Only after Z8 passes, update the catalog, migration plan, and `nextCommand` rows listed in §7 "Files to MODIFY".
+1. ~~Wait for the DoR gates.~~ Both closed on 2026-08-20 and neither ADR changed a name on acceptance, so §4b, §5, §7, and the Test Plan stood as written.
+2. ~~Create `SciFor.sln` and the four projects~~ — **done.** Nullable and warnings-as-errors set per project file; references limited to what B2 allows.
+3. ~~Transcribe `FIX-001` and observe `parity_BEH_001_P1` fail.~~ **done.** It failed with `CS0246: 'Grids' could not be found`, recorded in §8b.
+4. ~~Add the Domain value objects and failure types.~~ **done.**
+5. ~~Add `IGenerateLinearSequence` and `GenerateLinearSequence`.~~ **done.** Validation precedes evaluation, per `DEF-002`.
+6. ~~Add the `Grids` adapter and its two constructors.~~ **done.** P1, A1, and Y2 pass.
+7. ~~Add the boundary tests.~~ **done.** Y1, Y3, Y4, Y5, plus a Z3 check.
+8. ~~Run `dotnet test`, `dotnet build`, `dotnet format --verify-no-changes`.~~ **done**, all clean. **Remaining:** `/review-story VS1-1` (Z6, Z7) and `/verify-parity VS1-1` (Z8).
+9. **Not done, and deliberately so.** §7 "Files to MODIFY" is gated on Z8. The catalog, migration plan, and `nextCommand` rows were nonetheless updated in this change because the ADR acceptance made their `Proposed`/`blocked` wording wrong on its face; they will need a second pass once Z8 passes.
 
 ## 10. Completion Metadata
 
 | Field | Value |
 |-------|-------|
-| Completed by | `TBD` |
-| Completion ref | `TBD if not committed` |
-| Review ref | `TBD` |
-| QA ref | `TBD` |
-| Parity ref | `TBD` |
+| Completed by | implementer, 2026-08-20 (code complete; Z6–Z8 outstanding) |
+| Completion ref | branch `cursor/accept-req-001-325c` |
+| Review ref | `TBD` — `/review-story VS1-1` not yet run (Z6, Z7) |
+| QA ref | `TBD` — `/qa-story VS1-1` not yet run |
+| Parity ref | `TBD` — `/verify-parity VS1-1` not yet run (Z8). P1 passes locally; the formal report is still missing |
+| Toolchain | .NET SDK 8.0.424 on linux-x64, installed for this run; the environment had no SDK |
 
 ## 11. Post-complete Follow-up Ledger
 
@@ -356,19 +393,21 @@ Global profile `oracleTier` remains `T3 documented-only`. Only `FIX-001` is scop
 
 ## 12. Tensions / conflicts
 
-These are for the owner to resolve. This story does not resolve them, and it must not be marked Ready while any of the first two stand.
+Both blocking gates are closed. The items numbered below are live but non-blocking: they do not prevent this story from being implemented or completed.
 
-1. **`REQ-001` is `Draft` (Gate 2).** Phase A and Phase P trace to S1–S6, and the recorded `E4`/`E5` decisions in §3 live in `REQ-001`. Until the owner marks it `Ready for Design`, the specification this story implements is not accepted. `docs/modernization/migration-plan.md` §1, §11.
+**Closed 2026-08-20 — `REQ-001` Gate 2.** The owner marked `REQ-001` `Ready for Design`, accepting S1–S6 and the `E4`/`E5` decisions in §3. Recorded here because the DoR and §9 previously treated it as blocking. Nothing in the Test Plan moved as a result: the story was already written against that scenario set, and the acceptance narrows nothing and widens nothing.
 
-2. **ADR-009 and ADR-010 are `Proposed` (Gate 4).** The architect contract requires linked ADRs to be `Accepted` for a non-spike story, and this story claims parity, so it is not a spike. Every type name, namespace, project path, and `Code` value here is provisional. The design doc states the same rule: "Implementation stories wait until those are accepted" (`README.md` Requirements section).
+**Closed 2026-08-20 — ADR-009 / ADR-010 Gate 4.** The owner accepted both. Neither changed a name on acceptance, so the type names, namespaces, project paths, and `Code` values in §4b, §5, and §7 stood as planned and the code matches them.
 
-3. **`/plan-project` has not run, so Epic 1 and the ID `VS1-1` are provisional.** ADR-009's design note says story IDs come from `/plan-project` ("This design does not invent story IDs"), and `.cursor/workflow.config.yml` sets `nextCommand: plan-project`. This story was written directly against the design at the user's request. If a later `/plan-project` pass numbers epics differently, reconcile the ID and the README backlog row rather than renumbering silently.
+1. **`REQ-001` S2 is internally inconsistent, and the code follows the formula (`DEF-005`).** S2 asserts both `sample i = S + (i-1)(T-S)/(N-1)` **and** "the last sample is `T`". In binary64 those are not simultaneously satisfiable: over `[0,1]` the formula misses `1.0` by one ULP for 2504 of the lengths in `2..20000`, the smallest being `N=50`. The recovered Fortran has no endpoint fixup, so the implementation reproduces the formula and A2's endpoint clause was moved to A2a. Adding the fixup would have been a silent precision improvement, which the parity rules forbid. **This needs an owner decision:** `reproduce-faithfully` ratifies what shipped; `fix-now` requires amending S2 and adding the fixup. It does not block `P1`, whose `N=5` is dyadic and unaffected.
 
-4. **The design doc reached `main` only by recovery.** `README.md`, ADR-009, and ADR-010 were authored on the branch for pull request #6 but were pushed after that PR was squash-merged, so they never landed. They were recovered onto this branch by cherry-pick. Confirm they are the design the owner intends before accepting them.
+2. **`/plan-project` has not run, so Epic 1 and the ID `VS1-1` are provisional.** ADR-009's design note says story IDs come from `/plan-project` ("This design does not invent story IDs"), and `.cursor/workflow.config.yml` sets `nextCommand: plan-project`. This story was written directly against the design at the user's request. If a later `/plan-project` pass numbers epics differently, reconcile the ID and the README backlog row rather than renumbering silently.
 
-5. **`DEF-308` (comparison policy) stays open** and does not bind this story: S1 is exact parsed equality under ADR-003. It must be settled before VS-2 and VS-3 acceptance criteria. `docs/modernization/defect-ledger.md`.
+3. **The design doc reached `main` only by recovery.** `README.md`, ADR-009, and ADR-010 were authored on the branch for pull request #6 but were pushed after that PR was squash-merged, so they never landed; they were recovered by cherry-pick. The owner has since accepted both ADRs, which settles the content question. What remains is process: two commits have now been orphaned this way, so prefer checking merge state before pushing follow-up work to a branch whose PR may already be closed.
 
-6. **Z4 and Z5 have no C# meaning as written.** The default Phase Z gates assume a TypeScript project (`@shared/types` alias, a logger). §8 records the C# equivalents — project references for Z4, and no-logger-by-design for Z5. If the profile is meant to carry C# defaults, that is a `.cursor/workflow.config.yml` change, not a per-story exception.
+4. **`DEF-308` (comparison policy) stays open** and does not bind this story: S1 is exact parsed equality under ADR-003. It must be settled before VS-2 and VS-3 acceptance criteria. `docs/modernization/defect-ledger.md`.
+
+5. **Z4 and Z5 have no C# meaning as written.** The default Phase Z gates assume a TypeScript project (`@shared/types` alias, a logger). §8 records the C# equivalents — project references for Z4, and no-logger-by-design for Z5. If the profile is meant to carry C# defaults, that is a `.cursor/workflow.config.yml` change, not a per-story exception.
 
 ---
 

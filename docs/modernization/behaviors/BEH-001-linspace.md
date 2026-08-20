@@ -1,6 +1,6 @@
 # BEH-001: Generate an inclusive linear sequence (linspace)
 
-**Status:** Recovered; first code slice (VS-1). Requirements in `REQ-001` (Draft). Design in `README.md` (ADR-009/010 Proposed). Next: `/plan-project`.
+**Status:** Recovered; first code slice (VS-1). Requirements in `REQ-001` (`Ready for Design`). Design in `README.md` (ADR-009/010 Accepted). Ported by story `VS1-1` (implemented; `FIX-001` parity green). Next: `/review-story VS1-1`.
 **Evidence grade:** `E1 verified` for `FIX-001`; `E3 code-derived` for default-endpoint formula and abort conditions; `E5 unknown` for unexecuted optional flags, `mesh`, invalid `num`, and the CLI surface (out of first-slice scope)
 **Legacy surfaces:** Library function `TOOLS.linspace`; exercised by `fidelity/driver.f90`. CLI `numutils/src/linspace.f90` is documented as related and **out of first-slice scope**.
 **Date:** `2026-08-19`
@@ -133,4 +133,4 @@ Scenario: Invalid negative length
 - Design: `README.md`
 - Migration plan: `docs/modernization/migration-plan.md` (VS-1)
 
-*Created: 2026-08-19 | Refined: 2026-08-20 (`REQ-001`) | Designed: 2026-08-20*
+*Created: 2026-08-19 | Refined: 2026-08-20 (`REQ-001`) | Designed: 2026-08-20 | `REQ-001` `Ready for Design`: 2026-08-20*
