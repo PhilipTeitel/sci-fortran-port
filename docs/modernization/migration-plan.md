@@ -37,7 +37,7 @@ Everything else retained by ADR-005 §3 stays catalogued as **reserve** — avai
 
 Only **VS-1** has refined requirements (`REQ-001`, Draft pending Gate 2). VS-2 and VS-3 need `/document-legacy` and fixture capture first.
 
-**Next ADD command:** `/design-application` for VS-1, consuming `docs/requirements/REQ-001-linspace.md`. Concrete port names remain deferred (ADR-002). `/plan-port-story` follows design.
+**Next ADD command:** `/plan-project` (VS-1 design is in `README.md`; ADR-009/010 Proposed). Do not start VS-2 or VS-3 implementation stories from this plan.
 
 ---
 
@@ -92,7 +92,7 @@ flowchart TD
 
 | Slice | Behaviors | Status now | Next command | Implementation-ready? |
 |-------|-----------|------------|--------------|------------------------|
-| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` Draft (S1–S6) | `/design-application` | **No** until `/plan-port-story` |
+| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` Draft (S1–S6); design in `README.md` (ADR-009/010 Proposed) | `/plan-project` | **No** until `/plan-port-story` |
 | VS-2 | `BEH-003` `fermi` | T1 hash only; no parsed fixture | `/document-legacy` | No |
 | VS-3 | `BEH-040` `MATRIX` (inverse, diagonalize, solve) | Catalog-only; no T1 evidence | `/document-legacy` | No |
 | VS-4 *(optional)* | `BEH-004` `deriv` | T1 hash only; 1,024-row capture not retained | `/document-legacy` | No |
@@ -112,7 +112,7 @@ The only slice whose oracle is settled. `FIX-001` requires exact parsed equality
 - Invalid length is a typed domain failure; Fortran `N<0` / `N<2` strings are not the managed contract (`REQ-001` S5/S6).
 - `DEF-002` is **fix-now** at the managed port: reject negative length without reproducing Fortran `array(num)`-before-check allocation.
 
-This slice also establishes solution layout, the first port signature, and the typed-domain-failure pattern that VS-2 and VS-3 reuse. Its design cost is therefore higher than its arithmetic suggests, and that is expected.
+This slice also establishes solution layout, the first port signature, and the typed-domain-failure pattern that VS-2 and VS-3 reuse (`README.md`, ADR-009, ADR-010). Its design cost is therefore higher than its arithmetic suggests, and that is expected.
 
 ### VS-2 — `BEH-003` `fermi`
 
@@ -226,7 +226,7 @@ GAP-015 (RNG sequence versus distribution) and GAP-013 (complex-column order) no
 
 Library-wide design already exists: hexagonal ports, managed API as the product, I/O and host concerns as adapters, probe baseline, retirements (ADR-002, ADR-005, ADR-006, ADR-007).
 
-**Slice design starts after `/refine-feature` for that slice.** VS-1 requirements are `REQ-001` (Draft). Next is `/design-application`, which chooses concrete C# names, project layout, and the first port signature — the items ADR-002 explicitly deferred.
+**Slice design for VS-1 is in `README.md`.** ADR-009/010 are Proposed. `/plan-project` then `/plan-port-story` produce implementation-ready stories. Concrete C# names, project layout, and the first port signature are no longer deferred.
 
 Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 
@@ -234,7 +234,7 @@ Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 
 ## 11. Next command
 
-**`/design-application` for VS-1**, consuming `docs/requirements/REQ-001-linspace.md` (status `Draft` until Gate 2).
+**`/plan-project`**, consuming `README.md` and `docs/requirements/REQ-001-linspace.md`.
 
 Do not start VS-2 or VS-3 implementation stories from this plan. After VS-1 C# exists and `FIX-001` passes, the next step is VS-2 `/document-legacy`.
 
@@ -251,8 +251,9 @@ Do not start VS-2 or VS-3 implementation stories from this plan. After VS-1 C# e
 - Defects: `docs/modernization/defect-ledger.md`
 - Oracle: `docs/modernization/oracle.md`
 - Gaps / deps: `docs/modernization/translation-gaps.md`, `docs/modernization/dependency-ledger.md`
-- ADRs: ADR-001–008 under `docs/decisions/`
+- Design: `README.md`
+- ADRs: ADR-001–010 under `docs/decisions/`
 
 ---
 
-*Created: 2026-08-19 | Command: `/plan-migration` | Rescoped 2026-08-19 to demonstration-first vertical slices per ADR-006/007/008 | VS-1 refined 2026-08-20 (`REQ-001`)*
+*Created: 2026-08-19 | Command: `/plan-migration` | Rescoped 2026-08-19 to demonstration-first vertical slices per ADR-006/007/008 | VS-1 refined 2026-08-20 (`REQ-001`) | VS-1 designed 2026-08-20 (`README.md`, ADR-009/010)*

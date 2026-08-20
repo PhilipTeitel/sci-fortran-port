@@ -66,9 +66,13 @@ ADR-004/005 make the managed API the product for the **whole retained library**,
 - **§3's "CLI and HTTP adapters, if added later"** — no CLI adapter will be added. **ADR-006** retires the CLI surface from build scope. An HTTP adapter remains optional.
 - **§4's mapping of `STOP`/`error()` to a typed domain failure** is confirmed and generalized library-wide by the 2026-08-19 process-boundary decision recorded in `docs/PURPOSE.md`.
 
+## Third amendment (2026-08-20)
+
+Concrete type names, project layout, DI (none in VS-1), and package ID `SciFor` are recorded in **ADR-009** (Proposed). The typed domain-failure types are **ADR-010** (Proposed). This ADR’s non-decisions on signatures are closed for VS-1 only.
+
 ## Links
 
 - Assessment: `docs/modernization/ASSESSMENT.md` Conditions 3–4 (POC whole-library boundary)
 - Translation gaps: GAP-019, GAP-020, GAP-026, GAP-028
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
-- Related: ADR-001, ADR-003, ADR-004, ADR-005
+- Related: ADR-001, ADR-003, ADR-004, ADR-005, ADR-009, ADR-010
