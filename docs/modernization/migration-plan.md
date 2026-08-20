@@ -17,7 +17,7 @@
 **Defect policy:** reproduce-then-refactor
 **Authority:** ADR-004, ADR-005, ADR-006, ADR-007, ADR-008, `docs/modernization/behavior-catalog.md`
 
-This plan sequences code production. It does not authorize implementation-ready stories except where a slice has completed `/refine-feature`. It does not claim T1 parity outside recovered fixtures.
+This plan sequences code production. It does not authorize implementation-ready stories except where a slice has completed `/plan-port-story`. It does not claim T1 parity outside recovered fixtures.
 
 ---
 
@@ -35,9 +35,9 @@ Accordingly this plan builds **three vertical slices**, each carried end to end 
 
 Everything else retained by ADR-005 §3 stays catalogued as **reserve** — available, not planned. The CLI surface is retired from build scope (ADR-006). File I/O, CLI parsing, timing, and console diagnostics are adapters, not ported modules (ADR-007).
 
-Only **VS-1** is recovered enough to start requirements. VS-2 and VS-3 need `/document-legacy` and fixture capture first.
+Only **VS-1** has refined requirements (`REQ-001`, Draft pending Gate 2). VS-2 and VS-3 need `/document-legacy` and fixture capture first.
 
-**Next ADD command:** `/refine-feature` against `docs/modernization/behaviors/BEH-001-linspace.md`.
+**Next ADD command:** `/design-application` for VS-1, consuming `docs/requirements/REQ-001-linspace.md`. Concrete port names remain deferred (ADR-002). `/plan-port-story` follows design.
 
 ---
 
@@ -65,7 +65,7 @@ Every slice except VS-1 starts with recovery. Skip a step only when its artifact
 | Step | Command / activity | Exit criterion |
 |------|--------------------|----------------|
 | 1. Recover | `/document-legacy` | BEH file, flow, fixtures/captures, DEF rows for contradictions on that surface |
-| 2. Requirements | `/refine-feature` | Implementation-ready stories; open questions closed or explicitly deferred |
+| 2. Requirements | `/refine-feature` | `REQ-NNN` with `Sn` scenarios; open questions closed or explicitly deferred |
 | 3. Design | slice design (after refine) | Port signatures, types, test list, adapter mapping; no new product-scope decisions |
 | 4. Implement | C# behind hexagonal ports | Stories for that slice; FIX/captures pass their comparison rules |
 | 5. UAT | parity against accepted fixtures | No claim beyond recovered evidence |
@@ -92,7 +92,7 @@ flowchart TD
 
 | Slice | Behaviors | Status now | Next command | Implementation-ready? |
 |-------|-----------|------------|--------------|------------------------|
-| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted | `/refine-feature` | **No** until refine closes first-slice questions |
+| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` Draft (S1–S6) | `/design-application` | **No** until `/plan-port-story` |
 | VS-2 | `BEH-003` `fermi` | T1 hash only; no parsed fixture | `/document-legacy` | No |
 | VS-3 | `BEH-040` `MATRIX` (inverse, diagonalize, solve) | Catalog-only; no T1 evidence | `/document-legacy` | No |
 | VS-4 *(optional)* | `BEH-004` `deriv` | T1 hash only; 1,024-row capture not retained | `/document-legacy` | No |
@@ -105,9 +105,12 @@ VS-3 may be swapped for `BEH-050` `FFTGF` if complex-valued transforms suit the 
 
 ### VS-1 — `BEH-001` `linspace`
 
-The only slice whose oracle is settled. `FIX-001` requires exact parsed equality with `0, 0.25, 0.5, 0.75, 1` (ADR-003). `DEF-001` is dispositioned: reproduce the probe parsed values, not the Python-generated golden file.
+The only slice whose oracle is settled. `FIX-001` requires exact parsed equality with `0, 0.25, 0.5, 0.75, 1` (ADR-003). `DEF-001` is dispositioned: reproduce the probe parsed values, not the Python-generated golden file. `REQ-001` (2026-08-20) closes the first-slice questions:
 
-Open at refine: whether to expose `includeStart`/`includeStop`/`step`; decreasing intervals and `start == stop`; domain-failure vocabulary for the `N<0` / `N<2` paths (`DEF-002` still open).
+- Managed contract is start, stop, and length with inclusive defaults. `istart` / `iend` / `mesh` are deferred (`REQ-001` Q5).
+- Decreasing intervals and `start == stop` are specified from the accepted formula (`REQ-001` S3/S4) but are not T1.
+- Invalid length is a typed domain failure; Fortran `N<0` / `N<2` strings are not the managed contract (`REQ-001` S5/S6).
+- `DEF-002` is **fix-now** at the managed port: reject negative length without reproducing Fortran `array(num)`-before-check allocation.
 
 This slice also establishes solution layout, the first port signature, and the typed-domain-failure pattern that VS-2 and VS-3 reuse. Its design cost is therefore higher than its arithmetic suggests, and that is expected.
 
@@ -223,7 +226,7 @@ GAP-015 (RNG sequence versus distribution) and GAP-013 (complex-column order) no
 
 Library-wide design already exists: hexagonal ports, managed API as the product, I/O and host concerns as adapters, probe baseline, retirements (ADR-002, ADR-005, ADR-006, ADR-007).
 
-**Slice design starts after `/refine-feature` for that slice.** For VS-1 that is the next command. Design then chooses concrete C# names, project layout, and the first port signature — the items ADR-002 explicitly deferred.
+**Slice design starts after `/refine-feature` for that slice.** VS-1 requirements are `REQ-001` (Draft). Next is `/design-application`, which chooses concrete C# names, project layout, and the first port signature — the items ADR-002 explicitly deferred.
 
 Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 
@@ -231,7 +234,7 @@ Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 
 ## 11. Next command
 
-**`/refine-feature` on BEH-001** (`docs/modernization/behaviors/BEH-001-linspace.md`).
+**`/design-application` for VS-1**, consuming `docs/requirements/REQ-001-linspace.md` (status `Draft` until Gate 2).
 
 Do not start VS-2 or VS-3 implementation stories from this plan. After VS-1 C# exists and `FIX-001` passes, the next step is VS-2 `/document-legacy`.
 
@@ -243,6 +246,7 @@ Do not start VS-2 or VS-3 implementation stories from this plan. After VS-1 C# e
 - Assessment: `docs/modernization/ASSESSMENT.md`
 - Catalog: `docs/modernization/behavior-catalog.md`
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
+- Requirements: `docs/requirements/REQ-001-linspace.md`
 - Fixture: `docs/modernization/fixtures/FIX-001-linspace-5.md`
 - Defects: `docs/modernization/defect-ledger.md`
 - Oracle: `docs/modernization/oracle.md`
@@ -251,4 +255,4 @@ Do not start VS-2 or VS-3 implementation stories from this plan. After VS-1 C# e
 
 ---
 
-*Created: 2026-08-19 | Command: `/plan-migration` | Rescoped 2026-08-19 to demonstration-first vertical slices per ADR-006/007/008*
+*Created: 2026-08-19 | Command: `/plan-migration` | Rescoped 2026-08-19 to demonstration-first vertical slices per ADR-006/007/008 | VS-1 refined 2026-08-20 (`REQ-001`)*

@@ -7,7 +7,7 @@
 # Defect Ledger
 
 **Legacy repo:** `/Users/philipteitel/code/ADD-migrations/sci-fortran-legacy` (strictly read-only; explicit user override of configured `../scifortran-legacy`); GitHub `PhilipTeitel/scifortran-legacy` at `e586903a26cc50ca8942f20ca3bccbd8814e6252`
-**Date:** `2026-08-19` (first-slice rows `2026-08-19`; cross-cutting rows recovered `2026-08-10`)
+**Date:** `2026-08-20` (first-slice rows `2026-08-19`; DEF-002 disposition `2026-08-20`; cross-cutting rows recovered `2026-08-10`)
 **Defect policy (project):** `reproduce-then-refactor` — policy preference only; **no row below is decided** until an owner records `reproduce-faithfully`, `fix-now`, or `fix-later`.
 
 **Scope:** Two `/document-legacy` passes are recorded here and use disjoint identifier blocks.
@@ -25,8 +25,8 @@ Library-wide contradictions remain listed as open when they must not be silently
 
 | ID | Defect / mismatch | Affected behavior | Evidence | Decision | UAT impact | Backlog / story |
 |----|-------------------|-------------------|----------|----------|------------|-----------------|
-| DEF-001 | Checked-in `fidelity/golden/linspace-5.txt` is regenerated from a Python formula, not a retained legacy capture, even though it numerically matched the probe | BEH-001 / FIX-001 | `E1 verified / E3 code-derived / E4 inferred` — `docs/modernization/oracle.md:20,101`; ADR-001 | reproduce-faithfully the **probe parsed values**; do not treat the golden file as authority | Parity must use FIX-001, not the golden path | TBD port story |
-| DEF-002 | `linspace` declares `array(num)` before checking `num<0`, so negative length may be processor-dependent prior to `error`/`STOP` | BEH-001 error path | `E3 code-derived` — `src/tools_grids.f90:1-7`; unexecuted | TBD | Blocks error-path parity until decided | TBD |
+| DEF-001 | Checked-in `fidelity/golden/linspace-5.txt` is regenerated from a Python formula, not a retained legacy capture, even though it numerically matched the probe | BEH-001 / FIX-001 | `E1 verified / E3 code-derived / E4 inferred` — `docs/modernization/oracle.md:20,101`; ADR-001 | reproduce-faithfully the **probe parsed values**; do not treat the golden file as authority | Parity must use FIX-001, not the golden path | `REQ-001` S1 |
+| DEF-002 | `linspace` declares `array(num)` before checking `num<0`, so negative length may be processor-dependent prior to `error`/`STOP` | BEH-001 error path | `E3 code-derived` — `src/tools_grids.f90:1-7`; unexecuted | **fix-now** at the managed port: reject `length < 0` as a typed domain failure without allocating a sequence. Do not reproduce Fortran declaration-before-check. Caller-visible classification (failure, no sequence) is retained (`REQ-001` S5) | Error-path parity is classification only, not Fortran allocation order | `REQ-001` S5 |
 | DEF-003 | CLI program unit is `linsp` while help/NAME is `linspace` | CLI surface | `E3 code-derived` — `numutils/src/linspace.f90:1-13` | **retired with evidence** (ADR-006) | None; no CLI is built | Reopen only with a CLI adapter |
 | DEF-004 | Fidelity driver prints `es24.17`; CLI prints list-directed `write(*,*)` | Text surfaces | `E3 code-derived` — `fidelity/driver.f90:17`; `numutils/src/linspace.f90:47-49` | **retired with evidence** (ADR-007) | None; text codecs are adapter concerns and parity is parsed managed-API values (ADR-003) | Reopen only for legacy-format interop |
 
@@ -62,7 +62,7 @@ No `reproduce-faithfully` decision is recorded for any `DEF-3xx` row, and none i
 
 | DEF ID | Corrected expectation | Acceptance criterion | Approval source |
 |--------|-----------------------|----------------------|-----------------|
-| None yet. | — | — | No `fix-now` decision recorded. |
+| DEF-002 | Do not evaluate or allocate a result sequence for negative length. Reject as a typed domain failure. | `REQ-001` S5: no sequence; typed domain failure; process not terminated | ADR-002 §4; ADR-005 §2 (Fortran ABI not retained); `/refine-feature` 2026-08-20 |
 
 ## 4. Fix later
 
@@ -74,10 +74,10 @@ No `reproduce-faithfully` decision is recorded for any `DEF-3xx` row, and none i
 
 Owner must choose `reproduce-faithfully`, `fix-now`, or `fix-later` for each:
 
-- [ ] **DEF-002** — negative `num` sizing/`STOP` on the `linspace` error path. Blocks VS-1 error-path parity.
-- [ ] **DEF-308** — Accepted numeric comparison policy: `1e-6` vs `1e-10` vs exact, per built surface. Blocks VS-2 and VS-3 acceptance criteria.
+- [x] **DEF-002** — negative `num` sizing/`STOP` on the `linspace` error path. **fix-now** at the managed port (`REQ-001` S5). Does not block VS-1.
+- [ ] **DEF-308** — Accepted numeric comparison policy: `1e-6` vs `1e-10` vs exact, per built surface. Blocks VS-2 and VS-3 acceptance criteria. Does **not** block VS-1 / `FIX-001` (ADR-003).
 
-That is the whole open set. Fourteen of the seventeen rows are retired (below) and `DEF-001` is decided.
+That is the whole open set. Fourteen of the seventeen rows are retired (below) and `DEF-001` and `DEF-002` are decided.
 
 New rows are expected from VS-2 and VS-3 `/document-legacy`, particularly around eigenvalue ordering and sign conventions in `MATRIX`.
 
@@ -130,6 +130,7 @@ The rows below are **closed for this effort** with their findings preserved. Thi
 - Intent ledger: `docs/modernization/intent-ledger.md` (INT-006 tolerance; open question on `1e-10` vs `1e-6`)
 - Translation gaps: GAP-007, GAP-013, GAP-019, GAP-020, GAP-026
 - Assessment: `docs/modernization/ASSESSMENT.md` §1/§9 (complex-column + tolerance stops)
+- Requirements: `docs/requirements/REQ-001-linspace.md`
 - Migration plan: `docs/modernization/migration-plan.md`
 - Project defect policy: `.cursor/workflow.config.yml` → `defectPolicy: reproduce-then-refactor`
 
@@ -137,8 +138,11 @@ The rows below are **closed for this effort** with their findings preserved. Thi
 
 Still live:
 
-- Three comparison regimes coexist without an accepted parity rule (DEF-308); the first slice separately accepted probe parsed values over the checked-in golden file (DEF-001). `E1`/`E2`/`E3`/`E4`. This is the one tension that still blocks built slices.
-- The `linspace` negative-`num` path allocates before validating, and its behavior was never executed (DEF-002). `E3`.
+- Three comparison regimes coexist without an accepted parity rule (DEF-308); the first slice separately accepted probe parsed values over the checked-in golden file (DEF-001). `E1`/`E2`/`E3`/`E4`. This tension still blocks VS-2 and VS-3, not VS-1 / `FIX-001`.
+
+Closed for VS-1 by `/refine-feature` (2026-08-20):
+
+- The `linspace` negative-`num` path allocates before validating in Fortran (DEF-002). **fix-now** at the managed port: typed domain failure, no sequence allocation. `E3`.
 
 Recorded but retired, and unresolved as findings:
 
@@ -148,4 +152,4 @@ Recorded but retired, and unresolved as findings:
 
 Under hard rules, none of these may be described as fixed. Retiring a surface closes the row for this effort; it does not resolve the contradiction, and the finding stands for anyone who later builds that surface.
 
-*Created: 2026-08-10 (cross-cutting pass) | 2026-08-19 (first-slice pass) | Ledgers merged: 2026-08-19 | Dispositions per ADR-006/007: 2026-08-19*
+*Created: 2026-08-10 (cross-cutting pass) | 2026-08-19 (first-slice pass) | Ledgers merged: 2026-08-19 | Dispositions per ADR-006/007: 2026-08-19 | DEF-002 fix-now: 2026-08-20 (`REQ-001`)*

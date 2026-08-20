@@ -73,7 +73,7 @@ The function is otherwise stateless: no module globals are read or written in `l
 |--------|---------------|--------|-------------------|
 | `src/tools_grids.f90:1-3` vs `:7` | Result `array(num)` is declared before `num<0` is checked | Negative `num` may be processor-dependent before `error` | DEF-002 |
 | `istart`/`iend` false combinations | Not executed; four spacing rules exist in source | First-slice parity must not claim these branches | Defer or add fixtures |
-| `mesh` output | Optional argument never passed in probe | Managed port may omit it | Owner: include or defer |
+| `mesh` output | Optional argument never passed in probe | Managed port omits it in `REQ-001`; flags remain recovered and unaccepted for parity | Deferred (`REQ-001` Q5) |
 | CLI `RANGE` parser | `scan` for colons; empty-field reads; not run | Irrelevant to managed API slice | Keep out of BEH-001 |
 | Capture bytes | Probe deleted stdout files; only hash + parsed values remain | Cannot byte-compare Fortran format | ADR-003 uses parsed equality |
 
@@ -84,7 +84,7 @@ The function is otherwise stateless: no module globals are read or written in `l
 | Implication | Affected artifact | Evidence |
 |-------------|-------------------|----------|
 | Host-neutral port should accept start, stop, and length and return a sequence | ADR-002, `docs/DOMAIN.md` | E1 FIX-001; E3 signature |
-| Endpoint flags are real legacy parameters but unproven; do not silently drop or invent them in the first managed signature without a decision | BEH-001 open questions | E3 `src/tools_grids.f90:4-27` |
+| Endpoint flags are real legacy parameters but unproven; `REQ-001` defers them from the first managed contract rather than silently dropping or inventing them | `REQ-001` Q5; BEH-001 | E3 `src/tools_grids.f90:4-27` |
 | Abort is process-global `STOP`, not an error code; managed API must use a typed failure instead of mimicking `STOP` | ADR-002, GAP-026 | E3 `src/COMVARS.f90:189-199` |
 | No BLAS/FFT/file dependency on this path | DEP-012–018 not required for BEH-001 | E3 `src/tools_grids.f90`; E1 probe |
 
