@@ -58,7 +58,7 @@ The owner has now corrected that purpose: the project must port the Fortran libr
 
 ## Later amendment (2026-08-19)
 
-`/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). Next command is `/refine-feature` on BEH-001.
+`/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). `/refine-feature` produced `docs/requirements/REQ-001-linspace.md` (`Draft`, S1–S6) on 2026-08-20. Next command is `/design-application` for VS-1, then `/plan-port-story`.
 
 ## Second amendment (2026-08-19)
 
