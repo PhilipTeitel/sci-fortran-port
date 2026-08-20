@@ -30,7 +30,7 @@ Requirements and decisions live under `docs/requirements/` and `docs/decisions/`
 
 Consumed requirement files (append-only):
 
-- [docs/requirements/REQ-001-linspace.md](docs/requirements/REQ-001-linspace.md) — inclusive linear sequence (Draft; Gherkin S1–S6)
+- [docs/requirements/REQ-001-linspace.md](docs/requirements/REQ-001-linspace.md) — inclusive linear sequence (Ready for Design; Gherkin S1–S6)
 
 **Architecture decisions included for traceability for backlog alignment**
 
@@ -42,10 +42,10 @@ Consumed requirement files (append-only):
 - [docs/decisions/ADR-006-retire-cli-surface.md](docs/decisions/ADR-006-retire-cli-surface.md) — Accepted; no CLI adapter
 - [docs/decisions/ADR-007-io-and-host-concerns-are-adapters.md](docs/decisions/ADR-007-io-and-host-concerns-are-adapters.md) — Accepted; I/O, diagnostics channel, and exit status are adapters
 - [docs/decisions/ADR-008-demonstration-first-slice-scope.md](docs/decisions/ADR-008-demonstration-first-slice-scope.md) — Accepted; build VS-1, VS-2, VS-3 only
-- [docs/decisions/ADR-009-vs1-managed-port-and-layout.md](docs/decisions/ADR-009-vs1-managed-port-and-layout.md) — **Proposed**; solution layout, `IGenerateLinearSequence`, `Grids.Linspace`
+- [docs/decisions/ADR-009-vs1-managed-port-and-layout.md](docs/decisions/ADR-009-vs1-managed-port-and-layout.md) — **Proposed**; solution layout, `IGenerateLinearSequence`, `Grids.Linspace`; consumed by story [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md)
 - [docs/decisions/ADR-010-typed-domain-failure.md](docs/decisions/ADR-010-typed-domain-failure.md) — **Proposed**; `LinearSequenceRejectedException` / `LinearSequenceRejection`
 
-`REQ-001` is still **Draft** (Gate 2). ADR-009 and ADR-010 are **Proposed** (Gate 4). Implementation stories wait until those are accepted.
+`REQ-001` is **Ready for Design** as of 2026-08-20 (Gate 2 closed). ADR-009 and ADR-010 are still **Proposed** (Gate 4), so implementation waits on those two.
 
 ## High-Level Architecture
 
@@ -263,7 +263,7 @@ Port the recovered inclusive `linspace` behind `IGenerateLinearSequence` and `Gr
 
 | ID | Status | Story | Size | Notes |
 |----|--------|-------|------|-------|
-| [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md) | `Not Started` | Inclusive linspace at the managed port | M | **Not Ready.** Blocked on `REQ-001` `Draft` → `Ready for Design` and ADR-009/ADR-010 `Proposed` → `Accepted` |
+| [`VS1-1`](docs/features/VS1-1-managed-linspace-port.md) | `Not Started` | Inclusive linspace at the managed port | M | **Not Ready.** `REQ-001` Gate 2 closed 2026-08-20; still blocked on ADR-009/ADR-010 `Proposed` → `Accepted` |
 
 VS-2 (`fermi`) and VS-3 (`MATRIX`) remain later epics per [docs/modernization/migration-plan.md](docs/modernization/migration-plan.md). They each still need `/document-legacy` before refine/design, so they have no epic row yet.
 

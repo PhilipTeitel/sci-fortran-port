@@ -35,7 +35,7 @@ Accordingly this plan builds **three vertical slices**, each carried end to end 
 
 Everything else retained by ADR-005 §3 stays catalogued as **reserve** — available, not planned. The CLI surface is retired from build scope (ADR-006). File I/O, CLI parsing, timing, and console diagnostics are adapters, not ported modules (ADR-007).
 
-Only **VS-1** has refined requirements (`REQ-001`, Draft pending Gate 2). VS-2 and VS-3 need `/document-legacy` and fixture capture first.
+Only **VS-1** has refined requirements (`REQ-001`, `Ready for Design` as of 2026-08-20; Gate 2 closed). VS-2 and VS-3 need `/document-legacy` and fixture capture first.
 
 **Next ADD command:** `/plan-project` (VS-1 design is in `README.md`; ADR-009/010 Proposed). Do not start VS-2 or VS-3 implementation stories from this plan.
 
@@ -92,7 +92,7 @@ flowchart TD
 
 | Slice | Behaviors | Status now | Next command | Implementation-ready? |
 |-------|-----------|------------|--------------|------------------------|
-| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` Draft (S1–S6); design in `README.md` (ADR-009/010 Proposed) | `/plan-project` | **No** until `/plan-port-story` |
+| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` `Ready for Design` (S1–S6); design in `README.md` (ADR-009/010 Proposed); story `VS1-1` planned | `/plan-project` | **No** until ADR-009/010 are `Accepted` |
 | VS-2 | `BEH-003` `fermi` | T1 hash only; no parsed fixture | `/document-legacy` | No |
 | VS-3 | `BEH-040` `MATRIX` (inverse, diagonalize, solve) | Catalog-only; no T1 evidence | `/document-legacy` | No |
 | VS-4 *(optional)* | `BEH-004` `deriv` | T1 hash only; 1,024-row capture not retained | `/document-legacy` | No |
@@ -226,7 +226,7 @@ GAP-015 (RNG sequence versus distribution) and GAP-013 (complex-column order) no
 
 Library-wide design already exists: hexagonal ports, managed API as the product, I/O and host concerns as adapters, probe baseline, retirements (ADR-002, ADR-005, ADR-006, ADR-007).
 
-**Slice design for VS-1 is in `README.md`.** ADR-009/010 are Proposed. `/plan-project` then `/plan-port-story` produce implementation-ready stories. Concrete C# names, project layout, and the first port signature are no longer deferred.
+**Slice design for VS-1 is in `README.md`.** ADR-009/010 are Proposed. Concrete C# names, project layout, and the first port signature are no longer deferred. `REQ-001` is `Ready for Design` and story `VS1-1` (`docs/features/VS1-1-managed-linspace-port.md`) is planned, but it is not implementation-ready until those two ADRs are `Accepted`.
 
 Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 
@@ -256,4 +256,4 @@ Do not start VS-2 or VS-3 implementation stories from this plan. After VS-1 C# e
 
 ---
 
-*Created: 2026-08-19 | Command: `/plan-migration` | Rescoped 2026-08-19 to demonstration-first vertical slices per ADR-006/007/008 | VS-1 refined 2026-08-20 (`REQ-001`) | VS-1 designed 2026-08-20 (`README.md`, ADR-009/010)*
+*Created: 2026-08-19 | Command: `/plan-migration` | Rescoped 2026-08-19 to demonstration-first vertical slices per ADR-006/007/008 | VS-1 refined 2026-08-20 (`REQ-001`) | VS-1 designed 2026-08-20 (`README.md`, ADR-009/010) | `REQ-001` marked `Ready for Design` and story `VS1-1` planned: 2026-08-20*
