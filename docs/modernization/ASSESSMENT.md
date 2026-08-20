@@ -30,7 +30,15 @@ On 2026-08-19 the owner first recovered library `linspace` (BEH-001 / FIX-001, A
 
 A first-slice defect ledger now exists. Apparent defects or historical “fixes” outside BEH-001—including downstream `ZEROS`/`OPTIMIZE` compatibility, FFT sign/backend changes, square-lattice denominator reversal, `logspace` documentation mismatch, complex-column contradictions, and warning-affected routines—must not be silently corrected if those surfaces are later selected. `E1 verified / E3 code-derived / E4 inferred` — `docs/modernization/defect-ledger.md`; `docs/modernization/intent-ledger.md:42-50`; `docs/modernization/oracle.md:122-130,141-144`.
 
-**Planning gate (2026-08-19):** `/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). A later coverage pass maps every ADR-005 retained name, including TOOLS convergence checks (SL-014) and `LIST_*`/`VECTORS` internals. **`/refine-feature` (2026-08-19):** `docs/requirements/REQ-001-linspace.md` (Draft, S1–S5). Implementation-ready C# still waits for `/design-application` and `/plan-port-story`.
+**Planning gate (2026-08-19):** `/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). A later coverage pass mapped every ADR-005 retained name, including TOOLS convergence checks and `LIST_*`/`VECTORS` internals.
+
+**Scope correction (2026-08-19, evening):** the owner clarified that the objective is a POC demonstrating that Artifact-Driven Development extends to migration, prepared as evidence for a prospective client converting thick applications to thin UIs backed by services. Three decisions followed, and they narrow the plan considerably:
+
+- **ADR-006** retires all sixteen CLI programs from build scope, keeping their catalog as recovered evidence. Ten of the twenty-five slices are withdrawn.
+- **ADR-007** resolves a contradiction between ADR-002 §2 and ADR-005 §3 by classifying file I/O, CLI parsing, timing, and console diagnostics as adapters rather than library modules. Fourteen of seventeen defect rows are retired with evidence as a result.
+- **ADR-008** narrows planned work to three representative vertical slices (`BEH-001`, `BEH-003`, `BEH-040`), with the remaining modules held in reserve.
+
+Implementation-ready C# still starts at BEH-001 after `/design-application` and `/plan-port-story`. `REQ-001` (Draft) closed the first-slice refine questions on 2026-08-20. `E2 documented` — owner statement 2026-08-19; ADR-006/007/008; `/refine-feature` 2026-08-20.
 
 ## 2. Evidence consumed
 
@@ -89,16 +97,16 @@ A first-slice defect ledger now exists. Apparent defects or historical “fixes�
 | Numeric representation, tolerance, ordering, convergence, and backend conventions are unaccepted. | critical outside FIX-001; lowered for BEH-001 | `E2 documented` — ADR-003 exact parsed equality for FIX-001. Other behaviors remain unaccepted. `docs/modernization/translation-gaps.md:40-46`. | recovery/design/implementation/UAT | Approve additional behavior-specific contracts from trusted data. |
 | Runtime output is repeatable for the bounded probe, but binaries are not byte-reproducible and broader containment is not hardened. | high | `E1 verified / E5 unknown` — captures matched exactly; archives/binaries differed, each build emitted 310 warnings, and no host-filesystem/resource hardening was applied. `docs/modernization/oracle.md:37,63-73,118-130`. | oracle/recovery | Preserve source/environment/output hashes for the bounded oracle; investigate artifact determinism and warnings; harden isolation before broader inputs/surfaces. |
 | ASP.NET hosting, security, deployment, and job semantics are net-new and unspecified. | high | `E3 code-derived / E5 unknown` — `docs/modernization/translation-gaps.md:60,127-145`. | requirements/design/implementation/operations | Approve hosting OS/architecture, auth, API, payload, cancellation, job, scaling, SLA, and observability requirements. |
-| Defect ledger is absent for library-wide contradictions; first-slice ledger now exists. | high outside BEH-001 | `E2 documented` — `docs/modernization/defect-ledger.md` opened 2026-08-19 with DEF-001–004. FFT/`ZEROS`/complex-column/`logspace`/warning issues still lack DEF rows. | recovery/planning/implementation/UAT | Add DEF rows and decisions before porting those surfaces. |
+| Defect ledger is incomplete for library-wide contradictions; first-slice and cross-cutting ledgers now exist. | high outside BEH-001 and BEH-301–305 | `E2 documented` — `docs/modernization/defect-ledger.md` carries DEF-001–004 (first slice, 2026-08-19) and DEF-301–313 (cross-cutting, 2026-08-10). DEF-001 and DEF-002 are decided; DEF-308 remains open and blocks VS-2/VS-3. FFT/`ZEROS`/`logspace`/warning issues still lack DEF rows. | recovery/planning/implementation/UAT | Add DEF rows for the remaining surfaces, and record dispositions before porting any surface. |
 
 ## 6. Walking-skeleton feasibility
 
 **Result:** `library-wide port authorized`; first executable C# slice remains BEH-001
 
 - **Evidence:** Probe T1 plus owner purpose correction (ADR-004) and planning-gate scope (ADR-005). Catalog: `docs/modernization/behavior-catalog.md`. `E1 verified / E2 documented`.
-- **Smallest useful executable path:** Still host-neutral inclusive `linspace(0,1,5)` (FIX-001). Subsequent slices follow the catalog strangler order. Do **not** treat the `arange-5` driver loop as `arange`. `E1 verified / E2 documented`.
-- **Why not a big-bang rewrite:** Most retained surfaces are T3; each slice still needs `/document-legacy` and `/refine-feature` before C#. `/plan-migration` sequences that work.
-- **Next command:** `/design-application` on REQ-001 (`docs/requirements/REQ-001-linspace.md`), then `/plan-port-story` for SL-001. Later slices follow `docs/modernization/migration-plan.md`.
+- **Smallest useful executable path:** Still host-neutral inclusive `linspace(0,1,5)` (FIX-001). Two further slices follow (`fermi`, `MATRIX`) per ADR-008. Do **not** treat the `arange-5` driver loop as `arange`. `E1 verified / E2 documented`.
+- **Why not a big-bang rewrite:** Most retained surfaces are T3; each slice still needs `/document-legacy` and `/refine-feature` before C#.
+- **Next command:** `/design-application` for VS-1, consuming `docs/requirements/REQ-001-linspace.md`. Later slices follow `docs/modernization/migration-plan.md`.
 
 A compiling .NET solution or ASP.NET health endpoint without ported numerical contracts remains a **non-parity scaffold**. `E2 documented` — ADR-004.
 
@@ -123,10 +131,10 @@ Conditions are ordered by dependency. For a **production/redistributable** port,
 - [x] **5. Decide acceptance authority and extend oracle coverage only as required.** BEH-001/FIX-001 accepted (ADR-003). BEH-002–BEH-004 are T1 hash-characterized pending fixture recovery. All other retained surfaces stay T3 until their slice. Planning may proceed with mixed oracle. `E1 verified / E2 documented`.
 - [x] **6. Establish a reviewed bounded containment/build recipe for the current probe.** Unchanged: complete for reviewed scripts and allowlisted inputs. `E1 verified / E5 unknown` — `docs/modernization/oracle.md:29-39,41-73,147`.
 - [x] **7. Define behavior-specific compatibility contracts.** FIX-001 exact parsed equality (ADR-003). Other T1 sections use exact parsed equality once fixtures are recovered. Unexecuted surfaces may use profile `1e-6` only as a non-authoritative planning default (ADR-005). CLI text/RNG/matrix-order contracts remain per-slice. `E2 documented`.
-- [x] **8. Approve required target dependency routes.** POC defaults in ADR-005: managed/native numeric ports; reimplement facades; substitute a managed evaluator for `func`; wrap Gnuplot; drop missing FFTPACK/DLPLOT. Previously “blocked” DEP rows are closed for **planning** by those defaults, not by production legal review. `E2 documented`.
+- [x] **8. Approve required target dependency routes.** POC defaults in ADR-005: managed/native numeric ports; reimplement facades; drop missing FFTPACK/DLPLOT. The `func` evaluator and Gnuplot wrapping were withdrawn with the CLI (ADR-006). Previously “blocked” DEP rows are closed for **planning** by those defaults, not by production legal review. The BLAS/LAPACK route stops being a planning default and becomes real work at VS-3. `E2 documented`.
 - [x] **9. Create the legacy behavior catalog, purpose/domain artifacts, and defect ledger.** PURPOSE/DOMAIN rewritten for the whole library; `docs/modernization/behavior-catalog.md` lists retained/retired IDs; first-slice defect ledger remains. Keep E4/E5 items out of implementation-ready stories. `E2 documented`.
-- [x] **10. Approve decisions before design or migration planning.** ADRs 001–005 close purpose, baseline, boundary, numeric first fixture, retained/retired scope, and POC substitutions. `/plan-migration` completed 2026-08-19 (`docs/modernization/migration-plan.md`). `/refine-feature` drafted REQ-001. Slice design is `/design-application`. `E2 documented`.
-- [x] **11. Complete the final incremental `/assess-modernization` synthesis.** The 2026-08-10 assessment stands as evidence. **2026-08-19 evening:** whole-library purpose correction, `/plan-migration`, and `/refine-feature` → REQ-001. Suggested next command is `/design-application` on REQ-001. `E2 documented`.
+- [x] **10. Approve decisions before design or migration planning.** ADRs 001–005 close purpose, baseline, boundary, numeric first fixture, retained/retired scope, and POC substitutions. ADRs 006–008 close CLI disposition, the domain/adapter split, and build scope. `/plan-migration` completed 2026-08-19 and was rescoped the same day. `/refine-feature` produced `REQ-001` (Draft) on 2026-08-20. Slice design is next. `E2 documented`.
+- [x] **11. Complete the final incremental `/assess-modernization` synthesis.** The 2026-08-10 assessment stands as evidence. **2026-08-19 evening:** whole-library purpose correction, `/plan-migration`, then the demonstration-first rescoping in ADR-006/007/008. **2026-08-20:** `/refine-feature` produced `REQ-001` (Draft). Suggested next command is `/design-application` for VS-1. `E2 documented`.
 
 ## 9. Tensions / conflicts
 
@@ -165,4 +173,4 @@ Affected planning scope remains stopped for every unresolved conflict above. Thi
 - Purpose / domain: `docs/PURPOSE.md`, `docs/DOMAIN.md`
 - Decisions: ADR-001–005 under `docs/decisions/`
 
-*Created: 2026-08-09 | Incrementally assessed: 2026-08-10 | First-slice recovery: 2026-08-19 | Purpose correction (whole-library C# port): 2026-08-19 | `/plan-migration`: 2026-08-19 | `/refine-feature`: 2026-08-19 (REQ-001) | Target: C# / .NET 8 hexagonal managed API plus CLI adapters*
+*Created: 2026-08-09 | Incrementally assessed: 2026-08-10 | First-slice recovery: 2026-08-19 | Purpose correction (whole-library C# port): 2026-08-19 | `/plan-migration`: 2026-08-19 | Demonstration-first rescoping (ADR-006/007/008): 2026-08-19 | `/refine-feature` BEH-001 → `REQ-001`: 2026-08-20 | Target: C# / .NET 8 hexagonal managed API; no CLI*

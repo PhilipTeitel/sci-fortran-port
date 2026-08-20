@@ -1,182 +1,186 @@
-<!-- Requirements contract:
-- Preserve headings and order from the requirements template.
-- Do not invent answers. Trace every goal, non-goal, persona, constraint, and scenario to source material or a resolved question.
-- Do not produce design (no architecture, stack table, C# signatures, namespaces, or project layout).
-- Scenario IDs are S1, S2, … and later port-story Test Plans must map each in-scope Sn.
-- Status starts at Draft; the owner marks Ready for Design after review.
-- If a section has no content yet, write `None yet.`.
+<!--
+Refined-requirements contract:
+- This file is produced by /refine-feature (architect in Discovery / Refinement Mode).
+- Save it under the configured requirements directory using the configured requirement naming pattern (default `docs/requirements/REQ-NNN-short-slug.md`). Use sequential three-digit `NNN` unless the profile overrides the pattern.
+- Do not delete or renumber existing REQ files; append the next number.
+- Every Gherkin scenario must have an ID matching the configured scenario ID pattern (default `Sn`). The architect references those IDs from story Test Plans so each scenario traces to a concrete test.
+- Unresolved questions are listed under `Open questions` — they are blocking. Do not write design or stories until they are resolved (architect should stop and re-ask).
 -->
 
 # REQ-001: Inclusive linear sequence (linspace)
 
 **Source material:**
-- `docs/modernization/behaviors/BEH-001-linspace.md` — recovered library `linspace` behavior
-- `docs/modernization/flows/BEH-001-linspace.md` — library evaluation flow
-- `docs/modernization/fixtures/FIX-001-linspace-5.md` — accepted parsed fixture
-- `docs/modernization/oracle.md` — CAP-20260810-LINSPACE
-- `docs/PURPOSE.md`, `docs/DOMAIN.md`
-- `docs/modernization/migration-plan.md` (SL-001)
-- `docs/modernization/defect-ledger.md` (DEF-001, DEF-002)
-- ADRs: `docs/decisions/ADR-001-first-slice-oracle-baseline.md`, `docs/decisions/ADR-002-hexagonal-managed-api.md`, `docs/decisions/ADR-003-linspace-numeric-contract.md`, `docs/decisions/ADR-004-whole-library-csharp-port.md`, `docs/decisions/ADR-005-planning-gate-scope.md`
+- `docs/PURPOSE.md` — demonstration-first POC; product is the host-neutral managed C# API; fidelity at that API over host-idiomatic defaults
+- `docs/DOMAIN.md` — `LinearSequenceRequest` / `LinearSequence`; first-slice events `LinearSequenceProduced` / `LinearSequenceRejected`
+- `docs/modernization/behaviors/BEH-001-linspace.md` — recovered library `TOOLS.linspace`
+- `docs/modernization/flows/BEH-001-linspace.md` — probe call path and abort mapping
+- `docs/modernization/fixtures/FIX-001-linspace-5.md` — accepted parsed values
+- `docs/modernization/defect-ledger.md` — DEF-001 (decided), DEF-002 (error-path allocation)
+- `docs/modernization/migration-plan.md` — VS-1; open-at-refine questions
+- ADR-001 (probe baseline for BEH-001), ADR-002 (hexagonal managed API; typed domain failure), ADR-003 (binary64; exact parsed equality; general inclusive formula), ADR-005 (Fortran ABI not retained), ADR-006 (CLI retired), ADR-007 (message text / channel / exit are adapters), ADR-008 (VS-1 is the settled-oracle slice)
 
-**Date:** `2026-08-19`
+**Date:** `2026-08-20`
 **Status:** Draft
 
 ---
 
 ## 1. Goals
 
-- Give a C# caller a host-neutral way to request an inclusive linear sequence and receive the same numerical job the legacy `TOOLS.linspace` library function performed: evenly spaced binary64 samples from start through stop. `E2 documented` — `docs/PURPOSE.md`; ADR-002; ADR-004; BEH-001 §1.
-- Make the first walking-skeleton proof the accepted FIX-001 case: `linspace(start=0, stop=1, length=5)` with default inclusive endpoints returns exactly `0, 0.25, 0.5, 0.75, 1`. `E1 verified / E2 documented` — FIX-001; ADR-001; ADR-003.
-- Keep that arithmetic in a hexagonal port so later CLI or HTTP adapters call the same use case and do not redefine spacing. `E2 documented` — ADR-002; ADR-005.
-- Reject invalid lengths as typed domain failures instead of Fortran `error`/`STOP`, without claiming CLI exit codes or HTTP Problem Details in this slice. `E2 documented / E3 code-derived` — ADR-002; BEH-001 §6; GAP-026.
+- Give a managed-API caller a host-neutral way to request an inclusive linear sequence by start, stop, and length, matching legacy `TOOLS.linspace` with default inclusive endpoints.
+- Prove the ADD modernization trail on a settled oracle: `FIX-001` (`linspace(0,1,5)` → `0, 0.25, 0.5, 0.75, 1`) under exact parsed numeric equality.
+- Classify invalid length as a typed domain failure at the port, not as process `STOP` or Fortran stdout diagnostics.
+- Keep unexecuted optional-flag branches recovered but out of this requirement, so later stories cannot treat them as accepted parity.
 
 ## 2. Non-goals
 
-- The `linspace` CLI (`numutils/src/linspace.f90`, BEH-201 / SL-017), including help text, `wmin`/`wmax`/`L` defaults, `RANGE` parsing, program-unit name `linsp`, list-directed stdout, and process exit codes. `E2 documented / E3 code-derived` — ADR-002; BEH-001 §2, §11; migration plan SL-017.
-- HTTP / ASP.NET as a driving adapter for this slice. `E2 documented` — ADR-002; ADR-005.
-- Fortran `.mod` / `libscifor.a` ABI compatibility, and any uninventoried downstream Fortran callers of `linspace`. `E2 documented / E5 unknown` — ADR-005; BEH-001 §10.
-- Optional legacy flags `istart`, `iend`, and `mesh` on the first managed port. Those branches are unexecuted and unaccepted for parity; they wait for a later REQ with fixtures. `E3 code-derived / E5 unknown / E2 documented` — BEH-001 §3–§6; ADR-003.
-- Byte-level Fortran formatted output (`es24.17` or list-directed text), locale codecs, or complex-column contracts. `E2 documented` — ADR-003; DEF-004.
-- Treating `fidelity/golden/linspace-5.txt` as E1 authority. `E2 documented` — ADR-001; DEF-001.
-- Profile relative/absolute `1e-6` or script absolute `1e-10` as the FIX-001 pass/fail rule. `E2 documented` — ADR-003.
-- Claiming numeric parity for any linspace input other than FIX-001. The default-inclusive formula is the evaluation rule; additional exact-equality fixtures are required before further parity claims. `E2 documented` — ADR-003.
-- Signed-zero, NaN, Infinity, and overflow behavior. Those paths were not executed. `E2 documented` — ADR-003 explicit non-decisions.
-- Other SciFortran modules, CLI adapters, or SL-002+ slices. `E2 documented` — ADR-004; migration plan.
+- The `linspace` CLI program, its `RANGE` parser, help text, or list-directed stdout (`BEH-201`; ADR-006).
+- Optional legacy parameters `istart`, `iend`, and `mesh` as part of this managed contract. They remain recovered in `BEH-001` and unaccepted for parity (ADR-003).
+- Fortran formatted text, locale, or complex-column codecs as product behavior (ADR-003, ADR-007).
+- The Fortran `.mod` / `libscifor.a` ABI, including processor-dependent evaluation of `array(num)` before the `num<0` check (ADR-005; DEF-002).
+- HTTP/ASP.NET as a driving adapter in this requirement (ADR-002; optional later).
+- Other `TOOLS` grids (`logspace`, `arange`, …) and later vertical slices (VS-2, VS-3).
+- NaN, Infinity, signed-zero, subnormal, overflow, or `ddp=16` behavior (ADR-003 explicit non-decisions).
+- Treating `fidelity/golden/linspace-5.txt` or profile `1e-6` / script `1e-10` as the pass/fail rule (DEF-001; ADR-003).
+- Silently “fixing” or inventing endpoint-flag semantics that were never executed.
 
 ## 3. Personas / actors
 
-- **Target managed-API caller** — A C# consumer of the host-neutral linspace port. Supplies start, stop, and length; receives an ordered sequence or a typed domain failure. Does not go through Fortran stdout. `E2 documented` — ADR-002; `docs/DOMAIN.md` §2; BEH-001 §2.
+- **Managed-API caller** — A C# consumer of the host-neutral linspace port. Supplies start, stop, and length; receives an ordered binary64 sequence or a typed domain failure. Does not see Fortran stdout, CLI flags, or process exit codes. `E2` — ADR-002; `docs/PURPOSE.md` secondary actor.
 
-- **Numerical-library maintainer** — Owns the POC port. Needs the first slice to prove recovered behavior behind hexagonal ports so later families can follow the same strangler loop. `E2 documented` — `docs/PURPOSE.md`.
+- **ADD practitioner** — The primary purpose actor. Uses this requirement as the inspectable specification that later design, port stories, tests, and `FIX-001` parity must trace to. `E2` — `docs/PURPOSE.md`.
 
-Fortran library callers (`use TOOLS` / fidelity driver) and CLI users are legacy/recovery actors. They are not first-slice product personas. `E2 documented` — ADR-002; ADR-005.
+The legacy fidelity driver and Fortran `use TOOLS` callers are evidence of how the behavior was exercised, not product personas for this requirement.
 
 ## 4. User scenarios (Gherkin)
 
-### S1 — Inclusive five-point unit interval
+Parity is claimed only for **S1**. S2–S4 are specified by the accepted default-inclusive formula (ADR-003) and need additional fixtures before a parity claim. S5–S6 are specified by recovered abort classification (E3) mapped through ADR-002/007; they are not T1.
 
-Accepted first-slice parity fixture. Exact parsed equality; no text compare.
+### S1 — Inclusive five-point unit interval
 
 ```gherkin
 Given a linspace request with start 0, stop 1, and length 5
 And   default inclusive endpoints
 When  the host-neutral linspace port is invoked
-Then  the result has length 5
-And   the values equal 0, 0.25, 0.5, 0.75, and 1 exactly
+Then  the result is a sequence of length 5
+And   the values equal 0, 0.25, 0.5, 0.75, and 1 by exact parsed numeric equality
 ```
 
-Evidence: `E1 verified` — FIX-001; `docs/modernization/oracle.md` CAP-20260810-LINSPACE; ADR-001; ADR-003. Covers BEH-001 default-inclusive happy path.
-
-### S2 — Default inclusive evaluation follows the recovered step formula
-
-Specifies the evaluation rule for the default-inclusive path when length is at least 2. This is the contract for generating samples, including cases such as a decreasing interval or `start == stop`. It is **not** an additional exact-equality parity fixture.
+### S2 — Default-inclusive evaluation follows the accepted formula
 
 ```gherkin
-Given a linspace request with start S, stop T, and integer length N greater than or equal to 2
+Given a linspace request with start S, stop T, and length N
+And   N is an integer greater than or equal to 2
 And   default inclusive endpoints
 When  the host-neutral linspace port is invoked
-Then  the result has length N
-And   the 1-based sample i equals S + (i-1) * (T-S)/(N-1) in binary64
+Then  the result is a sequence of length N
+And   sample i (1-based in the legacy formula) equals S + (i-1) * (T-S)/(N-1)
 And   the first sample is S and the last sample is T
 ```
 
-Evidence: `E3 code-derived` formula at `src/tools_grids.f90:11-14`; `E2 documented` — ADR-003. `E1` confirms the formula on FIX-001 only. `E4 inferred` that decreasing and equal-endpoint cases follow the same formula; those specific inputs were not executed. Parity claims beyond FIX-001 remain out of this REQ.
+### S3 — Decreasing interval uses the same inclusive formula
 
-### S3 — Negative length is a typed domain failure
+```gherkin
+Given a linspace request whose start is greater than its stop
+And   length is an integer greater than or equal to 2
+And   default inclusive endpoints
+When  the host-neutral linspace port is invoked
+Then  the result uses a negative step
+And   both endpoints are included
+And   interior samples follow the S2 formula
+```
+
+### S4 — Equal endpoints produce a constant sequence
+
+```gherkin
+Given a linspace request whose start equals its stop
+And   length is an integer greater than or equal to 2
+And   default inclusive endpoints
+When  the host-neutral linspace port is invoked
+Then  every sample equals start
+And   the result length equals the requested length
+```
+
+### S5 — Negative length is a typed domain failure
 
 ```gherkin
 Given a linspace request whose length is less than 0
 When  the host-neutral linspace port is invoked
-Then  the call fails as a typed domain failure
-And   no linear sequence is returned
+Then  the call does not return a sequence
+And   the failure is a typed domain failure that callers can distinguish from success
+And   the process is not terminated
+And   leftover Fortran text "linspace: N<0, abort." is not the managed-API contract
 ```
 
-Evidence: `E3 code-derived` — `src/tools_grids.f90:7`; `src/COMVARS.f90:189-199` (`error("linspace: N<0, abort.")` then `STOP`). Mapping: `E2 documented` — ADR-002 (typed domain failure at the port; host exit codes / HTTP Problem Details are adapter concerns). Exact Fortran message text and process termination are **not** first-slice parity; the path was not executed. DEF-002’s Fortran `array(num)` sizing-before-check hazard is not a managed-API contract (Fortran ABI is not retained, ADR-005).
-
-### S4 — Inclusive endpoints reject length less than 2
+### S6 — Inclusive length less than 2 is a typed domain failure
 
 ```gherkin
 Given a linspace request with default inclusive endpoints
-And   length 0 or length 1
+And   length is 0 or 1
 When  the host-neutral linspace port is invoked
-Then  the call fails as a typed domain failure
-And   no linear sequence is returned
+Then  the call does not return a sequence
+And   the failure is a typed domain failure that callers can distinguish from success
+And   the process is not terminated
+And   leftover Fortran text "linspace: N<2 with both start and end points" is not the managed-API contract
 ```
-
-Evidence: `E3 code-derived` — `src/tools_grids.f90:12` (`error("linspace: N<2 with both start and end points")`). Mapping: ADR-002. Unexecuted. Callers of the managed port must be able to distinguish this failure class from S3 (negative length) without requiring byte-identical Fortran diagnostic text.
-
-### S5 — Successful evaluation has no I/O, network, or RNG side effects
-
-```gherkin
-Given a valid default-inclusive linspace request with length at least 2
-When  the host-neutral linspace port is invoked
-Then  the port returns the sequence and does not write files, open a network connection, or consume a RNG
-And   the port does not terminate the host process
-```
-
-Evidence: `E3 code-derived` — `src/tools_grids.f90:1-30` (no file/network/RNG); abort is only on invalid length. Process `STOP` is replaced by typed failure (ADR-002), so success must not abort.
 
 ## 5. Constraints
 
-- Host-neutral hexagonal port: domain/use-case code must not depend on ASP.NET, a CLI parser, Fortran formatted I/O, or filesystem/shell adapters. `E2 documented` — ADR-002.
-- First driving adapter is the managed C# API. CLI and HTTP, if added later, call this use case. `E2 documented` — ADR-002; ADR-005.
-- Map legacy `real(8)` samples to IEEE-754 binary64 (`double`). `E2 documented` — ADR-003.
-- FIX-001 comparison is exact parsed numeric equality. Do not use profile `1e-6` or script `1e-10`. `E2 documented` — ADR-003; DEF-001.
-- Probe baseline for this slice: revision `e586903a26cc50ca8942f20ca3bccbd8814e6252` and the recorded 2026-08-10 GNU Fortran 16.1.0 / OpenBLAS 0.3.34 / NR environment. `E1 verified / E2 documented` — ADR-001; ADR-005.
-- Defect policy: reproduce-then-refactor. Do not silently “fix” unexecuted branches. `E2 documented` — PURPOSE; `.cursor/workflow.config.yml` `defectPolicy`; BEH-001 §6.
-- DEF-001: reproduce the probe parsed values, not the Python-generated golden file. `E2 documented` — defect ledger.
-- Fortran `error`/`STOP` maps to a typed domain failure at the port. Concrete exception or result type names, namespaces, and package IDs are **not** this REQ (ADR-002 explicit non-decisions). `E2 documented`.
-- No Intel-confidential headers or Numerical Recipes source in the target tree (not required for this slice’s arithmetic). `E2 documented` — ADR-004; ADR-005.
-- Structure fidelity for this slice is preserve-then-refactor: implement the recovered inclusive formula first. `E2 documented` — migration plan; workflow profile.
+- **Process boundary.** The product contract is the host-neutral managed API. Domain code must not depend on ASP.NET, a CLI parser, Fortran formatted I/O, or filesystem/shell adapters (ADR-002 §2, ADR-007).
+- **Numeric representation.** Legacy `real(8)` sequence values map to IEEE-754 binary64. `FIX-001` records the managed sequence as a zero-based ordered list of those values (ADR-003; FIX-001).
+- **Comparison policy for this requirement.** S1 uses exact parsed numeric equality. Do not use workflow `1e-6` or fidelity-script `1e-10` (ADR-003). DEF-308 remains open for other slices, not for S1.
+- **Inclusive formula.** With both endpoints included and `N >= 2`, `step = (stop-start)/(N-1)` and `array(i) = start + (i-1)*step` for `i = 1..N` (ADR-003; `src/tools_grids.f90` via BEH-001).
+- **Failure classification.** `length < 0`, and inclusive endpoints with `length < 2`, are domain failures at the port (BEH-001 rules; ADR-002 §4). Message text, ANSI styling, output channel, and process exit status are adapter concerns with no fidelity requirement (ADR-007).
+- **DEF-001.** Reproduce the probe parsed values. The Python-generated golden file is not authority.
+- **DEF-002.** Do not reproduce Fortran declaration of `array(num)` before the negative-length check. Reject invalid length as a typed domain failure without attempting to allocate a sequence (Fortran ABI not retained, ADR-005 §2).
+- **Oracle baseline.** Source revision `e586903a26cc50ca8942f20ca3bccbd8814e6252` and the recorded 2026-08-10 probe environment (ADR-001).
+- **Optional flags.** This requirement’s managed contract is start, stop, and length with inclusive defaults. `istart` / `iend` / `mesh` are deferred, not dropped from the catalog: they stay in `BEH-001` as unexecuted branches and must not be implemented as accepted parity in VS-1.
+- **Downstream Fortran callers** besides the fidelity driver are out of scope (ADR-005; BEH-001 E5).
 
 ## 6. Resolved questions
 
 | # | Question | Resolution | Source |
 |---|----------|------------|--------|
-| 1 | Is `linspace` the first retained behavior? | Yes. It is the first **code** slice (SL-001), not the product boundary. | owner 2026-08-19; ADR-004; BEH-001 §10 |
-| 2 | Is the 2026-08-10 probe accepted for this behavior? | Yes, as the POC/oracle baseline. T1 execution still covers only the fidelity corpus. | ADR-001; ADR-005 |
-| 3 | Managed API vs CLI vs HTTP for the first driving adapter? | Managed API. CLI is a later adapter (BEH-201 / SL-017). HTTP is optional later. | ADR-002; ADR-005 |
-| 4 | Should optional `istart` / `iend` / `mesh` be on the first managed port? | **Deferred.** Unexecuted (`E5`); ADR-003 leaves them unaccepted for parity; PURPOSE forbids silently porting unexecuted branches. First-slice request is start, stop, and length with default inclusive endpoints. | BEH-001 §3, §10; ADR-003; PURPOSE; this refine 2026-08-19 |
-| 5 | What typed exception/result type and message stability are required? | Invalid length is a typed domain failure and returns no sequence (ADR-002). Concrete C# type names are design, not this REQ. Exact Fortran `N<0` / `N<2` stdout strings are not first-slice parity (unexecuted). S3 and S4 must remain distinguishable failure classes. | ADR-002; BEH-001 §6; this refine 2026-08-19 |
-| 6 | Must `start == stop` and decreasing intervals be specified before implementation, or only FIX-001? | The default-inclusive formula in S2 is the evaluation rule whenever length ≥ 2 (ADR-003). FIX-001 remains the only accepted exact-equality parity fixture. Do not invent extra goldens; do not claim parity for unexecuted numeric cases. | ADR-003; BEH-001 §6; this refine 2026-08-19 |
-| 7 | Are downstream Fortran `linspace` callers in supported scope besides the fidelity driver? | No. Fortran ABI is not retained. Unknown `libscifor.a` consumers are not required for this POC. | ADR-005; BEH-001 §10 |
-| 8 | How does DEF-002 (`array(num)` before `num<0`) affect the managed port? | The observable abort is a typed domain failure with no sequence (S3). Reproducing Fortran allocation of a negative-length result array is out of product (ABI not retained). The defect-ledger **label** (`reproduce-faithfully` vs `fix-now`) remains an M3 human decision and does not change S3. | ADR-002; ADR-005; DEF-002; this refine 2026-08-19 |
+| 1 | What is the first retained behavior and driving adapter? | Library `linspace`; first driving adapter is the managed C# API, not CLI or HTTP. | ADR-001; ADR-002; owner 2026-08-19 |
+| 2 | Which oracle and comparison rule apply? | Probe `e586903` environment; `FIX-001` exact parsed equality `0, 0.25, 0.5, 0.75, 1`. Not the Python golden file; not `1e-6`/`1e-10`. | ADR-001; ADR-003; DEF-001; FIX-001 |
+| 3 | How does `real(8)` map at the port? | IEEE-754 binary64 (`double` at the managed API). | ADR-003 |
+| 4 | Are CLI aliases, defaults (`wmin=-5`), and Fortran stdout in scope? | No. CLI retired; text codecs are adapters; parity is parsed values at the port. | ADR-006; ADR-007; ADR-003 |
+| 5 | Should `istart` / `iend` / `mesh` be on the first managed port? | No for this requirement. Inclusive defaults only. Flags remain recovered and unaccepted for parity; a later REQ may add them with fixtures. | ADR-003; ADR-008; BEH-001 §10; flow §6 |
+| 6 | Must decreasing intervals and `start == stop` be specified now? | Yes, as consequences of the accepted inclusive formula (S3, S4). They are not T1; additional fixtures are required before a parity claim. | ADR-003; BEH-001 §6 (E4 from formula) |
+| 7 | What failure vocabulary replaces `STOP` and leftover `N<0` / `N<2` strings? | Typed domain failure at the port. Classification is domain; exact Fortran message text, channel, and exit status are not the managed contract. Concrete type names are design. | ADR-002 §4; ADR-007; DOMAIN `LinearSequenceRejected` |
+| 8 | Must Fortran `array(num)`-before-check behavior be reproduced (DEF-002)? | No. Fortran ABI is not retained. Invalid length is rejected as a typed domain failure without sequence allocation. | ADR-005 §2; ADR-002 §4; DEF-002 disposition 2026-08-20 |
+| 9 | Are downstream Fortran `linspace` callers besides the fidelity driver in scope? | No. Unknown consumers are not required. | ADR-005; BEH-001 §10 |
+| 10 | Are NaN / Infinity / signed-zero / `ddp=16` in this requirement? | No. ADR-003 leaves those paths undecided; they stay out of VS-1. | ADR-003 explicit non-decisions |
 
 ## 7. Open questions
 
-None that block this REQ’s default-inclusive managed-port scope.
+Remaining items are design/story work, not requirement ambiguity for VS-1:
 
-Still unspecified **outside this REQ** (do not implement as if decided):
+- [ ] Concrete managed type names, namespaces, and solution layout — deferred by ADR-002 explicit non-decisions; belongs to `/design-application` / `/plan-port-story`.
+- [ ] Concrete typed-failure type name for `LinearSequenceRejected` — domain event is named; C# type is design.
 
-- Signed-zero, NaN, Infinity, and overflow (ADR-003 non-decision).
-- Optional endpoint flags and `mesh` (deferred; see resolved question 4).
-- CLI text, locale, and exit mapping (BEH-201 / DEF-003 / DEF-004).
-- DEF-002’s ledger classification of the Fortran sizing-before-check hazard (does not change S3).
+DEF-308 (library-wide comparison-policy tension) remains open and **does not block this requirement**: S1 is exact parsed equality under ADR-003.
 
 ## 8. Suggested ADR triggers
 
 | Trigger | Why it likely needs an ADR | Related Sn |
 |---------|----------------------------|------------|
-| Domain-failure vocabulary | ADR-002 maps `STOP` to a typed domain failure but leaves exception vs result type, type names, and message/code stability to design. GAP-026. | S3, S4 |
-| Non-dyadic linspace spacings | ADR-003 authorizes exact equality only for FIX-001. Later fixtures may need a tolerance ADR. | S2 |
-| Optional endpoint flags | If a later slice exposes `includeStart` / `includeStop` / step-out, that is a new contract plus fixtures, not a silent addition to this REQ. | deferred from S1–S2 |
-| DEF-002 ledger label | Human M3 should record `reproduce-faithfully`, `fix-now`, or `fix-later` for the Fortran allocation-before-check hazard. | S3 |
+| Managed port signature and sequence type | ADR-002 deferred names, namespaces, and layout; first port signature is VS-1 design | S1–S6 |
+| Typed domain-failure type for length rejection | Classification is decided; the failure type is the reusable VS-2/VS-3 pattern | S5, S6 |
+| Endpoint-flag / `mesh` surface (future REQ) | Recovered but unexecuted; adding them is a new contract, not a silent extension of REQ-001 | (none in this REQ) |
+| Additional `linspace` fixtures beyond FIX-001 | S2–S4 are specified from the formula; a later numeric-contract amendment would promote any new captures | S2, S3, S4 |
 
 Do **not** create those ADRs in this command. `/design-application` or `/plan-port-story` owns them.
 
 ## 9. Links
 
 - Source material: see header
-- Related REQ files: none yet
-- Related ADRs: ADR-001, ADR-002, ADR-003, ADR-004, ADR-005
+- Related REQ files: none — REQ-001 is first
+- Related ADRs: ADR-001, ADR-002, ADR-003, ADR-005, ADR-006, ADR-007, ADR-008
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
-- Flow: `docs/modernization/flows/BEH-001-linspace.md`
 - Fixture: `docs/modernization/fixtures/FIX-001-linspace-5.md`
-- Defects: `docs/modernization/defect-ledger.md`
-- Plan: `docs/modernization/migration-plan.md` (SL-001)
-- Purpose / domain: `docs/PURPOSE.md`, `docs/DOMAIN.md`
+- Domain: `docs/DOMAIN.md` §§4a, 5a, 7a, 9a, 10a
+- Plan: `docs/modernization/migration-plan.md` (VS-1)
 
 ---
 
-*Created: 2026-08-19 | Refined by: architect in Discovery Mode | Command: `/refine-feature` | Input: `docs/modernization/behaviors/BEH-001-linspace.md`*
+*Created: 2026-08-20 | Refined by: architect in Discovery Mode*

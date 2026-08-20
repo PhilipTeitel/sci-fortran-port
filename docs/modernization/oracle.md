@@ -148,8 +148,10 @@ Passing the script's formula/copy comparison is not a parity claim. T1 establish
 
 ## 9. Links
 
-- Behavior catalog: `docs/modernization/behaviors/BEH-001-linspace.md`
-- Defect ledger: `docs/modernization/defect-ledger.md`
+- Behavior catalog: `docs/modernization/behavior-catalog.md`
+- Per-function behaviors: `docs/modernization/behaviors/BEH-001-linspace.md` … `BEH-004-deriv.md`
+- Cross-cutting contracts: `docs/modernization/behaviors/BEH-301-numeric-kind-representation.md` … `BEH-305-stop-error-diagnostics.md`
+- Defect ledger: `docs/modernization/defect-ledger.md` (DEF-001 decided; DEF-002 and DEF-308 open; the other fourteen retired with evidence per ADR-006/007)
 - Fixture: `docs/modernization/fixtures/FIX-001-linspace-5.md`
 - Parity reports: `docs/modernization/parity/{STORY-ID}-parity.md`
 

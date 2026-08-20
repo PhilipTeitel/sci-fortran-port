@@ -19,8 +19,7 @@
 | INT-007 | The five checked-in expected references are not a recorded legacy-output corpus: four are regenerated from Python formulas and one is copied from the historical `xy2.deriv` file. | Fidelity provenance | E3 code-derived / E4 inferred | `scripts/fidelity.sh:105-159`; `fidelity/golden/*.txt`; `numutils/test/xy2.deriv` | high for generation path; low for historical file provenance | oracle |
 | INT-008 | Generated build/fidelity products are intended to stay out of version control, and prior tracked static archives were removed in the merged delta. | Artifact hygiene | E3 code-derived / E4 inferred | `.gitignore:4-13`; `git diff --name-status 5e4e6a3..e586903` | high for mechanism; medium for inferred rationale | legacy map |
 | INT-009 | Owner selected library `linspace` as the first code slice, accepted the 2026-08-10 probe, required hexagonal architecture and a managed API, then corrected purpose to a whole-library C# port POC (licensing accepted; `/plan-migration` unblocked). | Product purpose / first slice | E2 documented | Owner decisions 2026-08-19; ADR-001–005 | high | PURPOSE / catalog / ASSESSMENT |
-| INT-010 | `/plan-migration` sequences retained catalog IDs as SL-001–SL-025; first code-production command is `/refine-feature` on BEH-001; catalog-only rows stay document→refine→design→implement; ADR-005 TOOLS convergence checks travel with SL-014. | Migration sequencing | E2 documented | `docs/modernization/migration-plan.md`; catalog 2026-08-19 | high | migration plan / BEH-001 |
-| INT-011 | `/refine-feature` on BEH-001 produced REQ-001 (`Draft`, S1–S5): default-inclusive managed port; optional flags deferred; FIX-001 exact equality; typed domain failure for invalid length; Fortran ABI/CLI out of slice. Next is `/design-application`. | First-slice requirements | E2 documented | `docs/requirements/REQ-001-linspace.md`; owner artifacts ADR-001–005 | high | REQ-001 / SL-001 |
+| INT-010 | `/plan-migration` sequenced retained catalog IDs as SL-001–SL-025; first code-production command is `/refine-feature` on BEH-001; catalog-only rows stay document→refine→design→implement. **Superseded 2026-08-19 by ADR-006/007/008:** planned work is three vertical slices (VS-1 `BEH-001`, VS-2 `BEH-003`, VS-3 `BEH-040`); CLI slices are withdrawn; remaining modules are reserve. **2026-08-20:** `/refine-feature` produced `REQ-001` (Draft); next is `/design-application`. | Migration sequencing | E2 documented | `docs/modernization/migration-plan.md`; `docs/requirements/REQ-001-linspace.md`; catalog 2026-08-19; ADR-006/007/008 | high | migration plan / BEH-001 / REQ-001 |
 
 ## 2. Release-note and support commitments
 
@@ -71,6 +70,5 @@ None yet. No release notes, changelog, tag, support record, or accepted build tr
 - Behavior catalog: `docs/modernization/behavior-catalog.md`
 - Migration plan: `docs/modernization/migration-plan.md`
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
-- Requirements: `docs/requirements/REQ-001-linspace.md`
 
-*Created: 2026-08-10 | First-slice intent: 2026-08-19 | Whole-library purpose: 2026-08-19 | `/plan-migration`: 2026-08-19 | `/refine-feature`: 2026-08-19*
+*Created: 2026-08-10 | First-slice intent: 2026-08-19 | Whole-library purpose: 2026-08-19 | `/plan-migration`: 2026-08-19*

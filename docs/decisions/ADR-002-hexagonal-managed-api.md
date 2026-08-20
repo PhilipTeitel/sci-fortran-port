@@ -60,6 +60,12 @@ Concrete type names, project layout, DI container choice, and package IDs are **
 
 ADR-004/005 make the managed API the product for the **whole retained library**, with CLIs as adapters over the same ports. Fortran ABI is not retained. Concrete signatures remain out of this ADR.
 
+## Second amendment (2026-08-19)
+
+- **§2 is authoritative and was in conflict with ADR-005 §3**, which listed `IOTOOLS`, `PARSE_CMD`, `COMMON_VARS`, and `TIMER` as retained library modules. **ADR-007** resolves this: those are adapters, and file I/O is a driven port.
+- **§3's "CLI and HTTP adapters, if added later"** — no CLI adapter will be added. **ADR-006** retires the CLI surface from build scope. An HTTP adapter remains optional.
+- **§4's mapping of `STOP`/`error()` to a typed domain failure** is confirmed and generalized library-wide by the 2026-08-19 process-boundary decision recorded in `docs/PURPOSE.md`.
+
 ## Links
 
 - Assessment: `docs/modernization/ASSESSMENT.md` Conditions 3–4 (POC whole-library boundary)
