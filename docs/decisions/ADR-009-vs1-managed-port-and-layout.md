@@ -1,7 +1,7 @@
 # ADR-009: VS-1 solution layout and managed linspace port
 
-**Status:** Proposed
-**Date:** 2026-08-20
+**Status:** Accepted
+**Date:** 2026-08-20 (accepted 2026-08-20)
 
 ---
 

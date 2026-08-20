@@ -28,7 +28,7 @@ Reserve and evidence-only rows carry no story and no schedule. Their presence he
 
 | ID | Job | Legacy surface | Status | Evidence | Next ADD command |
 |----|-----|----------------|--------|----------|------------------|
-| BEH-001 | Inclusive linear sequence | `TOOLS.linspace` | **Built (VS-1)** — recovered; `REQ-001` `Ready for Design`; design Proposed (ADR-009/010); story `VS1-1` planned | FIX-001 exact parsed `0,0.25,0.5,0.75,1` | `/plan-project` |
+| BEH-001 | Inclusive linear sequence | `TOOLS.linspace` | **Built (VS-1)** — recovered; `REQ-001` `Ready for Design`; design Accepted (ADR-009/010); ported by story `VS1-1` | FIX-001 exact parsed `0,0.25,0.5,0.75,1` | `/plan-project` |
 | BEH-002 | Logarithmic sequence | `TOOLS.logspace` | Reserve; T1 characterized | `CAP-20260810-LOGSPACE` SHA-256 `c5b198af…`; parsed values not retained | none scheduled |
 | BEH-003 | Fermi function | `FUNCTIONS.fermi` | **Built (VS-2)** — T1 characterized, fixture not yet recovered | `CAP-20260810-FERMI` SHA-256 `6f35eadc…` | `/document-legacy` |
 | BEH-004 | Numerical derivative | `TOOLS.deriv` | Optional (VS-4); T1 characterized | `CAP-20260810-DERIV` SHA-256 `8a8879bc…`; input `numutils/test/xy2.data` | `/document-legacy` if added |

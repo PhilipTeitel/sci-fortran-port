@@ -37,7 +37,7 @@ Everything else retained by ADR-005 §3 stays catalogued as **reserve** — avai
 
 Only **VS-1** has refined requirements (`REQ-001`, `Ready for Design` as of 2026-08-20; Gate 2 closed). VS-2 and VS-3 need `/document-legacy` and fixture capture first.
 
-**Next ADD command:** `/plan-project` (VS-1 design is in `README.md`; ADR-009/010 Proposed). Do not start VS-2 or VS-3 implementation stories from this plan.
+**Next ADD command:** `/plan-project` (VS-1 design is in `README.md`; ADR-009/010 Accepted; VS-1 ported by story `VS1-1`). Do not start VS-2 or VS-3 implementation stories from this plan.
 
 ---
 
@@ -92,7 +92,7 @@ flowchart TD
 
 | Slice | Behaviors | Status now | Next command | Implementation-ready? |
 |-------|-----------|------------|--------------|------------------------|
-| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` `Ready for Design` (S1–S6); design in `README.md` (ADR-009/010 Proposed); story `VS1-1` planned | `/plan-project` | **No** until ADR-009/010 are `Accepted` |
+| VS-1 | `BEH-001` `linspace` | Recovered; `FIX-001` accepted; `REQ-001` `Ready for Design` (S1–S6); design in `README.md` (ADR-009/010 Accepted); **implemented** by story `VS1-1` | `/plan-project` | **Yes** — implemented; `FIX-001` parity green |
 | VS-2 | `BEH-003` `fermi` | T1 hash only; no parsed fixture | `/document-legacy` | No |
 | VS-3 | `BEH-040` `MATRIX` (inverse, diagonalize, solve) | Catalog-only; no T1 evidence | `/document-legacy` | No |
 | VS-4 *(optional)* | `BEH-004` `deriv` | T1 hash only; 1,024-row capture not retained | `/document-legacy` | No |
@@ -226,7 +226,7 @@ GAP-015 (RNG sequence versus distribution) and GAP-013 (complex-column order) no
 
 Library-wide design already exists: hexagonal ports, managed API as the product, I/O and host concerns as adapters, probe baseline, retirements (ADR-002, ADR-005, ADR-006, ADR-007).
 
-**Slice design for VS-1 is in `README.md`.** ADR-009/010 are Proposed. Concrete C# names, project layout, and the first port signature are no longer deferred. `REQ-001` is `Ready for Design` and story `VS1-1` (`docs/features/VS1-1-managed-linspace-port.md`) is planned, but it is not implementation-ready until those two ADRs are `Accepted`.
+**Slice design for VS-1 is in `README.md`.** ADR-009/010 are Accepted. Concrete C# names, project layout, and the first port signature are settled. `REQ-001` is `Ready for Design` and story `VS1-1` (`docs/features/VS1-1-managed-linspace-port.md`) is implemented, with `FIX-001` parity green.
 
 Do not start a library-wide ASP.NET or NuGet packaging design in this command.
 

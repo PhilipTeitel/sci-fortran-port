@@ -121,7 +121,7 @@ Closed: retained surface inventory (ADR-005 §5); process-boundary success crite
 - Related catalog: `docs/modernization/behavior-catalog.md`
 - Related plan: `docs/modernization/migration-plan.md`
 - Related assessment: `docs/modernization/ASSESSMENT.md`
-- Related ADRs: ADR-001–010 (ADR-006/007/008 are the operative scope decisions; ADR-009/010 are Proposed VS-1 design)
+- Related ADRs: ADR-001–010 (ADR-006/007/008 are the operative scope decisions; ADR-009/010 are the accepted VS-1 design)
 - Related design: `README.md`
 - Related behaviors: `docs/modernization/behaviors/BEH-001-linspace.md`; `BEH-301-*.md` … `BEH-305-*.md`
 - Related requirements: `docs/requirements/REQ-001-linspace.md`

@@ -153,10 +153,10 @@ And   leftover Fortran text "linspace: N<2 with both start and end points" is no
 
 ## 7. Open questions
 
-Remaining items are closed for VS-1 design (ADR-009/010, Proposed) or remain later-slice work:
+Remaining items are closed for VS-1 design (ADR-009/010, Accepted) or remain later-slice work:
 
-- [x] Concrete managed type names, namespaces, and solution layout — `SciFor.*` projects, `IGenerateLinearSequence`, `Grids.Linspace` ([ADR-009](../decisions/ADR-009-vs1-managed-port-and-layout.md), Proposed).
-- [x] Concrete typed-failure type name for `LinearSequenceRejected` — `LinearSequenceRejectedException` / `LinearSequenceRejection` ([ADR-010](../decisions/ADR-010-typed-domain-failure.md), Proposed).
+- [x] Concrete managed type names, namespaces, and solution layout — `SciFor.*` projects, `IGenerateLinearSequence`, `Grids.Linspace` ([ADR-009](../decisions/ADR-009-vs1-managed-port-and-layout.md), Accepted).
+- [x] Concrete typed-failure type name for `LinearSequenceRejected` — `LinearSequenceRejectedException` / `LinearSequenceRejection` ([ADR-010](../decisions/ADR-010-typed-domain-failure.md), Accepted).
 
 DEF-308 (library-wide comparison-policy tension) remains open and **does not block this requirement**: S1 is exact parsed equality under ADR-003.
 
@@ -175,7 +175,7 @@ Do **not** create those ADRs in this command. `/design-application` or `/plan-po
 
 - Source material: see header
 - Related REQ files: none — REQ-001 is first
-- Related ADRs: ADR-001, ADR-002, ADR-003, ADR-005, ADR-006, ADR-007, ADR-008, ADR-009 (Proposed), ADR-010 (Proposed)
+- Related ADRs: ADR-001, ADR-002, ADR-003, ADR-005, ADR-006, ADR-007, ADR-008, ADR-009, ADR-010
 - Design: `README.md`
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 - Fixture: `docs/modernization/fixtures/FIX-001-linspace-5.md`
@@ -184,4 +184,4 @@ Do **not** create those ADRs in this command. `/design-application` or `/plan-po
 
 ---
 
-*Created: 2026-08-20 | Refined by: architect in Discovery Mode | Design types: ADR-009/010 Proposed | Marked `Ready for Design` by owner: 2026-08-20*
+*Created: 2026-08-20 | Refined by: architect in Discovery Mode | Design types: ADR-009/010 Accepted | Marked `Ready for Design` by owner: 2026-08-20*

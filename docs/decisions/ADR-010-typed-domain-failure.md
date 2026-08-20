@@ -1,7 +1,7 @@
 # ADR-010: Typed domain failure for rejected linear sequences
 
-**Status:** Proposed
-**Date:** 2026-08-20
+**Status:** Accepted
+**Date:** 2026-08-20 (accepted 2026-08-20)
 
 ---
 
