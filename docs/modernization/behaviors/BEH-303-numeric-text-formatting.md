@@ -59,7 +59,7 @@ Numeric interchange is plain text via Fortran list-directed (`*`) and fixed-widt
 | Malformed numeric token | Unverified (list-directed failure modes) | `E5` — GAP-007; legacy-map §7 | TBD |
 | File open failure in fidelity driver | Prints message; `stop 1` | `E3` — `fidelity/driver.f90:43-46` | see BEH-305 / **DEF-309** |
 | Tolerance / comparison regimes | Workflow `1e-6` vs script `1e-10` vs probe exact | `E1`/`E2`/`E3` — oracle §6; INT-006 | **DEF-308** open/TBD |
-| `r8_to_s_left` comment vs code | Comment G14.6; write `g16.9` | `E3` — `src/COMVARS.f90:495-521` | **DEF-311** open/TBD |
+| `r8_to_s_left` comment vs code | Comment G14.6; write `g16.9` | `E3` — `src/COMVARS.f90:495-521` | **DEF-311** retired w/ evidence (ADR-007) |
 | Width overflow in fixed formats | Not characterized | `E5` | TBD |
 | Comma-decimal locale | Not run | `E5` — GAP-007 | TBD |
 
@@ -110,7 +110,9 @@ And comparison policies (exact vs normalized) are decided per surface, not assum
 
 - Intent ledger: `docs/modernization/intent-ledger.md` (INT-006/007)
 - Legacy flow: `docs/modernization/flows/` (none yet)
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-308, DEF-311 (open/TBD); complex-column DEF-301–306 via BEH-304
+- Defect ledger: `docs/modernization/defect-ledger.md` — **DEF-308 remains open** (comparison policy, blocks VS-2/VS-3); DEF-311 retired with evidence; complex-column DEF-301–306 via BEH-304, all retired
+
+**Scope note (2026-08-19):** ADR-007 makes text codecs an adapter concern with no legacy-fidelity requirement, so this file is **legacy characterization** rather than a product contract. One exception matters: the verification harness still parses Fortran-formatted text to recover fixtures, so the formats recorded here remain load-bearing for the oracle even though no product surface reproduces them.
 - Related gaps: GAP-007, GAP-009, GAP-013 (column order separated in BEH-304)
 - Related behavior: BEH-304 (complex-column order)
 

@@ -28,7 +28,9 @@ Domain model artifact contract:
 
 ## 1. Purpose alignment
 
-The purpose is to re-host the retained SciFortran library in C# so numerical jobs keep their legacy meaning: generate grids, evaluate functions, integrate, invert and diagonalize matrices, transform Green functions, optimize, interpolate, sample, and (as adapters) drive the existing CLI jobs. This model names the bounded contexts required to plan that port. It does not model ASP.NET, MPI, or missing plot/FFT backends. See `docs/PURPOSE.md` and ADR-005.
+The purpose is to demonstrate that Artifact-Driven Development extends to migration, using a C# port of retained SciFortran numerics as the worked example (`docs/PURPOSE.md`, ADR-008). Numerical jobs must keep their legacy meaning: generate grids, evaluate functions, integrate, invert and diagonalize matrices, transform Green functions, optimize, interpolate, sample.
+
+This model names every bounded context recovered from the legacy system, because the domain model documents what the legacy system *is*. Only three contexts are built (ADR-008); the rest are marked reserve. CLI programs are retired from build scope (ADR-006), and file I/O is a driven port rather than a domain context (ADR-007). It does not model ASP.NET, MPI, or missing plot/FFT backends.
 
 The model also names the ubiquitous language for the **numeric representation, array layout, text interchange, complex-column order, and diagnostic/termination** contracts recovered in BEH-301-305. Those contracts cut across every bounded context below: a module port is not faithfully translated merely by reproducing its arithmetic, because kind, layout, codec, column order, and termination semantics are separately observable. Sections that carry both passes are split into a first-slice/library part and a cross-cutting part.
 
@@ -42,7 +44,8 @@ Two recovery passes contributed vocabulary. Both are canonical; they describe di
 |------|------------|------------------|------------|--------|
 | SciFor library | The retained public numerical capability formerly imported via `use SCIFOR` | managed port, C# library | “ASP.NET app” as the product | `src/SCIFOR.f90`; ADR-004 |
 | Port | Host-neutral application service for one retained Fortran public procedure or cohesive family | use case | HTTP endpoint as the domain | ADR-002, ADR-005 |
-| Driving adapter | Something that invokes a port (managed API now; CLI later; HTTP optional) | CLI adapter | “the Fortran program is the domain” | ADR-005 |
+| Driving adapter | Something that invokes a port (managed C# API; HTTP optional later). No CLI adapter is built (ADR-006) | managed API surface | “the Fortran program is the domain” | ADR-002, ADR-006 |
+| Driven adapter | Something a port invokes to reach the outside — persistence, serialization, transport. File I/O lives here (ADR-007) | data port; file adapter | “`splot` is a domain operation” | ADR-007 |
 | Linear sequence | Ordered evenly spaced real samples over an interval | `linspace` result | Fortran `array(num)` as a product noun | BEH-001 |
 | Start / Stop / Length | Inclusive-grid request fields | `start`, `stop`, `num` | CLI-only `wmin`/`L` as library defaults | BEH-001 |
 | Domain failure | Call rejected instead of returning a result | legacy `error`/`STOP` | HTTP status as the domain concept | ADR-002 |
@@ -68,12 +71,11 @@ Two recovery passes contributed vocabulary. Both are canonical; they describe di
 
 ```mermaid
 flowchart LR
-  subgraph adapters [Driving adapters]
+  subgraph driving [Driving adapters]
     ManagedAPI[Managed C# API]
-    CLI[CLI programs]
-    HTTP[HTTP later]
+    HTTP[HTTP optional]
   end
-  subgraph core [Host-neutral library]
+  subgraph core [Host-neutral domain]
     Grids[Grids and arrays]
     Funcs[Scalar functions]
     Quad[Quadrature]
@@ -83,36 +85,43 @@ flowchart LR
     Spl[Splines]
     Rand[Random and statistics]
     Cond[Many-body helpers]
-    Io[File and plot data]
+  end
+  subgraph driven [Driven adapters]
+    DataPort[(Numeric data port)]
+    FileAdapter[File adapter]
   end
   ManagedAPI --> core
-  CLI --> core
   HTTP -.-> core
+  core --> DataPort --> FileAdapter
 ```
 
-| Context | Meaning | Legacy module(s) | First catalog IDs |
-|---------|---------|------------------|-------------------|
-| Grids and arrays | Inclusive/log/integer/power meshes, sort/shift, derivatives | `TOOLS` | BEH-001–BEH-005, BEH-010 |
-| Scalar functions | Fermi, step, sign, Faddeeva | `FUNCTIONS` public exports | BEH-003, BEH-020 |
-| Quadrature | Trapezoid/Simpson, Kramers–Kronig | `INTEGRATE` | BEH-030 |
-| Matrices | Inverse, eigen, linear solve | `MATRIX` | BEH-040 |
-| Transforms | FFT and imaginary-time/frequency maps | `FFTGF` (NR) | BEH-050 |
-| Optimization | Broyden, Brent, MINPACK facades | `OPTIMIZE` | BEH-060 |
-| Splines | Linear/cubic/poly interpolation | `SPLINE` | BEH-070 |
-| Random and statistics | Sampling, histogram, moments | `RANDOM`, `STATISTICS` | BEH-080 |
-| Many-body helpers | Green-function types, Padé, square lattice, Bethe DOS | `GREENFUNX`, `PADE`, `SQUARE_LATTICE`, Bethe in `TOOLS` | BEH-090 |
-| File and plot data | Paths, gzip, `splot`/`sread` payloads | `IOTOOLS` | BEH-100 |
-| CLI adapters | Process arguments and streams over the ports above | `numutils/src/*` | BEH-200+ |
+| Context | Meaning | Legacy module(s) | Catalog IDs | Build status |
+|---------|---------|------------------|-------------|--------------|
+| Grids and arrays | Inclusive/log/integer/power meshes, sort/shift, derivatives | `TOOLS` | BEH-001–BEH-005, BEH-010 | **VS-1** (`linspace`); rest reserve |
+| Scalar functions | Fermi, step, sign, Faddeeva | `FUNCTIONS` public exports | BEH-003, BEH-020 | **VS-2** (`fermi`); rest reserve |
+| Matrices | Inverse, eigen, linear solve | `MATRIX` | BEH-040 | **VS-3** |
+| Quadrature | Trapezoid/Simpson, Kramers–Kronig | `INTEGRATE` | BEH-030 | Reserve |
+| Transforms | FFT and imaginary-time/frequency maps | `FFTGF` (NR) | BEH-050 | Reserve; permitted VS-3 substitute |
+| Optimization | Broyden, Brent, MINPACK facades | `OPTIMIZE` | BEH-060 | Reserve |
+| Splines | Linear/cubic/poly interpolation | `SPLINE` | BEH-070 | Reserve |
+| Random and statistics | Sampling, histogram, moments | `RANDOM`, `STATISTICS` | BEH-080 | Reserve |
+| Many-body helpers | Green-function types, Padé, square lattice, Bethe DOS | `GREENFUNX`, `PADE`, `SQUARE_LATTICE`, Bethe in `TOOLS` | BEH-090 | Reserve |
 
-The cross-cutting contracts (BEH-301-305) are **not** a bounded context. They are constraints that each context above must satisfy at its boundary, and they are the reason `BEH-100` (file and plot data) and `BEH-110` (diagnostics/timer) cannot be planned as ordinary function ports.
+**Not bounded contexts, by decision:**
+
+- **File and plot data** (`IOTOOLS`, BEH-100) is a **driven port with adapters**, not a domain context (ADR-007). The domain hands values across the port; an adapter decides persistence. Legacy `splot`/`sread` formats are evidence, not specification.
+- **CLI adapters** (`numutils/src/*`, BEH-200+) are **retired from build scope** (ADR-006). Their catalog entries remain as recovered evidence about how library procedures were called.
+- **Diagnostics, timing, CLI parsing** (BEH-110) are **dissolved** (ADR-007). Only failure *classification* is domain, as a typed domain failure.
+
+The cross-cutting contracts (BEH-301–305) are **not** a bounded context either. They are constraints each context must satisfy at its boundary. ADR-007 splits them: `BEH-301` (numeric kind), `BEH-302` (array layout) and the classification half of `BEH-305` bind the domain; `BEH-303` (text codecs), `BEH-304` (external column order) and the channel/styling/exit half of `BEH-305` are adapter concerns with no fidelity requirement.
 
 Identifier blocks in use, so the two recovery passes stay distinguishable:
 
 | Block | Meaning |
 |-------|---------|
-| `BEH-001`-`BEH-005` | Individually recovered grid/function behaviors (first slice) |
-| `BEH-010`-`BEH-110` | Context anchors per legacy module |
-| `BEH-200`+ | CLI driving adapters |
+| `BEH-001`-`BEH-005` | Individually recovered grid/function behaviors |
+| `BEH-010`-`BEH-110` | Context anchors per legacy module (`BEH-100` reshaped, `BEH-110` dissolved) |
+| `BEH-200`+ | CLI programs — recovered evidence only, not built |
 | `BEH-301`-`BEH-305` | Cross-cutting numeric/text/diagnostic contracts |
 
 ## 4. Data dictionary
@@ -275,7 +284,8 @@ Library-wide entities (Matrix, Transform, Histogram, …) are **TBD per slice** 
 | Relationship | Cardinality | Notes | Source |
 |--------------|-------------|-------|--------|
 | LinearSequenceRequest → LinearSequence | one-to-one on success | First recovered job | BEH-001 |
-| CLI adapter → library port | many adapters, one arithmetic | CLI must not reimplement grids/FFT | ADR-005 |
+| Driving adapter → library port | many adapters, one arithmetic | No adapter reimplements arithmetic. Only the managed API exists today; HTTP is optional | ADR-002, ADR-006 |
+| Library port → driven data port | one-to-many | The domain hands values across the port; the adapter chooses serialization. No legacy-format fidelity | ADR-007 |
 
 ### 6b. Contract relationships
 
@@ -311,21 +321,25 @@ erDiagram
 
 | Boundary | Protects | External interactions |
 |----------|----------|----------------------|
-| Linear sequence evaluation | Inclusive formula and length rules | Managed API; later `linspace` CLI |
-| Each later module port | That module’s public contract | Managed API and matching CLI |
+| Linear sequence evaluation (VS-1) | Inclusive formula and length rules | Managed API |
+| Scalar function evaluation (VS-2) | Fermi parameterization and sweep semantics | Managed API |
+| Dense linear algebra (VS-3) | Inverse/eigen/solve contracts, layout, and provider substitution | Managed API; numeric provider behind a driven port |
+| Each reserve module port | That module’s public contract | Managed API, if ever built |
 
-Process-global `COMMON_VARS` / RNG state is an adapter or domain-service concern (GAP-002, GAP-015); it is not an aggregate in this draft.
+Process-global `COMMON_VARS` state is no longer an aggregate question: `TIMER` is dropped and diagnostics are adapter concerns (ADR-007). Process-global RNG state (GAP-015) remains a reserve concern for `BEH-080`, which is not built.
 
 ### 7b. Contract boundaries
 
 | Boundary | Entities inside | Invariants protected | External interactions | Design implications |
 |----------|-----------------|----------------------|-----------------------|---------------------|
 | `InMemoryNumericBoundary` | `NumericValue`, `ComplexPair`, `ArrayLayout` | Kind-8 components; `(re,im)` memory pairing; Fortran bounds/column-major semantics | Encoded streams/files; host buffers | Host layout adapters must not silently rewrite domain bounds/order — **design deferred** |
-| `SurfaceCodecBoundary` | `NumericSurface`, `TextNumericCodec`, `ComplexColumnOrder`, `ExchangeFlag` | Per-surface text and column contracts; no global codec | stdin/stdout/files; help text | Contradictions require defect disposition before “fixing” codecs |
-| `DiagnosticTerminationBoundary` | `DiagnosticMessage`, `ProcessTermination` | Fatal vs non-fatal; stdout emission; STOP semantics | CLI process; optional help status return | Host remapping is outside legacy domain unless approved as non-parity |
+| `SurfaceCodecBoundary` | `NumericSurface`, `TextNumericCodec`, `ComplexColumnOrder`, `ExchangeFlag` | Per-surface text and column contracts; no global codec | stdin/stdout/files; help text | **Legacy characterization only.** Under ADR-007 no built surface reproduces a text or column contract; the codecs recorded here explain what the legacy did and why the contradictions were retired rather than fixed |
+| `DiagnosticTerminationBoundary` | `DiagnosticMessage`, `ProcessTermination` | Fatal vs non-fatal; stdout emission; STOP semantics | Host process; optional help status return | **Split by ADR-007.** Which conditions are fatal is a domain invariant expressed as a typed failure; emission channel and exit status are adapter concerns |
 | `VerificationBoundary` | `ComparisonPolicy` (+ fixtures) | Must not claim accepted product tolerances from provisional knobs | Oracle captures; scripts | Blocks parity stories until approved |
 
 ## 8. Lifecycles and state transitions
+
+These record **legacy behavior as recovered**, not target design. The complex-column and diagnostic lifecycles below belong to surfaces that ADR-006/007 place outside the product boundary; they are kept because they are the evidence behind the retired defect rows.
 
 ### `ComplexPair` across a complex-column surface (e.g. `fftgf`)
 
@@ -377,8 +391,8 @@ No approved lifecycle yet. Provisional knobs exist; promotion to accepted policy
 Library-wide (do not block `/refine-feature` on BEH-001):
 
 - [ ] Canonical C# names: keep Fortran identifiers (`linspace`, `fftgf`) as aliases, or rename to ubiquitous-language types only?
-- [ ] How is process-global RNG/timer/diagnostic state exposed without ASP.NET request races?
-- [ ] Which MATRIX/FFT results require order/sign canonicalization?
+- [ ] **Blocks VS-3.** Which MATRIX results require order/sign canonicalization? Eigenvalue ordering and eigenvector sign conventions are uncharacterized and must be settled in the VS-3 numeric-contract ADR.
+- [x] How is process-global RNG/timer/diagnostic state exposed without request races — largely dissolved by ADR-007: `TIMER` is dropped and diagnostics are adapter concerns. Process-global RNG state survives only as a reserve concern for `BEH-080`, which is not built.
 
 First-slice (block `/refine-feature` on BEH-001, not library planning):
 
@@ -388,47 +402,63 @@ First-slice (block `/refine-feature` on BEH-001, not library planning):
 
 ### 10b. Cross-cutting contract questions
 
-Blocking for design/story planning in the affected scope:
+Still blocking for design/story planning in the built slices:
 
 - [ ] Exact kind-8 storage width, endianness, IEEE mode, and edge (NaN/Infinity/signed-zero/subnormal) contract for the accepted compiler? `E5` — BEH-301
 - [ ] Is `ddp=16` future intent, dead scaffolding, or required by unexamined paths? `E3`/`E5` — BEH-301
-- [ ] Per retained surface: accepted `ComparisonPolicy` (absolute/relative/ULP/residual)? Exact-byte comparison is off the table for computational surfaces under the managed-API boundary, but remains open for the retained IOTOOLS file helpers. `E1`/`E2`/`E3`/`E4`/`E5` — BEH-301/303; INT-006
-- [ ] Which public APIs must preserve non-default lower bounds vs normalize copies? Slice/view vs copy at host boundary? `E3`/`E5` — BEH-302
-- [ ] Observable effect of `fftgf` `stride` (parsed, unused in inspected body)? `E3`/`E5` — BEH-302/304 flow
-- [ ] Per retained complex surface: canonical external order and disposition of help-vs-code contradictions (`reproduce-faithfully` / `fix-*`)? Deferred for CLI stdout, but **still binding for the retained IOTOOLS `splot`/`sread` helpers**, whose file formats stay library behavior. `E2`/`E3` — BEH-304; DEF-301/302 recorded, decisions open
-- [ ] Does `ffcmplx` `sread(fin,Gread,wm)` resolve/build, and is unused `ex` dead help, broken feature, or unsupported utility? `E3`/`E5` — BEH-304 flow
-- [ ] Are `sreadM_*` allocation/format anomalies latent defects or unreachable? `E3` — BEH-304
-- [ ] Does `r8_to_s_left` intend comment `G14.6` or code `g16.9` for diagnostic formatting? `E3` — BEH-303
-- [ ] Must ANSI styling and stdout-mixed diagnostics be preserved for CLI compatibility? What exit status does bare `STOP` produce on the accepted runtime? `E3`/`E5` — BEH-305. **No longer blocks the managed API** (adapter concern per the 2026-08-19 boundary decision); still required before any CLI adapter claims legacy compatibility. Tracked as DEF-309/310.
-- [x] Which failures remain process-aborting vs become typed non-terminating results — closed by ADR-002 section 4 and the 2026-08-19 boundary decision: `error`/`STOP` becomes a typed domain failure at the managed port; host exit codes and Problem Details are adapter concerns. `E2` — GAP-026 remains open only for adapter work.
-- [x] Retained `NumericSurface` inventory — closed by ADR-005 section 5 (retained/retired list, `ffcmplx` retained).
+- [ ] Per built surface: accepted `ComparisonPolicy` (absolute/relative/ULP/residual)? Exact-byte comparison is off the table everywhere now that no surface carries a text-fidelity requirement (ADR-007). VS-3 is the hard case: elementwise equality is unlikely to be right for `MATRIX`. `E1`/`E2`/`E3`/`E4`/`E5` — BEH-301; INT-006; DEF-308
+- [ ] Which public APIs must preserve non-default lower bounds vs normalize copies? Slice/view vs copy at the port boundary? **Blocks VS-3**, where Fortran column-major and leading-dimension conventions meet C# defaults. `E3`/`E5` — BEH-302
+
+Closed or dissolved by the 2026-08-19 decisions:
+
+- [x] Per complex surface: canonical **external** order and disposition of help-vs-code contradictions — dissolved by ADR-007. External column order is an adapter choice with no fidelity requirement; in-memory component pairing remains domain under BEH-301. DEF-301/302/305 retired with evidence.
+- [x] Does `ffcmplx` `sread(fin,Gread,wm)` resolve/build, and is unused `ex` dead help or broken feature — retired unresolved (DEF-303/304). The utility is not built.
+- [x] Are `sreadM_*` allocation/format anomalies latent defects or unreachable — retired unresolved (DEF-307). They appear to be legacy defects; not reproducing them is the intended outcome.
+- [x] Observable effect of `fftgf` `stride` — retired unresolved (DEF-312). The utility is not built.
+- [x] Does `r8_to_s_left` intend `G14.6` or `g16.9` — retired unresolved (DEF-311). Diagnostic formatting is an adapter concern.
+- [x] Must ANSI styling and stdout-mixed diagnostics be preserved, and what exit status does bare `STOP` produce — retired unresolved (DEF-309/310). Channel, styling, and exit status are adapter concerns (ADR-007).
+- [x] Which failures remain process-aborting vs become typed non-terminating results — closed by ADR-002 §4: `error`/`STOP` becomes a typed domain failure at the managed port. `E2` — GAP-026 now applies only to hypothetical adapter work.
+- [x] Retained `NumericSurface` inventory — closed by ADR-005 §5, then narrowed to built slices by ADR-008.
 
 ## 11. Tensions / conflicts
 
 ### 11a. Scope and catalog tensions
 
-- CLI defaults (e.g. `linspace` `wmin=-5`) are not library defaults. Library ports require explicit arguments; CLI adapters apply CLI defaults. `E3`
+- CLI defaults (e.g. `linspace` `wmin=-5`) are not library defaults, and no CLI is built (ADR-006). Library ports require explicit arguments. The CLI defaults survive only as evidence of intended usage. `E3`
 - `FUNCTIONS` comments list a huge special-function collection, but the module’s public list is six names. The catalog follows **public exports**, not the include file. ADR-005.
-- Fidelity `arange-5` is a driver loop, not library `arange`. BEH-005 stays T3 until a real `arange` capture exists.
+- Fidelity `arange-5` is a driver loop, not library `arange`. BEH-005 stays T3, and is reserve rather than built.
+- The catalog documents fifteen library families while three are built (ADR-008). Reserve entries must stay marked as reserve so the model is not read as a work commitment.
 
 ### 11b. Contract tensions
 
-Do not pick a winner; affected design/story scope is stopped until disposition. Rows marked *deferred* were moved outside the product boundary by the 2026-08-19 managed-API decision — they no longer block managed-API stories, but they are not resolved and must be settled before an adapter claims legacy compatibility.
+Do not pick a winner; affected design/story scope is stopped until disposition.
+
+**Live — these block built slices:**
 
 | Conflict | Sources | Impact |
 |----------|---------|--------|
-| Workflow relative/absolute `1e-6` vs fidelity absolute `1e-10` vs probe exact equality — three comparison regimes; none is accepted product policy | `E1`/`E2`/`E3`/`E4` — BEH-301/303; INT-006; ASSESSMENT §9 | Blocks parity stories and `ComparisonPolicy` approval |
-| Kind-8 declarations abundant; portable equivalence to C# `double`/`Complex` unproven | `E3`/`E5` — BEH-301; GAP-008 | Blocks numeric representation ADR-level claims |
-| Fortran 1-based/column-major vs default C# 0-based/row-major; no accepted buffer decision | `E3`/`E5` — BEH-302; GAP-005 | Blocks array-boundary design for matrix/FFT surfaces |
-| `r8_to_s_left` comment `G14.6` vs code `g16.9` | `E3` — BEH-303 | **Deferred** — diagnostic string formatting is an adapter concern |
-| Fidelity probe mixes `es24.17` and list-directed sections — no single global text codec even for the probe corpus | `E3` — BEH-303 | **Deferred** for computational surfaces; still blocks a one-codec assumption for the retained IOTOOLS helpers |
-| `fftgf` help claims Fortran `(re,im)`; default writer emits `(Im, Re)` | `E2`/`E3` — BEH-304; flow §5 | **Deferred** — the contradiction is in the `fftgf` CLI utility, not the FFTGF library procedures |
-| `fftgf` default input `(Re,Im)` vs default output `(Im,Re)` — asymmetric ends | `E3` — BEH-304 | **Deferred** — CLI round-trip; blocks any adapter claiming legacy stream compatibility |
-| `ffcmplx` documents `ex` but never uses it; `sread` argument order vs `pade` unresolved | `E2`/`E3`/`E5` — BEH-304 | **Deferred** — CLI utility; the `sread` call-site question still bears on the IOTOOLS port |
-| `SLREAD`/`SLPLOT` integer-X complex `(Re,Im)` vs real-X complex `(Im,Re)`; `txtfy` always `(re,im)` | `E3` — BEH-304 | **Binding** — IOTOOLS is a retained library module, so these file formats remain product behavior |
-| Bare `STOP` vs fidelity `stop 1`; diagnostics on stdout vs Unix stderr / ASP.NET Problem Details | `E3`/`E5` — BEH-305; GAP-026 | **Deferred** — channel and exit status are adapter concerns under ADR-002 section 4. Does not block managed-API stories; blocks any adapter claiming legacy parity |
-| Exercise authorization vs production/redistribution approval | `E2` — ASSESSMENT §1, Condition 2 | Blocks product-wide migration planning framed as production-ready |
-| Operational probe baseline vs production/parity authority | `E1`/`E5` — ASSESSMENT Condition 1; INT open Qs | Blocks treating probe captures as accepted product goldens without owner decision |
+| Workflow relative/absolute `1e-6` vs fidelity absolute `1e-10` vs probe exact equality — three comparison regimes; none is accepted product policy | `E1`/`E2`/`E3`/`E4` — BEH-301; INT-006; DEF-308; ASSESSMENT §9 | Blocks parity stories and `ComparisonPolicy` approval for VS-2 and VS-3 |
+| Kind-8 declarations abundant; portable equivalence to C# `double`/`Complex` unproven | `E3`/`E5` — BEH-301; GAP-008 | Blocks numeric representation claims |
+| Fortran 1-based/column-major vs default C# 0-based/row-major; no accepted buffer decision | `E3`/`E5` — BEH-302; GAP-005 | Blocks array-boundary design for VS-3 |
+| `MATRIX` eigenvalue ordering and eigenvector sign conventions uncharacterized; no T1 evidence | `E5` — BEH-040; ADR-008 | Blocks the VS-3 numeric-contract ADR |
+| Probe-linked OpenBLAS behavior vs an unchosen managed or native provider | `E5` — GAP-010; DEP-012–018 | Blocks VS-3 implementation |
+| Exercise authorization vs production/redistribution approval | `E2` — ASSESSMENT §1, Condition 2 | Blocks any framing of this work as production-ready |
+| Operational probe baseline vs production/parity authority | `E1`/`E5` — ASSESSMENT Condition 1; INT open Qs | Blocks treating probe captures as accepted goldens without owner decision |
+
+**Retired with evidence — recorded, unresolved, and out of the product boundary (ADR-006/007):**
+
+| Conflict | Sources | Disposition |
+|----------|---------|-------------|
+| `r8_to_s_left` comment `G14.6` vs code `g16.9` | `E3` — BEH-303; DEF-311 | Diagnostic formatting is an adapter concern |
+| Fidelity probe mixes `es24.17` and list-directed sections — no single global text codec | `E3` — BEH-303; DEF-004 | No surface carries a text-fidelity requirement; the harness still parses both |
+| `fftgf` help claims `(re,im)`; default writer emits `(Im, Re)` | `E2`/`E3` — BEH-304; flow §5; DEF-301 | `fftgf` is not built |
+| `fftgf` default input `(Re,Im)` vs output `(Im,Re)` — asymmetric ends | `E3` — BEH-304; DEF-302 | `fftgf` is not built |
+| `ffcmplx` documents `ex` but never uses it; `sread` argument order vs `pade` | `E2`/`E3`/`E5` — BEH-304; DEF-303/304 | Not built; no legacy reader is ported |
+| `SLREAD`/`SLPLOT` integer-X `(Re,Im)` vs real-X `(Im,Re)`; `txtfy` always `(re,im)` | `E3` — BEH-304; DEF-305/306 | External column order is an adapter choice (ADR-007) |
+| `sreadM_*` allocation and duplicate-`imY(2)` anomalies | `E3`/`E5` — BEH-304; DEF-307 | Apparent legacy defects; legacy readers are not ported |
+| Bare `STOP` vs fidelity `stop 1`; diagnostics on stdout vs stderr / Problem Details | `E3`/`E5` — BEH-305; GAP-026; DEF-309/310 | Channel and exit status are adapter concerns (ADR-002 §4, ADR-007) |
+
+Retirement closes these for this effort. It does not resolve them, and each must be reopened before any future surface claims legacy compatibility.
 
 ## 12. Links
 
@@ -443,4 +473,4 @@ Do not pick a winner; affected design/story scope is stopped until disposition. 
 
 ---
 
-*Created: 2026-08-10 (contract recovery) | Updated: 2026-08-19 | Whole-library bounded contexts and cross-cutting contracts merged | Plan: SL-001-SL-025*
+*Created: 2026-08-10 (contract recovery) | Updated: 2026-08-19 | Whole-library bounded contexts and cross-cutting contracts merged; rescoped per ADR-006/007/008 | Plan: VS-1–VS-3 in `docs/modernization/migration-plan.md`*

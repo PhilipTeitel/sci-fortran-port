@@ -127,9 +127,25 @@ Blocked ledger routes are decided as follows for **planning and implementation**
 
 ---
 
+## Later amendment (2026-08-19)
+
+Three sections of this ADR are superseded in part:
+
+| Section | Change | Superseded by |
+|---------|--------|---------------|
+| §3, rows `IOTOOLS` / `PARSE_CMD` / `COMMON_VARS` / `TIMER` | These are **not** library modules. File I/O becomes a driven port with adapters; CLI parsing and timing are dropped; diagnostics split between typed domain failures and adapter output. Listing them as retained library surface contradicted ADR-002 §2. | ADR-007 |
+| §4, retained CLI adapters | **All sixteen CLI programs are retired from build scope.** Their catalog entries stay as recovered evidence about library behavior. | ADR-006 |
+| §6, rows `func` / `libmatheval` and Gnuplot / `splot` | Withdrawn with the CLI jobs they served. No managed expression evaluator and no Gnuplot wrapping. | ADR-006 |
+
+The retained *library* module list in §3 is otherwise unchanged, but ADR-008 narrows what is **planned work**: only representative vertical slices are built, and the remaining modules are held in reserve.
+
+§1 (oracle baseline), §2 (process boundary), §5 (retirements), and §7 (numeric comparison) stand as written.
+
+---
+
 ## Links
 
 - Catalog: `docs/modernization/behavior-catalog.md`
 - Migration plan: `docs/modernization/migration-plan.md`
 - Dependency ledger: `docs/modernization/dependency-ledger.md`
-- Related: ADR-001–004
+- Related: ADR-001–004; amended by ADR-006, ADR-007, ADR-008

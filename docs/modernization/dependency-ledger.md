@@ -81,7 +81,7 @@ No database, network API, message bus, scheduler, web framework, container, or o
 |--------|-------------------|----------|--------------------|-------------|--------------|
 | DEP-001 | .NET 8 SDK, C# compiler, and CLR | substitute | Fortran kinds, array layout, floating-point flags, static initialization, STOP/error behavior, and formatted I/O differ | yes — target runtime/numeric baseline | Compile/run trusted `ifort` fixtures if recoverable; compare routine and CLI outputs at behavior-specific tolerances |
 | DEP-002 | .NET 8 SDK, C# compiler, and CLR | substitute | Same language/runtime mismatch as DEP-001; the merged default does not pin GNU version/flags or prove formatting/numeric behavior | yes — target runtime/numeric baseline | In a disposable copy, pin `gfortran`, clean-build/run twice, record environment and outputs, and detect compiler-dependent behavior before accepting an oracle |
-| DEP-003 | TBD: managed library API, ASP.NET endpoints, CLI compatibility layer, or native adapter | **POC: managed API + CLI adapters** | Fortran module ABI not retained (ADR-005). | yes — ADR-002, ADR-005 | Catalog + FIX-001; later CLI adapter tests |
+| DEP-003 | TBD: managed library API, ASP.NET endpoints, CLI compatibility layer, or native adapter | **POC: managed API only** | Fortran module ABI not retained (ADR-005); CLI retired from build scope (ADR-006); HTTP optional. | yes — ADR-002, ADR-005, ADR-006 | Catalog + FIX-001 at the managed port |
 | DEP-004 | `dotnet build` / MSBuild and target CI | reimplement | The merged shell entrypoint makes hidden inputs more explicit but still mutates a tracked FFT symlink, creates in-tree links/artifacts, omits CLI utilities, and depends on machine paths | yes — build/release strategy | First verify the legacy script in a disposable clean copy; target CI must then produce reproducible declared artifacts with source/version metadata and no host aliases or untracked inputs |
 | DEP-005 | MSBuild/.NET artifact generation and managed file-copy tasks | reimplement | Static archives and compiler-specific `.mod` files have no managed analogue | no — subordinate to build strategy | Clean build produces only declared artifacts; installation manifest test |
 | DEP-006 | Assembly informational version plus CI-injected source revision | substitute | Legacy metadata is mutable, checked in, and can become stale | no | Build twice from a pinned commit and assert runtime-reported revision equals source revision |
@@ -135,7 +135,9 @@ No dependency-specific CVE claim is made because exact legacy versions are not k
 
 ## 5. Blockers
 
-**POC planning (2026-08-19):** ADR-005 closes these rows for **migration planning and C# implementation defaults**. They remain relevant as characterization/risk items inside their slices (do not copy Intel/NR source; recover `func` grammar; wrap Gnuplot). They no longer block `/plan-migration`.
+**POC planning (2026-08-19):** ADR-005 closes these rows for **migration planning and C# implementation defaults**. They remain relevant as characterization/risk items inside their slices (do not copy Intel/NR source). They no longer block `/plan-migration`.
+
+**Rescoping (2026-08-19):** ADR-006 retires the CLI, which removes DEP-026 (`libmatheval`) and DEP-027 (Gnuplot) from the product entirely — no managed expression evaluator and no plotting adapter is built, so their license and threat-model concerns do not arise. ADR-008 makes DEP-012–018 (BLAS/LAPACK) the one dependency route that becomes real implementation work, at VS-3.
 
 | DEP ID | Why blocked | Affected behavior | Required decision |
 |--------|-------------|-------------------|-------------------|

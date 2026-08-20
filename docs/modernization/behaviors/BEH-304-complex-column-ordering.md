@@ -58,16 +58,16 @@ Complex values appear externally as pairs of real columns or as `(re,im)` diagno
 
 | Case | Legacy behavior | Evidence | Defect decision |
 |------|-----------------|----------|-----------------|
-| Help vs default `fftgf` output order | Help implies `(re,im)`; default write is `(im,re)` | `E2`/`E3` — `numutils/src/fftgf.f90:32,97-100` | **DEF-301** open/TBD |
-| Default `fftgf` input vs output asymmetry | Read `(Re,Im)`; write `(Im,Re)` | `E3` — `numutils/src/fftgf.f90:70-71,97-100` | **DEF-302** open/TBD |
-| `ffcmplx` `ex` flag | Documented; unused in body | `E2`/`E3` — `numutils/src/ffcmplx.f90:23-50` | **DEF-303** open/TBD |
-| `ffcmplx` `sread` argument order | `sread(fin,Gread,wm)` vs `pade`/`sreadM_RC` shape | `E3`/`E5` — `numutils/src/ffcmplx.f90:50`; `pade.f90:59` | **DEF-304** open/TBD |
-| IC vs RC column split | Integer-X `(Re,Im)`; real-X `(Im,Re)` | `E3` — `slread_sread_V.f90` / `slplot_splot_V.f90` | **DEF-305** open/TBD |
-| `txtfy` vs file/CLI writers | Diagnostic `(re,im)` vs several `(im,re)` writers | `E3` — `COMVARS.f90:275-283` | **DEF-306** open/TBD |
-| `sreadM_*` unallocated `imY` path | Source appears to use unallocated `imY` | `E3` — `src/slread_sread_M.f90:200-207` | **DEF-307** open/TBD |
-| Dual-Y formatted read duplicate `imY(2)` | Formatted branch writes `imY(2)` twice instead of `reY(2)` | `E3` — `src/slread_sread_M.f90:195,87` | **DEF-307** open/TBD |
-| `fftgf` unused `STRIDE` | Parsed; not applied in body | `E3`/`E5` — `numutils/src/fftgf.f90:46,56` | **DEF-312** open/TBD |
-| `tau2iw` help vs two-column read | Help claims real input; reader takes two columns | `E2`/`E3` — `fftgf.f90:32-33,70-71` | **DEF-313** open/TBD |
+| Help vs default `fftgf` output order | Help implies `(re,im)`; default write is `(im,re)` | `E2`/`E3` — `numutils/src/fftgf.f90:32,97-100` | **DEF-301** retired w/ evidence (ADR-006) |
+| Default `fftgf` input vs output asymmetry | Read `(Re,Im)`; write `(Im,Re)` | `E3` — `numutils/src/fftgf.f90:70-71,97-100` | **DEF-302** retired w/ evidence (ADR-006) |
+| `ffcmplx` `ex` flag | Documented; unused in body | `E2`/`E3` — `numutils/src/ffcmplx.f90:23-50` | **DEF-303** retired w/ evidence (ADR-006) |
+| `ffcmplx` `sread` argument order | `sread(fin,Gread,wm)` vs `pade`/`sreadM_RC` shape | `E3`/`E5` — `numutils/src/ffcmplx.f90:50`; `pade.f90:59` | **DEF-304** retired w/ evidence (ADR-007) |
+| IC vs RC column split | Integer-X `(Re,Im)`; real-X `(Im,Re)` | `E3` — `slread_sread_V.f90` / `slplot_splot_V.f90` | **DEF-305** retired w/ evidence (ADR-007) |
+| `txtfy` vs file/CLI writers | Diagnostic `(re,im)` vs several `(im,re)` writers | `E3` — `COMVARS.f90:275-283` | **DEF-306** retired w/ evidence (ADR-007) |
+| `sreadM_*` unallocated `imY` path | Source appears to use unallocated `imY` | `E3` — `src/slread_sread_M.f90:200-207` | **DEF-307** retired w/ evidence (ADR-007) |
+| Dual-Y formatted read duplicate `imY(2)` | Formatted branch writes `imY(2)` twice instead of `reY(2)` | `E3` — `src/slread_sread_M.f90:195,87` | **DEF-307** retired w/ evidence (ADR-007) |
+| `fftgf` unused `STRIDE` | Parsed; not applied in body | `E3`/`E5` — `numutils/src/fftgf.f90:46,56` | **DEF-312** retired w/ evidence (ADR-006) |
+| `tau2iw` help vs two-column read | Help claims real input; reader takes two columns | `E2`/`E3` — `fftgf.f90:32-33,70-71` | **DEF-313** retired w/ evidence (ADR-006) |
 | Missing/`ffcmplx` not in default build | Source exists; omitted from `all` | `E3`/`E5` — `numutils/src/Makefile:8,24-26` | TBD (scope; see DEF-303/304) |
 
 ## 7. Draft Gherkin
@@ -113,7 +113,9 @@ And any help-text contradiction is treated as an unresolved tension until a defe
 
 - Intent ledger: `docs/modernization/intent-ledger.md`
 - Legacy flow: `docs/modernization/flows/BEH-304-fftgf-complex-column-io.md`
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-301–307, DEF-312–313 (all open/TBD)
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-301–307, DEF-312–313 (all **retired with evidence** per ADR-006/007; recorded, unresolved, and outside the product boundary)
+
+**Scope note (2026-08-19):** ADR-007 makes external complex-column order an adapter concern with no legacy-fidelity requirement, and ADR-006 retires the `fftgf`/`ffcmplx` programs. This file is retained as **legacy characterization** — it documents what the legacy system did and is the evidence behind the retired rows. In-memory complex component pairing remains a domain contract under BEH-301.
 - Related gaps: GAP-013, GAP-007
 - Related behavior: BEH-303
 

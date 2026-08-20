@@ -198,7 +198,7 @@ Implications are evidence for Migration Strategist / Architect — **no target d
 |-------------|-------------------|----------|
 | Each retained surface needs a **named** complex-column codec; a global `(Re,Im)` or `(Im,Re)` default would change some observables | GAP-013; future ADR external data contracts; REQ/DOMAIN for BEH-304 | `E2`/`E3` — this flow §§3.1–3.5; `translation-gaps.md` GAP-013 |
 | `fftgf` list-directed two-column stream is a CLI text boundary separate from HTTP/DTO mapping | GAP-007, GAP-020 | `E3` — `fftgf.f90:70-71,93-113` |
-| Help-vs-writer and unused-`ex` contradictions need owner dispositions before implementation may “fix” or “preserve” | `defect-ledger.md` DEF-301–304, DEF-312–313 (open/TBD); assessment §1/§9 complex-column stop | `E2`/`E3` — BEH-304 tensions; ASSESSMENT complex-column conflict |
+| Help-vs-writer and unused-`ex` contradictions are **retired with evidence**, not dispositioned — no implementation may describe them as fixed | `defect-ledger.md` DEF-301–304, DEF-312–313 (retired, ADR-006/007) | `E2`/`E3` — BEH-304 tensions; ASSESSMENT complex-column conflict |
 | Abs/phase `ffcmplx` egress is not a complex-column writer; risk is mis-parsed input complex | GAP-013, GAP-019 | `E3` — `ffcmplx.f90:50-55` |
 | Diagnostic `txtfy` `(re,im)` must not be assumed equal to file/CLI column order | GAP-013; BEH-303 adjacency | `E3` — `COMVARS.f90:275-283` vs `splotV_RC` |
 | Ordering of *pairs* is column semantics (GAP-013), distinct from sort/eigenpair ordering (GAP-014) | GAP-014 only if consumers sort complex keys | `E4` inferred separation — do not conflate without evidence |
@@ -214,7 +214,9 @@ Implications are evidence for Migration Strategist / Architect — **no target d
 - Translation gaps: `docs/modernization/translation-gaps.md` — GAP-007, GAP-013, GAP-014 (ordering family, not pair-swap), GAP-020, GAP-026
 - Oracle: `docs/modernization/oracle.md` (CLI/`fftgf` outside scoped T1; complex-column fixtures still open)
 - Assessment stop: `docs/modernization/ASSESSMENT.md` §9 complex-column conflict
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-301–307, DEF-312–313 (all open/TBD); contradictions in §5 map to those IDs
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-301–307, DEF-312–313 (all **retired with evidence**, ADR-006/007); contradictions in §5 map to those IDs
+
+**Scope note (2026-08-19):** `fftgf` is retired from build scope (ADR-006) and external complex-column order is an adapter concern (ADR-007). This flow is retained as **legacy characterization** and as the evidence behind the retired rows. It does not describe target behavior.
 
 ### Tensions / conflicts
 

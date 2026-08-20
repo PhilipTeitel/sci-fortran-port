@@ -62,9 +62,17 @@ For **BEH-001** only:
 
 ---
 
+## Later amendment (2026-08-19)
+
+The decision line "text/locale/complex-column codecs are out of scope for this managed-API slice" was written scoped to BEH-001. **ADR-007 generalizes it library-wide**: with `IOTOOLS` reclassified as a driven port with adapters, no retained surface carries a text or complex-column fidelity requirement. The numeric contract for BEH-001 is otherwise unchanged.
+
+Per-slice numeric contracts in the shape of this ADR are still required for each new vertical slice (ADR-008), notably for `MATRIX`.
+
+---
+
 ## Links
 
 - Oracle: `docs/modernization/oracle.md` CAP-20260810-LINSPACE
 - Fixture: `docs/modernization/fixtures/FIX-001-linspace-5.md`
 - Behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
-- Related: ADR-001, ADR-002
+- Related: ADR-001, ADR-002; generalized by ADR-007; slice scope per ADR-008

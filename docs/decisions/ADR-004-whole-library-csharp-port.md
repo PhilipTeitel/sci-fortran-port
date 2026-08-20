@@ -60,6 +60,14 @@ The owner has now corrected that purpose: the project must port the Fortran libr
 
 `/plan-migration` produced `docs/modernization/migration-plan.md` (SL-001–SL-025). Next command is `/refine-feature` on BEH-001.
 
+## Second amendment (2026-08-19)
+
+This ADR's **authorization** of the whole retained library stands: no module is forbidden, and the reserve remains available. What changed is **planned work**.
+
+- **ADR-008** narrows the build to representative vertical slices, because the objective is demonstrating that Artifact-Driven Development extends to migration, not shipping a SciFortran replacement. Decision 1's "usable C# that reproduces accepted legacy behavior" holds for the slices built; it is no longer a claim about the library as a whole.
+- **ADR-006** retires the CLI programs referenced in decision 2 from build scope.
+- Decision 6's `/plan-migration` output is superseded in sequencing by ADR-008.
+
 ## Links
 
 - Assessment: `docs/modernization/ASSESSMENT.md` Conditions 1–11

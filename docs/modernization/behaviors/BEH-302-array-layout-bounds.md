@@ -97,7 +97,9 @@ And routines that declare bounds such as -N:N or 0:L expose those bounds in thei
 
 - Intent ledger: `docs/modernization/intent-ledger.md`
 - Legacy flow: `docs/modernization/flows/` (none yet; candidate for `/trace-flow` on `fftgf` bounds)
-- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-312 (`fftgf` unused `STRIDE`, open/TBD)
+- Defect ledger: `docs/modernization/defect-ledger.md` — DEF-312 (`fftgf` unused `STRIDE`, **retired with evidence**, ADR-006)
+
+**Scope note (2026-08-19):** this contract **remains binding on the domain** under ADR-007. Index base, shape, and non-default lower bounds are part of the call contract, and they are load-bearing for VS-3, where Fortran column-major and leading-dimension conventions meet C# defaults.
 - Related gaps: GAP-005, GAP-014
 
 ### Tensions / conflicts
