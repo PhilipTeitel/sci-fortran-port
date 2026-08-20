@@ -28,7 +28,7 @@ Reserve and evidence-only rows carry no story and no schedule. Their presence he
 
 | ID | Job | Legacy surface | Status | Evidence | Next ADD command |
 |----|-----|----------------|--------|----------|------------------|
-| BEH-001 | Inclusive linear sequence | `TOOLS.linspace` | **Built (VS-1)** — recovered; requirements refined (`REQ-001` Draft) | FIX-001 exact parsed `0,0.25,0.5,0.75,1` | `/design-application` |
+| BEH-001 | Inclusive linear sequence | `TOOLS.linspace` | **Built (VS-1)** — recovered; `REQ-001` Draft; design Proposed (ADR-009/010) | FIX-001 exact parsed `0,0.25,0.5,0.75,1` | `/plan-project` |
 | BEH-002 | Logarithmic sequence | `TOOLS.logspace` | Reserve; T1 characterized | `CAP-20260810-LOGSPACE` SHA-256 `c5b198af…`; parsed values not retained | none scheduled |
 | BEH-003 | Fermi function | `FUNCTIONS.fermi` | **Built (VS-2)** — T1 characterized, fixture not yet recovered | `CAP-20260810-FERMI` SHA-256 `6f35eadc…` | `/document-legacy` |
 | BEH-004 | Numerical derivative | `TOOLS.deriv` | Optional (VS-4); T1 characterized | `CAP-20260810-DERIV` SHA-256 `8a8879bc…`; input `numutils/test/xy2.data` | `/document-legacy` if added |
@@ -109,9 +109,10 @@ See `docs/modernization/migration-plan.md`. Summary: VS-1 `BEH-001` → VS-2 `BE
 
 - PURPOSE / DOMAIN: `docs/PURPOSE.md`, `docs/DOMAIN.md`
 - Oracle: `docs/modernization/oracle.md`
-- ADRs: ADR-004, ADR-005, ADR-006, ADR-007, ADR-008
+- ADRs: ADR-004, ADR-005, ADR-006, ADR-007, ADR-008, ADR-009, ADR-010
 - Recovered behavior: `docs/modernization/behaviors/BEH-001-linspace.md`
 - Requirements: `docs/requirements/REQ-001-linspace.md`
+- Design: `README.md`
 - Migration plan: `docs/modernization/migration-plan.md`
 
-*Created: 2026-08-19 | Sequenced: 2026-08-19 | ADR-005 name coverage: 2026-08-19 | Rescoped per ADR-006/007/008: 2026-08-19 | VS-1 refined: 2026-08-20 (`REQ-001`)*
+*Created: 2026-08-19 | Sequenced: 2026-08-19 | ADR-005 name coverage: 2026-08-19 | Rescoped per ADR-006/007/008: 2026-08-19 | VS-1 refined: 2026-08-20 (`REQ-001`) | VS-1 designed: 2026-08-20*
